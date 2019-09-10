@@ -5,4 +5,11 @@
 @import 'variables';
 
 // Bootstrap
-@import '~bootstrap/scss/bootstrap';
+@import '../../node_modules/bootstrap/dist/css/bootstrap.css';
+
+// Bulma
+@import '../../node_modules/bulma/bulma.sass';
+
+.tab-content {
+   padding-top: 20px;
+}

@@ -7,7 +7,15 @@
 require('./bootstrap');
 
 window.Vue = require('vue');
+import Categories from './components/CategoriesComponent.vue';
 
+// import VeeValidate from 'vee-validate';
+// import { ValidationProvider, extend } from 'vee-validate';
+
+// // Vue.use(VeeValidate);
+// import { required, email } from 'vee-validate/dist/rules';
+// extend('required', required);
+// extend('email', email);
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue
@@ -21,6 +29,7 @@ window.Vue = require('vue');
 
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 
+// Vue.component('ValidationProvider', ValidationProvider);
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
@@ -28,5 +37,25 @@ Vue.component('example-component', require('./components/ExampleComponent.vue').
  */
 
 const app = new Vue({
-    el: '#app',
+   el: '#app',
+   components: {
+      Categories,
+   },
+   data() {
+      return {
+         form: {
+            successMsg: null,
+            errorMsg: null
+         }
+      }
+   },
+   methods: {
+      newCategoryAdded: function(category) {
+         this.form.successMsg = 'Category added successfully';
+         setTimeout(() => this.form.successMsg = null, 2000);
+      },
+      resetForm: function() {
+         this.form.successMsg = this.form.errorMsg = null;
+      }
+   }
 });

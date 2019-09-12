@@ -1772,17 +1772,70 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
- // Vue.use(VeeValidate);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
-Object(vee_validate__WEBPACK_IMPORTED_MODULE_0__["extend"])('required', vee_validate_dist_rules__WEBPACK_IMPORTED_MODULE_1__["required"]);
-Object(vee_validate__WEBPACK_IMPORTED_MODULE_0__["extend"])('email', vee_validate_dist_rules__WEBPACK_IMPORTED_MODULE_1__["email"]);
-Object(vee_validate__WEBPACK_IMPORTED_MODULE_0__["extend"])('max', vee_validate_dist_rules__WEBPACK_IMPORTED_MODULE_1__["max"]);
-Object(vee_validate__WEBPACK_IMPORTED_MODULE_0__["extend"])('alpha_dash', vee_validate_dist_rules__WEBPACK_IMPORTED_MODULE_1__["alpha_dash"]);
+Object(vee_validate__WEBPACK_IMPORTED_MODULE_0__["extend"])("required", vee_validate_dist_rules__WEBPACK_IMPORTED_MODULE_1__["required"]);
+Object(vee_validate__WEBPACK_IMPORTED_MODULE_0__["extend"])("email", vee_validate_dist_rules__WEBPACK_IMPORTED_MODULE_1__["email"]);
+Object(vee_validate__WEBPACK_IMPORTED_MODULE_0__["extend"])("max", vee_validate_dist_rules__WEBPACK_IMPORTED_MODULE_1__["max"]);
+Object(vee_validate__WEBPACK_IMPORTED_MODULE_0__["extend"])("alpha_dash", vee_validate_dist_rules__WEBPACK_IMPORTED_MODULE_1__["alpha_dash"]);
 var httpConfig = {
   create: {
-    method: 'post',
-    url: '/categories'
+    method: "post",
+    url: "/categories",
+    responseType: "json"
+  },
+  get: {
+    method: "get",
+    url: "/categories",
+    responseType: "json"
+  },
+  "delete": {
+    url: "/categories/{category_id}",
+    params: {
+      data: {
+        _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+      }
+    }
   }
 };
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -1792,36 +1845,64 @@ var httpConfig = {
   },
   data: function data() {
     return {
-      name: null,
-      categoryCode: null,
+      categories: [],
       form: {
-        message: null
-      }
+        name: null,
+        categoryCode: null
+      },
+      serverResponse: {}
     };
+  },
+  mounted: function mounted() {
+    var _this = this;
+
+    axios(httpConfig.get).then(function (_ref) {
+      var data = _ref.data;
+
+      if (data.length) {
+        _this.categories = data;
+      }
+    });
   },
   computed: {
     postData: function postData() {
       return {
-        name: this.name,
-        category_code: this.categoryCode,
-        _token: document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        name: this.form.name,
+        category_code: this.form.categoryCode.toLowerCase(),
+        _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
       };
     }
   },
   methods: {
     createCategory: function createCategory() {
-      console.log(this.postData);
+      httpConfig.create.data = this.postData;
       var vm = this;
-      axios[httpConfig.create.method](httpConfig.create.url, this.postData).then(function (response) {
+      axios(httpConfig.create).then(function (response) {
         var data = response.data;
+        vm.$emit("category-added", data);
+      });
+      this.resetForm();
+    },
+    deleteCategory: function deleteCategory(categoryId) {
+      var _this2 = this;
 
-        if (data.success) {
-          vm.$emit('category-added', data.data);
-          vm.name = vm.categoryCode = null;
+      axios["delete"](httpConfig["delete"].url.replace('{category_id}', categoryId), httpConfig["delete"].params).then(function (response) {
+        _this2.serverResponse = response;
+        console.log(_this2.serverResponse);
+
+        if (response.data.success === true) {
+          _this2.categories = _this2.categories.filter(function (category) {
+            return category.id !== categoryId;
+          });
         }
 
-        console.log(response);
+        _this2.$emit('category-deleted', _this2.serverResponse);
       });
+    },
+    resetForm: function resetForm() {
+      for (var key in this.form) {
+        this.form[key] = null;
+      }
     }
   }
 });
@@ -37177,7 +37258,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "required_if", function() { return required_if; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "size", function() { return size; });
 /**
-  * vee-validate v3.0.3
+  * vee-validate v3.0.5
   * (c) 2019 Abdelrahman Awad
   * @license MIT
   */
@@ -37878,7 +37959,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js");
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vue__WEBPACK_IMPORTED_MODULE_0__);
 /**
-  * vee-validate v3.0.3
+  * vee-validate v3.0.5
   * (c) 2019 Abdelrahman Awad
   * @license MIT
   */
@@ -37945,6 +38026,14 @@ function __generator(thisArg, body) {
         } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
+}
+
+function __spreadArrays() {
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+            r[k] = a[j];
+    return r;
 }
 
 var isNaN = function (value) {
@@ -38172,7 +38261,7 @@ function findIndex(arrayLike, predicate) {
     }
     /* istanbul ignore next */
     for (var i = 0; i < array.length; i++) {
-        if (predicate(array[i])) {
+        if (predicate(array[i], i)) {
             return i;
         }
     }
@@ -38268,6 +38357,19 @@ var RuleContainer = /** @class */ (function () {
         }
         return definition.params.some(function (param) { return !!param.isTarget; });
     };
+    RuleContainer.getTargetParamNames = function (rule, params) {
+        var definition = RuleContainer.getRuleDefinition(rule);
+        if (Array.isArray(params)) {
+            return params.filter(function (_, idx) {
+                return definition.params && find(definition.params, function (p, i) { return !!p.isTarget && i === idx; });
+            });
+        }
+        return Object.keys(params)
+            .filter(function (key) {
+            return definition.params && find(definition.params, function (p) { return !!p.isTarget && p.name === key; });
+        })
+            .map(function (key) { return params[key]; });
+    };
     RuleContainer.getRuleDefinition = function (ruleName) {
         return RULES[ruleName];
     };
@@ -38322,7 +38424,7 @@ var DEFAULT_CONFIG = {
 var currentConfig = __assign({}, DEFAULT_CONFIG);
 var getConfig = function () { return currentConfig; };
 var setConfig = function (newConf) {
-    currentConfig = __assign({}, currentConfig, newConf);
+    currentConfig = __assign(__assign({}, currentConfig), newConf);
 };
 var configure = function (cfg) {
     setConfig(cfg);
@@ -38523,7 +38625,7 @@ function _test(field, value, rule) {
  * Generates error messages.
  */
 function _generateFieldError(field, value, ruleSchema, ruleName, params, data) {
-    var values = __assign({}, (params || {}), (data || {}), { _field_: field.name, _value_: value, _rule_: ruleName });
+    var values = __assign(__assign(__assign({}, (params || {})), (data || {})), { _field_: field.name, _value_: value, _rule_: ruleName });
     if (ruleSchema.message) {
         return {
             msg: _normalizeMessage(ruleSchema.message, field.name, values),
@@ -38539,7 +38641,7 @@ function _normalizeMessage(template, field, values) {
     if (typeof template === 'function') {
         return template(field, values);
     }
-    return interpolate(template, __assign({}, values, { _field_: field }));
+    return interpolate(template, __assign(__assign({}, values), { _field_: field }));
 }
 function _buildParams(provided, defined, crossTable) {
     var params = {};
@@ -38664,7 +38766,7 @@ var Dictionary = /** @class */ (function () {
     Dictionary.prototype.format = function (locale, field, rule, values) {
         var message;
         // find if specific message for that field was specified.
-        var dict = this.container[locale].fields && this.container[locale].fields[field];
+        var dict = this.container[locale] && this.container[locale].fields && this.container[locale].fields[field];
         if (dict && dict[rule]) {
             message = dict[rule];
         }
@@ -38677,10 +38779,16 @@ var Dictionary = /** @class */ (function () {
         if (this._hasName(locale, field)) {
             field = this.getName(locale, field);
         }
-        return isCallable(message) ? message(field, values) : interpolate(message, __assign({}, values, { _field_: field }));
+        return isCallable(message) ? message(field, values) : interpolate(message, __assign(__assign({}, values), { _field_: field }));
     };
     Dictionary.prototype.merge = function (dictionary) {
         merge(this.container, dictionary);
+    };
+    Dictionary.prototype.hasRule = function (name) {
+        var locale = this.container[this.locale];
+        if (!locale)
+            return false;
+        return !!(locale.messages && locale.messages[name]);
     };
     Dictionary.prototype.getName = function (locale, key) {
         return this.container[locale].names[key];
@@ -38699,7 +38807,17 @@ function updateRules() {
     if (INSTALLED) {
         return;
     }
-    RuleContainer.iterate(function (name) {
+    RuleContainer.iterate(function (name, schema) {
+        var _a, _b;
+        if (schema.message && !DICTIONARY.hasRule(name)) {
+            DICTIONARY.merge((_a = {},
+                _a[DICTIONARY.locale] = {
+                    messages: (_b = {},
+                        _b[name] = schema.message,
+                        _b)
+                },
+                _a));
+        }
         extend(name, {
             message: function (field, values) {
                 return DICTIONARY.resolve(field, name, values || {});
@@ -38856,6 +38974,7 @@ function addComponentNodeListener(node, eventName, handler) {
 function addVNodeListener(vnode, eventName, handler) {
     if (vnode.componentOptions) {
         addComponentNodeListener(vnode, eventName, handler);
+        return;
     }
     addNativeNodeListener(vnode, eventName, handler);
 }
@@ -38926,11 +39045,11 @@ function resolveRules(vnode) {
         return {};
     }
     var rules = {};
-    if ('required' in attrs) {
+    if ('required' in attrs && attrs.required !== false) {
         rules.required = attrs.type === 'checkbox' ? [true] : true;
     }
     if (isTextInput(vnode)) {
-        return normalizeRules(__assign({}, rules, resolveTextualRules(vnode)));
+        return normalizeRules(__assign(__assign({}, rules), resolveTextualRules(vnode)));
     }
     return normalizeRules(rules);
 }
@@ -38950,7 +39069,7 @@ function shouldValidate(ctx, model) {
         return true;
     }
     // when the value changes for whatever reason.
-    if (ctx.value !== model.value) {
+    if (ctx.value !== model.value && ctx.normalizedEvents.length) {
         return true;
     }
     // when it needs validation due to props/cross-fields changes.
@@ -38964,7 +39083,7 @@ function shouldValidate(ctx, model) {
     return false;
 }
 function createValidationCtx(ctx) {
-    return __assign({}, ctx.flags, { errors: ctx.messages, classes: ctx.classes, failedRules: ctx.failedRules, reset: function () { return ctx.reset(); }, validate: function () {
+    return __assign(__assign({}, ctx.flags), { errors: ctx.messages, classes: ctx.classes, failedRules: ctx.failedRules, reset: function () { return ctx.reset(); }, validate: function () {
             var args = [];
             for (var _i = 0; _i < arguments.length; _i++) {
                 args[_i] = arguments[_i];
@@ -39084,10 +39203,7 @@ var ValidationProvider = vue__WEBPACK_IMPORTED_MODULE_0___default.a.extend({
     props: {
         vid: {
             type: String,
-            default: function () {
-                PROVIDER_COUNTER++;
-                return "_vee_" + PROVIDER_COUNTER;
-            }
+            default: ''
         },
         name: {
             type: String,
@@ -39150,11 +39266,14 @@ var ValidationProvider = vue__WEBPACK_IMPORTED_MODULE_0___default.a.extend({
             var _this = this;
             return Object.keys(this.normalizedRules)
                 .filter(RuleContainer.isTargetRule)
-                .map(function (rule) {
-                var depName = _this.normalizedRules[rule][0];
-                watchCrossFieldDep(_this, depName);
-                return depName;
-            });
+                .reduce(function (acc, rule) {
+                var deps = RuleContainer.getTargetParamNames(rule, _this.normalizedRules[rule]);
+                acc.push.apply(acc, deps);
+                deps.forEach(function (depName) {
+                    watchCrossFieldDep(_this, depName);
+                });
+                return acc;
+            }, []);
         },
         normalizedEvents: function () {
             var _this = this;
@@ -39167,7 +39286,7 @@ var ValidationProvider = vue__WEBPACK_IMPORTED_MODULE_0___default.a.extend({
             });
         },
         isRequired: function () {
-            var rules = __assign({}, this._resolvedRules, this.normalizedRules);
+            var rules = __assign(__assign({}, this._resolvedRules), this.normalizedRules);
             var forceRequired = this.forceRequired;
             var isRequired = Object.keys(rules).some(RuleContainer.isRequireRule) || forceRequired;
             this.flags.required = !!isRequired;
@@ -39188,21 +39307,21 @@ var ValidationProvider = vue__WEBPACK_IMPORTED_MODULE_0___default.a.extend({
         var children = normalizeChildren(this, ctx);
         // Handle single-root slot.
         extractVNodes(children).forEach(function (input) {
-            _this._resolvedRules = resolveRules(input);
+            _this._resolvedRules = getConfig().useConstraintAttrs ? resolveRules(input) : {};
             addListeners(_this, input);
         });
         return this.slim && children.length <= 1 ? children[0] : h(this.tag, children);
     },
     beforeDestroy: function () {
         // cleanup reference.
-        this.$_veeObserver.unsubscribe(this);
+        this.$_veeObserver.unsubscribe(this.id);
     },
     activated: function () {
         this.$_veeObserver.subscribe(this);
         this.isDeactivated = false;
     },
     deactivated: function () {
-        this.$_veeObserver.unsubscribe(this);
+        this.$_veeObserver.unsubscribe(this.id);
         this.isDeactivated = true;
     },
     methods: {
@@ -39222,6 +39341,7 @@ var ValidationProvider = vue__WEBPACK_IMPORTED_MODULE_0___default.a.extend({
             this.initialValue = this.value;
             var flags = createFlags();
             this.setFlags(flags);
+            this.validateSilent();
         },
         validate: function () {
             var args = [];
@@ -39252,7 +39372,7 @@ var ValidationProvider = vue__WEBPACK_IMPORTED_MODULE_0___default.a.extend({
                     switch (_a.label) {
                         case 0:
                             this.setFlags({ pending: true });
-                            rules = __assign({}, this._resolvedRules, this.normalizedRules);
+                            rules = __assign(__assign({}, this._resolvedRules), this.normalizedRules);
                             Object.defineProperty(rules, '_$$isNormalized', {
                                 value: true,
                                 writable: false,
@@ -39269,9 +39389,7 @@ var ValidationProvider = vue__WEBPACK_IMPORTED_MODULE_0___default.a.extend({
                         case 1:
                             result = _a.sent();
                             this.setFlags({ pending: false });
-                            if (!this.isRequired) {
-                                this.setFlags({ valid: result.valid, invalid: !result.valid });
-                            }
+                            this.setFlags({ valid: result.valid, invalid: !result.valid });
                             return [2 /*return*/, result];
                     }
                 });
@@ -39307,32 +39425,41 @@ function createValuesLookup(vm) {
         return acc;
     }, reduced);
 }
-function updateRenderingContextRefs(vm) {
-    // IDs should not be nullable.
-    if (isNullOrUndefined(vm.id) && vm.id === vm.vid) {
-        vm.id = "" + PROVIDER_COUNTER;
-        PROVIDER_COUNTER++;
+function extractId(vm) {
+    if (vm.vid) {
+        return vm.vid;
     }
-    var id = vm.id, vid = vm.vid;
+    if (vm.name) {
+        return vm.name;
+    }
+    if (vm.id) {
+        return vm.id;
+    }
+    PROVIDER_COUNTER++;
+    return "_vee_" + PROVIDER_COUNTER;
+}
+function updateRenderingContextRefs(vm) {
+    var providedId = extractId(vm);
+    var id = vm.id;
     // Nothing has changed.
-    if (vm.isDeactivated || (id === vid && vm.$_veeObserver.refs[id])) {
+    if (vm.isDeactivated || (id === providedId && vm.$_veeObserver.refs[id])) {
         return;
     }
     // vid was changed.
-    if (id !== vid && vm.$_veeObserver.refs[id] === vm) {
-        vm.$_veeObserver.unsubscribe({ vid: id });
+    if (id !== providedId && vm.$_veeObserver.refs[id] === vm) {
+        vm.$_veeObserver.unsubscribe(id);
     }
+    vm.id = providedId;
     vm.$_veeObserver.subscribe(vm);
-    vm.id = vid;
 }
 function createObserver() {
     return {
         refs: {},
-        subscribe: function (ctx) {
-            this.refs[ctx.vid] = ctx;
+        subscribe: function (vm) {
+            this.refs[vm.id] = vm;
         },
-        unsubscribe: function (ctx) {
-            delete this.refs[ctx.vid];
+        unsubscribe: function (id) {
+            delete this.refs[id];
         }
     };
 }
@@ -39365,7 +39492,8 @@ var flagMergingStrategy = {
     valid: 'every',
     invalid: 'some',
     pending: 'some',
-    validated: 'every'
+    validated: 'every',
+    changed: 'some'
 };
 function mergeFlags(lhs, rhs, strategy) {
     var stratName = flagMergingStrategy[strategy];
@@ -39379,6 +39507,7 @@ function data$1() {
     // FIXME: Not sure of this one can be typed, circular type reference.
     var observers = [];
     return {
+        id: '',
         refs: refs,
         refsByName: refsByName,
         observers: observers,
@@ -39445,7 +39574,7 @@ var ValidationObserver = vue__WEBPACK_IMPORTED_MODULE_0___default.a.extend({
                 },
                 reset: function () { return _this.reset(); }
             };
-            return values(this.refs).concat(Object.keys(this.inactiveRefs).map(function (key) {
+            return __spreadArrays(values(this.refs), Object.keys(this.inactiveRefs).map(function (key) {
                 return {
                     vid: key,
                     flags: _this.inactiveRefs[key].flags,
@@ -39460,7 +39589,7 @@ var ValidationObserver = vue__WEBPACK_IMPORTED_MODULE_0___default.a.extend({
                     }
                     acc[flag] = mergeFlags(acc[flag], flags[flag], flag);
                 });
-                acc.errors[provider.vid] =
+                acc.errors[provider.id] =
                     provider.messages ||
                         values(provider.ctx.errors).reduce(function (errs, obsErrors) {
                             return errs.concat(obsErrors);
@@ -39470,6 +39599,7 @@ var ValidationObserver = vue__WEBPACK_IMPORTED_MODULE_0___default.a.extend({
         }
     },
     created: function () {
+        this.id = this.vid;
         if (this.$_veeObserver) {
             this.$_veeObserver.subscribe(this, 'observer');
         }
@@ -39481,12 +39611,12 @@ var ValidationObserver = vue__WEBPACK_IMPORTED_MODULE_0___default.a.extend({
     },
     deactivated: function () {
         if (this.$_veeObserver) {
-            this.$_veeObserver.unsubscribe(this, 'observer');
+            this.$_veeObserver.unsubscribe(this.id, 'observer');
         }
     },
     beforeDestroy: function () {
         if (this.$_veeObserver) {
-            this.$_veeObserver.unsubscribe(this, 'observer');
+            this.$_veeObserver.unsubscribe(this.id, 'observer');
         }
     },
     render: function (h) {
@@ -39501,19 +39631,19 @@ var ValidationObserver = vue__WEBPACK_IMPORTED_MODULE_0___default.a.extend({
                 this.observers.push(subscriber);
                 return;
             }
-            this.refs = __assign({}, this.refs, (_a = {}, _a[subscriber.vid] = subscriber, _a));
-            this.refsByName = __assign({}, this.refsByName, (_b = {}, _b[subscriber.name] = subscriber, _b));
+            this.refs = __assign(__assign({}, this.refs), (_a = {}, _a[subscriber.id] = subscriber, _a));
+            this.refsByName = __assign(__assign({}, this.refsByName), (_b = {}, _b[subscriber.name] = subscriber, _b));
             if (subscriber.persist) {
                 this.restoreProviderState(subscriber);
             }
         },
-        unsubscribe: function (_a, kind) {
-            var vid = _a.vid, name = _a.name;
+        unsubscribe: function (id, kind) {
             if (kind === void 0) { kind = 'provider'; }
             if (kind === 'provider') {
-                this.removeProvider({ vid: vid, name: name });
+                this.removeProvider(id);
+                return;
             }
-            var idx = findIndex(this.observers, function (o) { return o.vid === vid; });
+            var idx = findIndex(this.observers, function (o) { return o.id === id; });
             if (idx !== -1) {
                 this.observers.splice(idx, 1);
             }
@@ -39524,9 +39654,9 @@ var ValidationObserver = vue__WEBPACK_IMPORTED_MODULE_0___default.a.extend({
                 var results;
                 return __generator(this, function (_c) {
                     switch (_c.label) {
-                        case 0: return [4 /*yield*/, Promise.all(values(this.refs)
+                        case 0: return [4 /*yield*/, Promise.all(__spreadArrays(values(this.refs)
                                 .filter(function (r) { return !r.disabled; })
-                                .map(function (ref) { return ref[silent ? 'validateSilent' : 'validate']().then(function (r) { return r.valid; }); }).concat(this.observers.filter(function (o) { return !o.disabled; }).map(function (obs) { return obs.validate({ silent: silent }); })))];
+                                .map(function (ref) { return ref[silent ? 'validateSilent' : 'validate']().then(function (r) { return r.valid; }); }), this.observers.filter(function (o) { return !o.disabled; }).map(function (obs) { return obs.validate({ silent: silent }); })))];
                         case 1:
                             results = _c.sent();
                             return [2 /*return*/, results.every(function (r) { return r; })];
@@ -39539,38 +39669,40 @@ var ValidationObserver = vue__WEBPACK_IMPORTED_MODULE_0___default.a.extend({
             Object.keys(this.inactiveRefs).forEach(function (key) {
                 _this.$delete(_this.inactiveRefs, key);
             });
-            return values(this.refs).concat(this.observers).forEach(function (ref) { return ref.reset(); });
+            return __spreadArrays(values(this.refs), this.observers).forEach(function (ref) { return ref.reset(); });
         },
         restoreProviderState: function (provider) {
-            var id = provider.vid.indexOf('_vee_') === 0 ? provider.name : provider.vid;
-            var state = this.inactiveRefs[id || provider.vid];
+            var id = provider.id;
+            var state = this.inactiveRefs[id];
             if (!state) {
                 return;
             }
             provider.setFlags(state.flags);
             provider.applyResult(state);
-            this.$delete(this.inactiveRefs, provider.vid);
+            this.$delete(this.inactiveRefs, provider.id);
         },
-        removeProvider: function (_a) {
-            var vid = _a.vid, name = _a.name;
-            var provider = this.refs[vid];
-            // save it for the next time.
-            if (provider && provider.persist) {
-                var id = vid.indexOf('_vee_') === 0 ? name : vid;
+        removeProvider: function (id) {
+            var provider = this.refs[id];
+            if (!provider) {
+                // FIXME: inactive refs are not being cleaned up.
+                return;
+            }
+            if (provider.persist) {
                 /* istanbul ignore next */
                 if (true) {
-                    if (vid.indexOf('_vee_') === 0 && !name) {
+                    if (id.indexOf('_vee_') === 0) {
                         warn('Please provide a `vid` or a `name` prop when using `persist`, there might be unexpected issues otherwise.');
                     }
                 }
-                this.inactiveRefs[id || vid] = {
+                // save it for the next time.
+                this.inactiveRefs[id] = {
                     flags: provider.flags,
                     errors: provider.messages,
                     failedRules: provider.failedRules
                 };
             }
-            this.$delete(this.refs, vid);
-            this.$delete(this.refsByName, name);
+            this.$delete(this.refs, id);
+            this.$delete(this.refsByName, provider.name);
         },
         setErrors: function (errors) {
             var _this = this;
@@ -39615,7 +39747,7 @@ function withValidation(component, mapProps) {
         // Props are any attrs not associated with ValidationProvider Plus the model prop.
         // WARNING: Accidental prop overwrite will probably happen.
         var prop = (findModelConfig(this.$vnode) || { prop: 'value' }).prop;
-        var props = __assign({}, this.$attrs, (_a = {}, _a[prop] = model && model.value, _a), mapProps(vctx));
+        var props = __assign(__assign(__assign({}, this.$attrs), (_a = {}, _a[prop] = model && model.value, _a)), mapProps(vctx));
         return h(options, {
             attrs: this.$attrs,
             props: props,
@@ -39625,7 +39757,7 @@ function withValidation(component, mapProps) {
     return hoc;
 }
 
-var version = '3.0.3';
+var version = '3.0.5';
 
 
 
@@ -39702,26 +39834,30 @@ var render = function() {
                                               {
                                                 name: "model",
                                                 rawName: "v-model",
-                                                value: _vm.name,
-                                                expression: "name"
+                                                value: _vm.form.name,
+                                                expression: "form.name"
                                               }
                                             ],
                                             staticClass: "input",
                                             class: {
                                               "is-danger":
-                                                _vm.name && errors.length
+                                                _vm.form.name && errors.length
                                             },
                                             attrs: {
                                               type: "text",
                                               name: "name"
                                             },
-                                            domProps: { value: _vm.name },
+                                            domProps: { value: _vm.form.name },
                                             on: {
                                               input: function($event) {
                                                 if ($event.target.composing) {
                                                   return
                                                 }
-                                                _vm.name = $event.target.value
+                                                _vm.$set(
+                                                  _vm.form,
+                                                  "name",
+                                                  $event.target.value
+                                                )
                                               }
                                             }
                                           }),
@@ -39734,9 +39870,10 @@ var render = function() {
                                                   name: "show",
                                                   rawName: "v-show",
                                                   value:
-                                                    _vm.name && _vm.name.length,
+                                                    _vm.form.name &&
+                                                    _vm.form.name.length,
                                                   expression:
-                                                    "name && name.length"
+                                                    "form.name && form.name.length"
                                                 }
                                               ],
                                               staticClass: "has-text-danger"
@@ -39793,14 +39930,14 @@ var render = function() {
                                               {
                                                 name: "model",
                                                 rawName: "v-model",
-                                                value: _vm.categoryCode,
-                                                expression: "categoryCode"
+                                                value: _vm.form.categoryCode,
+                                                expression: "form.categoryCode"
                                               }
                                             ],
                                             staticClass: "input",
                                             class: {
                                               "is-danger":
-                                                _vm.categoryCode &&
+                                                _vm.form.categoryCode &&
                                                 errors.length
                                             },
                                             attrs: {
@@ -39809,15 +39946,18 @@ var render = function() {
                                               name: "category_code"
                                             },
                                             domProps: {
-                                              value: _vm.categoryCode
+                                              value: _vm.form.categoryCode
                                             },
                                             on: {
                                               input: function($event) {
                                                 if ($event.target.composing) {
                                                   return
                                                 }
-                                                _vm.categoryCode =
+                                                _vm.$set(
+                                                  _vm.form,
+                                                  "categoryCode",
                                                   $event.target.value
+                                                )
                                               }
                                             }
                                           }),
@@ -39830,10 +39970,11 @@ var render = function() {
                                                   name: "show",
                                                   rawName: "v-show",
                                                   value:
-                                                    _vm.categoryCode &&
-                                                    _vm.categoryCode.length,
+                                                    _vm.form.categoryCode &&
+                                                    _vm.form.categoryCode
+                                                      .length,
                                                   expression:
-                                                    "categoryCode && categoryCode.length"
+                                                    "form.categoryCode && form.categoryCode.length"
                                                 }
                                               ],
                                               staticClass: "has-text-danger"
@@ -39872,7 +40013,7 @@ var render = function() {
                                     observerSlotProp.pristine
                                 }
                               },
-                              [_vm._v("Create\n                     ")]
+                              [_vm._v("Create")]
                             )
                           ])
                         ])
@@ -39884,12 +40025,80 @@ var render = function() {
             }
           }
         ])
-      })
+      }),
+      _vm._v(" "),
+      _vm._m(0),
+      _vm._v(" "),
+      _c("div", { staticClass: "columns" }, [
+        _c("div", { staticClass: "column" }, [
+          _c("table", { staticClass: "table is-bordered is-hoverable" }, [
+            _vm._m(1),
+            _vm._v(" "),
+            _c(
+              "tbody",
+              _vm._l(_vm.categories, function(category) {
+                return _c("tr", { key: category.id }, [
+                  _c("td", { staticClass: "has-text-centered" }, [
+                    _vm._v(_vm._s(category.name))
+                  ]),
+                  _vm._v(" "),
+                  _c("td", { staticClass: "has-text-centered" }, [
+                    _vm._v(_vm._s(category.category_code))
+                  ]),
+                  _vm._v(" "),
+                  _c("td", { staticClass: "has-text-centered" }, [
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-primary",
+                        on: {
+                          click: function($event) {
+                            return _vm.deleteCategory(category.id)
+                          }
+                        }
+                      },
+                      [_vm._v("Delete")]
+                    )
+                  ])
+                ])
+              }),
+              0
+            )
+          ])
+        ])
+      ])
     ],
     1
   )
 }
-var staticRenderFns = []
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "columns" }, [
+      _c("div", { staticClass: "column has-text-centered" }, [
+        _c("h4", { staticClass: "title is-4" }, [_vm._v("All Categories")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", [
+        _c("th", { staticClass: "has-text-centered" }, [_vm._v("Name")]),
+        _vm._v(" "),
+        _c("th", { staticClass: "has-text-centered" }, [
+          _vm._v("Category code")
+        ]),
+        _vm._v(" "),
+        _c("th", { staticClass: "has-text-centered" }, [_vm._v("Action")])
+      ])
+    ])
+  }
+]
 render._withStripped = true
 
 
@@ -52136,13 +52345,21 @@ var app = new Vue({
     };
   },
   methods: {
-    newCategoryAdded: function newCategoryAdded(category) {
+    newCategoryAdded: function newCategoryAdded(responseData) {
       var _this = this;
 
-      this.form.successMsg = 'Category added successfully';
+      if (responseData.success === true) {
+        this.form.successMsg = 'Category added successfully';
+      } else {
+        this.form.errorMsg = responseData.msg;
+      }
+
       setTimeout(function () {
-        return _this.form.successMsg = null;
+        return _this.resetForm();
       }, 2000);
+    },
+    categoryDeleted: function categoryDeleted(serverResponse) {
+      serverResponse.data.success ? this.form.successMsg = 'Category removed successfully' : this.form.errorMsg = 'Unable to delelte category';
     },
     resetForm: function resetForm() {
       this.form.successMsg = this.form.errorMsg = null;
@@ -52366,8 +52583,8 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! E:\xampp\htdocs\myProjects\birdboard\resources\js\app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! E:\xampp\htdocs\myProjects\birdboard\resources\sass\app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! C:\xampp\htdocs\vue_laravel\birdboard\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! C:\xampp\htdocs\vue_laravel\birdboard\resources\sass\app.scss */"./resources/sass/app.scss");
 
 
 /***/ })

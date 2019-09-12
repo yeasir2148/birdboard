@@ -50,9 +50,17 @@ const app = new Vue({
       }
    },
    methods: {
-      newCategoryAdded: function(category) {
-         this.form.successMsg = 'Category added successfully';
-         setTimeout(() => this.form.successMsg = null, 2000);
+      newCategoryAdded: function(responseData) {
+         if(responseData.success === true) {
+            this.form.successMsg = 'Category added successfully';
+         } else {
+            this.form.errorMsg = responseData.msg;
+         }
+
+         setTimeout(() => this.resetForm(), 2000);
+      },
+      categoryDeleted: function(serverResponse) {
+         (serverResponse.data.success) ? this.form.successMsg = 'Category removed successfully' : this.form.errorMsg ='Unable to delelte category';
       },
       resetForm: function() {
          this.form.successMsg = this.form.errorMsg = null;

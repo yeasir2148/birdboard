@@ -22,6 +22,7 @@ Route::get('/projects/{project}','ProjectsController@show');
 
 Route::get('categories','CategoriesController@index');
 Route::post('/categories','CategoriesController@store');
+Route::delete('/categories/{category}','CategoriesController@destroy');
 
 Auth::routes();
 

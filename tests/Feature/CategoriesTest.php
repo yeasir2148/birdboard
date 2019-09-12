@@ -10,10 +10,10 @@ class CategoriesTest extends TestCase
 {
    use RefreshDatabase;
 
-   protected function setUp(): void {
-      parent::setUp();
-      $this->withoutExceptionHandling();
-   }
+   // protected function setUp(): void {
+   //    parent::setUp();
+   //    $this->withoutExceptionHandling();
+   // }
    /** @test */
    public function a_user_can_create_a_category()
    {
@@ -38,11 +38,19 @@ class CategoriesTest extends TestCase
    }
 
    /** @test */
-   public function a_user_can_view_categories() {
-      $category = factory('App\Category')->create();
-      $this->get('/categories')->assertSee($category->name);
+   public function fetching_categories_from_db_gets_all_categories() {
+      $category = factory('App\Category',3)->create();
+      $data = $this->get('/categories')->decodeResponseJson();
+      $this->assertEquals(count($category), count($data));
+      // dd($response);
    }
    
-    
-    
+   /** @test */
+   public function a_user_can_remove_a_category()
+   {
+      // $this->withExceptionHandling();
+      $category = factory('App\Category')->create();
+      $this->delete('categories/'.$category->id);
+      $this->assertDatabaseMissing('categories',['id' => $category->id]);
+   }    
 }

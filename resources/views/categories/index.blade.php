@@ -28,38 +28,9 @@
 					</div>
 					<div class="columns">
 						<div class="column">
-							<categories @category-added="newCategoryAdded"></categories>
+							<categories @category-added="newCategoryAdded" @category-deleted="categoryDeleted"></categories>
 						</div>
 					</div>
-
-					<div class="columns">
-						<div class="column has-text-centered">
-							<h4 class="title is-4">All Categories</h4>
-						</div>
-					</div>
-
-					<div class="columns">
-						<div class="column">
-							<table class="table is-bordered is-hoverable">
-								<thead>
-									<tr>
-										<th class="has-text-centered">Name</th>
-										<th class="has-text-centered">Action</th>
-									</tr>
-								</thead>
-
-								<tbody>
-									@foreach($categories as $category)
-									<tr>
-										<td class="has-text-centered">{{ $category->name }}</td>
-										<td class="has-text-centered"><span class="btn btn-primary">Edit</span></td>
-									</tr>
-									@endforeach
-								</tbody>
-							</table>
-						</div>
-					</div>
-
 				</div>
 				<div class="tab-pane fade" id="subcategory_content" role="tabpanel" aria-labelledby="profile-tab">Profile Content
 				</div>

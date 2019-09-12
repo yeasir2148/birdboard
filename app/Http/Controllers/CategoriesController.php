@@ -7,102 +7,107 @@ use Illuminate\Http\Request;
 
 class CategoriesController extends Controller
 {
-    public function __construct()
-    {
+   public function __construct()
+   {
         // $this->middleware('auth');
-    }
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        $categories = Category::all();
-        // dd($categories);
-        return view('categories.index', compact('categories'));
-    }
+   }
+   /**
+    * Display a listing of the resource.
+    *
+    * @return \Illuminate\Http\Response
+    */
+   public function index()
+   {
+      $categories = Category::all();
+      if(request()->ajax() || App()->runningUnitTests()) {
+         return response()->json($categories);
+      }
+      // dd(App()->runningUnitTests());
+      return view('categories.index', compact('categories'));
+   }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
+   /**
+    * Show the form for creating a new resource.
+    *
+    * @return \Illuminate\Http\Response
+    */
+   public function create()
+   {
         //
-    }
+   }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        $response = [];
-        $validatedAttr = $request->validate([
-            'name' => 'required',
-            'category_code' => 'required'
-        ]);
-        $newCategory = Category::firstOrCreate(
-            ['category_code' => $validatedAttr['category_code']],
-            ['name' => $validatedAttr['name']]);
+   /**
+    * Store a newly created resource in storage.
+    *
+    * @param  \Illuminate\Http\Request  $request
+    * @return \Illuminate\Http\Response
+    */
+   public function store(Request $request)
+   {
+      $response = [];
+      $validatedAttr = $request->validate([
+         'name' => 'required',
+         'category_code' => 'required'
+      ]);
+      $newCategory = Category::firstOrCreate(
+         ['category_code' => $validatedAttr['category_code']],
+         ['name' => $validatedAttr['name']]
+      );
 
-        if($newCategory->wasRecentlyCreated !== true) {
-            $response['success'] = false;
-            $response['msg'] = 'Record already exists';
-        } else {
-            $response['success'] = true;
-            $response['data'] = $newCategory;
-        }
+      if ($newCategory->wasRecentlyCreated !== true) {
+         $response['success'] = false;
+         $response['msg'] = 'Record already exists';
+      } else {
+         $response['success'] = true;
+         $response['data'] = $newCategory;
+      }
 
-        return json_encode($response);
-    }
+      return json_encode($response);
+   }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Category  $category
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Category $category)
-    {
-        
-    }
+   /**
+    * Display the specified resource.
+    *
+    * @param  \App\Category  $category
+    * @return \Illuminate\Http\Response
+    */
+   public function show(Category $category)
+   {
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Category  $category
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Category $category)
-    {
+   }
+
+   /**
+    * Show the form for editing the specified resource.
+    *
+    * @param  \App\Category  $category
+    * @return \Illuminate\Http\Response
+    */
+   public function edit(Category $category)
+   {
         //
-    }
+   }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Category  $category
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Category $category)
-    {
+   /**
+    * Update the specified resource in storage.
+    *
+    * @param  \Illuminate\Http\Request  $request
+    * @param  \App\Category  $category
+    * @return \Illuminate\Http\Response
+    */
+   public function update(Request $request, Category $category)
+   {
         //
-    }
+   }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Category  $category
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Category $category)
-    {
-        //
-    }
+   /**
+    * Remove the specified resource from storage.
+    *
+    * @param  \App\Category  $category
+    * @return \Illuminate\Http\Response
+    */
+   public function destroy(Category $category)
+   {
+      $success = $category->delete();
+      return response()->json(['success' => $success]);
+   }
 }

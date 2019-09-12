@@ -6,8 +6,9 @@ use App\Category;
 use Faker\Generator as Faker;
 
 $factory->define('App\Category', function (Faker $faker) {
+   $name = $faker->word;
     return [
-        'name' => $faker->word,
-        'category_code' => $faker->word
+        'name' => $name,
+        'category_code' => strtolower($name)
     ];
 });

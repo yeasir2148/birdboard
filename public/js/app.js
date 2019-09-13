@@ -1875,28 +1875,35 @@ var httpConfig = {
   },
   methods: {
     createCategory: function createCategory() {
+      var _this2 = this;
+
       httpConfig.create.data = this.postData;
       var vm = this;
       axios(httpConfig.create).then(function (response) {
         var data = response.data;
-        vm.$emit("category-added", data);
+
+        if (data.success === true) {
+          _this2.categories.push(data.data);
+        }
+
+        _this2.$emit("category-added", data);
       });
       this.resetForm();
     },
     deleteCategory: function deleteCategory(categoryId) {
-      var _this2 = this;
+      var _this3 = this;
 
       axios["delete"](httpConfig["delete"].url.replace('{category_id}', categoryId), httpConfig["delete"].params).then(function (response) {
-        _this2.serverResponse = response;
-        console.log(_this2.serverResponse);
+        _this3.serverResponse = response;
+        console.log(_this3.serverResponse);
 
         if (response.data.success === true) {
-          _this2.categories = _this2.categories.filter(function (category) {
+          _this3.categories = _this3.categories.filter(function (category) {
             return category.id !== categoryId;
           });
         }
 
-        _this2.$emit('category-deleted', _this2.serverResponse);
+        _this3.$emit('category-deleted', _this3.serverResponse);
       });
     },
     resetForm: function resetForm() {

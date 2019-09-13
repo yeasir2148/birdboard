@@ -174,9 +174,12 @@ export default {
       createCategory: function() {
          httpConfig.create.data = this.postData;
          var vm = this;
-         axios(httpConfig.create).then(function(response) {
+         axios(httpConfig.create).then((response) => {
             let data = response.data;
-            vm.$emit("category-added", data);
+            if(data.success === true) {
+               this.categories.push(data.data);
+            }
+            this.$emit("category-added", data);
          });
 
          this.resetForm();

@@ -1,7 +1,7 @@
 <template>
    <div>
       <ValidationObserver v-slot="observerSlotProp" @submit.prevent="createCategory">
-         <form method="post" action="/categories">
+         <form method="post" action="/categories" id="createCategoryForm">
             <div class="field is-horizontal">
                <div class="field-label is-normal">
                   <label for="category_name" class="label">Category Name</label>
@@ -39,7 +39,7 @@
                   <div class="field">
                      <div class="control">
                         <validation-provider
-                           name="cateory-code"
+                           name="category-code"
                            rules="required|max:30|alpha_dash"
                            v-slot="{ errors }"
                         >
@@ -134,7 +134,7 @@ const httpConfig = {
       url: "/categories/{category_id}",
       params: {
          data: {
-           _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+            // _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
          }
       }         
    }
@@ -148,13 +148,14 @@ export default {
             name: null,
             categoryCode: null
          },
-         serverResponse: {}
+         serverResponseData: {}
       };
    },
 
    mounted: function() {
       axios(httpConfig.get)
       .then(({ data }) => {
+         console.log(111111111);
          if(data.length) {
             this.categories = data;
          }
@@ -166,36 +167,52 @@ export default {
          return {
             name: this.form.name,
             category_code: this.form.categoryCode.toLowerCase(),
-            _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+            // _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
          };
       }
    },
    methods: {
-      createCategory: function() {
+      createCategory: async function() {
          httpConfig.create.data = this.postData;
          var vm = this;
-         axios(httpConfig.create).then((response) => {
-            let data = response.data;
-            if(data.success === true) {
-               this.categories.push(data.data);
-            }
-            this.$emit("category-added", data);
-         });
-
-         this.resetForm();
+         await axios(httpConfig.create)
+            .then((response) => {
+               this.serverResponseData = response.data;
+               if(this.serverResponseData.success === true) {
+                  this.categories.push(this.serverResponseData.data);
+               }               
+            })
+            .catch(errorResponse => {
+               this.serverResponseData = {
+                  success: false,
+                  msg: errorResponse.message
+               };
+            })
+            .finally(() => {
+               this.$emit("category-added", this.serverResponseData);
+               this.resetForm();
+            });         
       },
 
       deleteCategory: function(categoryId) {
          axios.delete(httpConfig.delete.url.replace('{category_id}', categoryId), httpConfig.delete.params)
          .then( response => {
-            this.serverResponse = response;
-            console.log(this.serverResponse);
+            this.serverResponseData = response.data;
+
             if(response.data.success === true) {
                this.categories = this.categories.filter(category => {
                   return category.id !== categoryId;
                });
             }
-            this.$emit('category-deleted', this.serverResponse);
+         })
+         .catch(errorResponse => {
+            this.serverResponseData = {
+               success: false,
+               msg: errorResponse.message
+            };
+         })
+         .finally(() => {
+            this.$emit('category-deleted', this.serverResponseData);
          });
       },
 

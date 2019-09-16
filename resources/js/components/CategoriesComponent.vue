@@ -112,75 +112,100 @@
 
 
 <script>
-import { ValidationObserver, ValidationProvider, extend } from "vee-validate";
-import { required, email, max, alpha_dash } from "vee-validate/dist/rules";
-extend("required", required);
-extend("email", email);
-extend("max", max);
-extend("alpha_dash", alpha_dash);
+   import { ValidationObserver, ValidationProvider, extend } from "vee-validate";
+   import { required, email, max, alpha_dash } from "vee-validate/dist/rules";
+   extend("required", required);
+   extend("email", email);
+   extend("max", max);
+   extend("alpha_dash", alpha_dash);
 
-const httpConfig = {
-   create: {
-      method: "post",
-      url: "/categories",
-      responseType: "json"
-   },
-   get: {
-      method: "get",
-      url: "/categories",
-      responseType: "json"
-   },
-   delete: {
-      url: "/categories/{category_id}",
-      params: {
-         data: {
-            // _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
-         }
-      }         
-   }
-};
-export default {
-   components: { ValidationObserver, ValidationProvider },
-   data() {
-      return {
-         categories:[],
-         form: {
-            name: null,
-            categoryCode: null
-         },
-         serverResponseData: {}
-      };
-   },
-
-   mounted: function() {
-      axios(httpConfig.get)
-      .then(({ data }) => {
-         console.log(111111111);
-         if(data.length) {
-            this.categories = data;
-         }
-      });
-   },
-
-   computed: {
-      postData: function() {
-         return {
-            name: this.form.name,
-            category_code: this.form.categoryCode.toLowerCase(),
-            // _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
-         };
+   const httpConfig = {
+      create: {
+         method: "post",
+         url: "/categories",
+         responseType: "json"
+      },
+      get: {
+         method: "get",
+         url: "/categories",
+         responseType: "json"
+      },
+      delete: {
+         url: "/categories/{category_id}",
+         params: {
+            data: {
+               // _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+            }
+         }         
       }
-   },
-   methods: {
-      createCategory: async function() {
-         httpConfig.create.data = this.postData;
-         var vm = this;
-         await axios(httpConfig.create)
-            .then((response) => {
+   };
+   export default {
+      components: { ValidationObserver, ValidationProvider },
+         data() {
+            return {
+               categories:[],
+               form: {
+                  name: null,
+                  categoryCode: null
+               },
+               serverResponseData: {}
+            };
+         },
+
+      mounted: function() {
+         axios(httpConfig.get)
+         .then(({ data }) => {
+            // console.log(111111111);
+            if(data.length) {
+               this.categories = data;
+            }
+         });
+      },
+
+      computed: {
+         postData: function() {
+            return {
+               name: this.form.name,
+               category_code: this.form.categoryCode.toLowerCase(),
+               // _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+            };
+         }
+      },
+      methods: {
+         createCategory: async function() {
+            httpConfig.create.data = this.postData;
+            var vm = this;
+            console.log('inititing axios calll..........................');
+            await axios(httpConfig.create)
+               .then((response) => {
+                  console.log('Received responses ----------------');
+                  this.serverResponseData = response.data;
+                  if(this.serverResponseData.success === true) {
+                     this.categories.push(this.serverResponseData.data);
+                  }               
+               })
+               .catch(errorResponse => {
+                  this.serverResponseData = {
+                     success: false,
+                     msg: errorResponse.message
+                  };
+               })
+               .finally(() => {
+                  this.$emit("category-added", this.serverResponseData);
+                  this.resetForm();
+               });         
+         },
+
+         deleteCategory: function(categoryId) {
+            axios.delete(httpConfig.delete.url.replace('{category_id}', categoryId), httpConfig.delete.params)
+            .then( response => {
                this.serverResponseData = response.data;
-               if(this.serverResponseData.success === true) {
-                  this.categories.push(this.serverResponseData.data);
-               }               
+
+               if(response.data.success === true) {
+                  this.categories = this.categories.filter(category => {
+                     return category.id !== categoryId;
+                  });
+               }
             })
             .catch(errorResponse => {
                this.serverResponseData = {
@@ -189,38 +214,15 @@ export default {
                };
             })
             .finally(() => {
-               this.$emit("category-added", this.serverResponseData);
-               this.resetForm();
-            });         
-      },
+               this.$emit('category-deleted', this.serverResponseData);
+            });
+         },
 
-      deleteCategory: function(categoryId) {
-         axios.delete(httpConfig.delete.url.replace('{category_id}', categoryId), httpConfig.delete.params)
-         .then( response => {
-            this.serverResponseData = response.data;
-
-            if(response.data.success === true) {
-               this.categories = this.categories.filter(category => {
-                  return category.id !== categoryId;
-               });
+         resetForm: function() {
+            for (var key in this.form) {
+               this.form[key] = null;
             }
-         })
-         .catch(errorResponse => {
-            this.serverResponseData = {
-               success: false,
-               msg: errorResponse.message
-            };
-         })
-         .finally(() => {
-            this.$emit('category-deleted', this.serverResponseData);
-         });
-      },
-
-      resetForm: function() {
-         for (var key in this.form) {
-            this.form[key] = null;
          }
       }
-   }
-};
+   };
 </script>

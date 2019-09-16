@@ -1877,8 +1877,8 @@ var httpConfig = {
 
     axios(httpConfig.get).then(function (_ref) {
       var data = _ref.data;
-      console.log(111111111);
 
+      // console.log(111111111);
       if (data.length) {
         _this.categories = data;
       }
@@ -53386,8 +53386,8 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! E:\xampp\htdocs\myProjects\birdboard\resources\js\app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! E:\xampp\htdocs\myProjects\birdboard\resources\sass\app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! C:\xampp\htdocs\vue_laravel\birdboard\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! C:\xampp\htdocs\vue_laravel\birdboard\resources\sass\app.scss */"./resources/sass/app.scss");
 
 
 /***/ })

@@ -7,7 +7,7 @@ import moxios from 'moxios';
 import expect from 'expect';
 import Categories from '../../resources/js/components/CategoriesComponent.vue';
 import VeeValidate from 'vee-validate';
-import flushPromises from "flush-promises";
+// import flushPromises from "flush-promises";
 
 describe('Categories', () => {
 
@@ -24,6 +24,7 @@ describe('Categories', () => {
 
    it('renders All Categories', () => {
       wrapper = shallowMount(Categories, { sync: false });
+      const vm = wrapper.vm
       expect(wrapper.html()).toContain('Category');
       wrapper.destroy();
    });
@@ -42,7 +43,6 @@ describe('Categories', () => {
 
    it('it fetches categogies upon being mounted', function (done) {
       wrapper = shallowMount(Categories, { sync: false });
-      // console.log(22222222);
 
       moxios.stubRequest('/categories', {
          status: 200,
@@ -54,20 +54,16 @@ describe('Categories', () => {
             }
          ],
       }, 2000);
-      // let wrapper1 = shallowMount(Categories);
+
       moxios.wait(() => {
-         // console.log(33333);
          expect(wrapper.vm.categories.length).toBe(1);
          expect(wrapper.html()).toContain('Fish');
-         // console.log(wrapper.text());
          done();
       });
-      // wrapper.destroy();
    });
 
    it('calls an api on create button click', function (done) {
-      let wrapper1 = mount(Categories, { sync: true });
-
+      const wrapper1 = mount(Categories);
       moxios.stubRequest('/categories', {
          status: 200,
          response: {
@@ -81,17 +77,15 @@ describe('Categories', () => {
       });
 
       wrapper1.find('input[name="name"]').setValue('Meat');
-      wrapper1.find('input[name="category_code"]').setValue('Meat');
+      wrapper1.find('input[name="category_code"]').setValue('meat');
       wrapper1.find('#createCategoryForm').trigger('submit.prevent');
 
-      // await flushPromises();
-      // expect(wrapper1.text()).toContain('New Category');
+      expect(wrapper1.vm.form.name).toBe('Meat');
+      expect(wrapper1.vm.form.categoryCode).toBe('meat');
+
       moxios.wait(() => {
          expect(wrapper1.text()).toContain('Meat');
-         // expect(wrapper1.vm.form.name).toBe('Meat');
-         wrapper1.destroy();
          done();
       });
-      // wrapper1.destroy();
    });
 });

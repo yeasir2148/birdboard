@@ -7,7 +7,6 @@ import moxios from 'moxios';
 import expect from 'expect';
 import Categories from '../../resources/js/components/CategoriesComponent.vue';
 import VeeValidate from 'vee-validate';
-// import flushPromises from "flush-promises";
 
 describe('Categories', () => {
 
@@ -42,7 +41,6 @@ describe('Categories', () => {
    });
 
    it('it fetches categogies upon being mounted', function (done) {
-      wrapper = shallowMount(Categories, { sync: false });
 
       moxios.stubRequest('/categories', {
          status: 200,
@@ -55,6 +53,10 @@ describe('Categories', () => {
          ],
       }, 2000);
 
+      wrapper = shallowMount(Categories, { sync: false });
+
+
+
       moxios.wait(() => {
          expect(wrapper.vm.categories.length).toBe(1);
          expect(wrapper.html()).toContain('Fish');
@@ -62,19 +64,20 @@ describe('Categories', () => {
       });
    });
 
-   it('calls an api on create button click', function (done) {
+   it.only('calls a post api on create button click', function (done) {
       const wrapper1 = mount(Categories);
-      moxios.stubRequest('/categories', {
-         status: 200,
-         response: {
-            success: true,
-            data: {
-               name: 'Meat',
-               category_code: 'meat',
-               id: 5
-            }
-         }
-      });
+
+      // moxios.stubRequest('/categories', {
+      //    status: 200,
+      //    response: {
+      //       success: true,
+      //       data: {
+      //          name: 'Meat',
+      //          category_code: 'meat',
+      //          id: 5
+      //       }
+      //    }
+      // });
 
       wrapper1.find('input[name="name"]').setValue('Meat');
       wrapper1.find('input[name="category_code"]').setValue('meat');
@@ -84,7 +87,25 @@ describe('Categories', () => {
       expect(wrapper1.vm.form.categoryCode).toBe('meat');
 
       moxios.wait(() => {
-         expect(wrapper1.text()).toContain('Meat');
+         // console.log((moxios.requests.mostRecent().config));
+         const request = moxios.requests.mostRecent();
+         if (request.config.method === 'post') {
+            console.log('here');
+            request.respondWith({
+               status: 200,
+               response: {
+                  success: true,
+                  data: {
+                     name: 'Meat',
+                     category_code: 'meat',
+                     id: 5
+                  }
+               }
+            });
+         }
+
+         expect(moxios.requests.mostRecent().config.method).toEqual('post');
+
          done();
       });
    });

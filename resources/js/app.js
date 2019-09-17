@@ -8,6 +8,7 @@ require('./bootstrap');
 
 window.Vue = require('vue');
 import Categories from './components/CategoriesComponent.vue';
+import Subcategories from './components/SubcategoriesComponent.vue';
 
 // import VeeValidate from 'vee-validate';
 // import { ValidationProvider, extend } from 'vee-validate';
@@ -39,7 +40,7 @@ Vue.component('example-component', require('./components/ExampleComponent.vue').
 const app = new Vue({
    el: '#app',
    components: {
-      Categories,
+      Categories, Subcategories
    },
    data() {
       return {
@@ -50,20 +51,21 @@ const app = new Vue({
       }
    },
    methods: {
-      newCategoryAdded: function (responseData) {
-         if (responseData.success === true) {
-            this.form.successMsg = 'Category added successfully';
-         } else {
-            this.form.errorMsg = responseData.msg;
-         }
+      // newCategoryAdded: function (responseData) {
+      //    if (responseData.success === true) {
+      //       this.form.successMsg = 'Category added successfully';
+      //    } else {
+      //       this.form.errorMsg = responseData.msg;
+      //    }
 
-         setTimeout(() => this.resetForm(), 2000);
-      },
-      categoryDeleted: function (serverResponse) {
-         (serverResponse.success) ? this.form.successMsg = 'Category removed successfully' : this.form.errorMsg = (serverResponse.msg);
-      },
-      resetForm: function () {
-         this.form.successMsg = this.form.errorMsg = null;
-      }
+      //    // setTimeout(() => this.resetForm(), 2000);
+      // },
+      // categoryDeleted: function (serverResponse) {
+      //    (serverResponse.success) ? this.form.successMsg = 'Category removed successfully' : this.form.errorMsg = (serverResponse.msg);
+      // },
+      // resetForm: function (component) {
+      //    console.log('called');
+      //    component.form.successMsg = component.form.errorMsg = null;
+      // }
    }
 });

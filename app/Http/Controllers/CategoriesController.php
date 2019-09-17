@@ -56,7 +56,7 @@ class CategoriesController extends Controller
 
       if ($newCategory->wasRecentlyCreated !== true) {
          $response['success'] = false;
-         $response['msg'] = 'Record already exists';
+         $response['message'] = 'Record already exists';
       } else {
          $response['success'] = true;
          $response['data'] = $newCategory;

@@ -22,17 +22,27 @@
 				<div class="tab-pane fade show active" id="category_content" role="tabpanel" aria-labelledby="home-tab">
 					<div class="columns">
 						<div class="column">
+
+						</div>
+					</div>
+					<div class="columns">
+						<div class="column">
+							<categories></categories>
+						</div>
+					</div>
+				</div>
+				<div class="tab-pane fade" id="subcategory_content" role="tabpanel" aria-labelledby="profile-tab">
+               <div class="columns">
+						<div class="column">
 							<div class="alert alert-success" v-if="form.successMsg && form.successMsg.length">@{{form.successMsg}}</div>
 							<div class="alert alert-danger" v-if="form.errorMsg && form.errorMsg.length">@{{form.errorMsg}}</div>
 						</div>
 					</div>
 					<div class="columns">
 						<div class="column">
-							<categories @category-added="newCategoryAdded" @category-deleted="categoryDeleted"></categories>
+							<subcategories @category-added="newCategoryAdded" @category-deleted="categoryDeleted"></subcategories>
 						</div>
 					</div>
-				</div>
-				<div class="tab-pane fade" id="subcategory_content" role="tabpanel" aria-labelledby="profile-tab">Profile Content
 				</div>
 				<div class="tab-pane fade" id="food_type_content" role="tabpanel" aria-labelledby="contact-tab">Contact content
 				</div>

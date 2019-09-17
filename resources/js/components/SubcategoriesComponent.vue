@@ -1,12 +1,10 @@
 <template>
    <div>
-      <div class="alert alert-success" v-if="form.successMsg && form.successMsg.length">{{form.successMsg}}</div>
-      <div class="alert alert-danger" v-if="form.errorMsg && form.errorMsg.length">{{form.errorMsg}}</div>
       <ValidationObserver v-slot="observerSlotProp" @submit.prevent="createCategory">
-         <form method="post" action="/categories" id="createCategoryForm">
+         <form method="post" action="/subcategories" id="createSubCategoryForm">
             <div class="field is-horizontal">
                <div class="field-label is-normal">
-                  <label for="category_name" class="label">Category Name</label>
+                  <label for="subcategory_name" class="label">Subcategory Name</label>
                </div>
                <div class="field-body">
                   <div class="field">
@@ -14,19 +12,18 @@
                         <validation-provider
                            name="category-name"
                            rules="required|max:30|alpha_dash"
-                           v-slot="{ errors, classes }"
-                        >
+                           v-slot="{ errors, classes }">
                            <input
                               type="text"
                               class="input"
-                              :class="{ 'is-danger': form.name && errors.length}"
+                              :class="{ 'is-danger': form.subCategoryName && errors.length}"
                               name="name"
-                              v-model="form.name"
-                           >
+                              v-model="form.subcategoryName">
                            <span
                               class="has-text-danger"
-                              v-show="form.name && form.name.length"
-                           >{{ errors[0] }}</span>
+                              v-show="form.subCategoryName && form.subCategoryName.length">
+                              {{ errors[0] }}
+                           </span>
                         </validation-provider>
                      </div>
                   </div>
@@ -35,7 +32,7 @@
 
             <div class="field is-horizontal">
                <div class="field-label is-normal">
-                  <label for="category_code" class="label">Category Code</label>
+                  <label for="subcategory_code" class="label">Subcategory Code</label>
                </div>
                <div class="field-body">
                   <div class="field">
@@ -43,20 +40,19 @@
                         <validation-provider
                            name="category-code"
                            rules="required|max:30|alpha_dash"
-                           v-slot="{ errors }"
-                        >
+                           v-slot="{ errors }">
                            <input
                               type="text"
                               class="input"
-                              :class="{'is-danger': form.categoryCode && errors.length}"
+                              :class="{'is-danger': form.subcategoryCode && errors.length}"
                               id="category_code"
                               name="category_code"
-                              v-model="form.categoryCode"
-                           >
+                              v-model="form.subcategoryCode">
                            <span
                               class="has-text-danger"
-                              v-show="form.categoryCode && form.categoryCode.length"
-                           >{{ errors[0] }}</span>
+                              v-show="form.subcategoryCode && form.subcategoryCode.length">
+                                 {{ errors[0] }}
+                           </span>
                         </validation-provider>
                      </div>
                   </div>
@@ -71,8 +67,9 @@
                         <button
                            class="button is-link"
                            type="submit"
-                           :disabled="!observerSlotProp.valid || observerSlotProp.pristine"
-                        >Create</button>
+                           :disabled="!observerSlotProp.valid || observerSlotProp.pristine">
+                              Create
+                        </button>
                      </div>
                   </div>
                </div>
@@ -82,7 +79,7 @@
 
       <div class="columns">
          <div class="column has-text-centered">
-            <h4 class="title is-4">All Categories</h4>
+            <h4 class="title is-4">All Sub</h4>
          </div>
       </div>
 
@@ -98,13 +95,13 @@
                </thead>
 
                <tbody>
-                  <tr v-for="category in categories" :key="category.id">
+                  <!-- <tr v-for="category in categories" :key="category.id">
                      <td class="has-text-centered">{{ category.name }}</td>
                      <td class="has-text-centered">{{ category.category_code }}</td>
                      <td class="has-text-centered">
                         <button class="btn btn-primary" @click="deleteCategory(category.id)">Delete</button>
                      </td>
-                  </tr>
+                  </tr> -->
                </tbody>
             </table>
          </div>
@@ -116,6 +113,7 @@
 <script>
    import { ValidationObserver, ValidationProvider, extend } from "vee-validate";
    import { required, email, max, alpha_dash } from "vee-validate/dist/rules";
+  
    extend("required", required);
    extend("email", email);
    extend("max", max);
@@ -136,7 +134,7 @@
          url: "/categories/{category_id}",
          params: {
             data: {
-               // _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+               _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
             }
          }         
       }
@@ -145,18 +143,17 @@
       components: { ValidationObserver, ValidationProvider },
          data() {
             return {
-               categories:[],
+               categories: [],
+               subCategories:[],
                form: {
-                  name: null,
-                  categoryCode: null,
-                  successMsg: null,
-                  errorMsg: null
+                  subcategoryName: null,
+                  subcategoryCode: null
                },
                serverResponseData: {}
             };
          },
 
-      mounted: function() { 
+      mounted: function() {
          axios(httpConfig.get)
          .then(({ data }) => {
             if(data.length) {
@@ -180,21 +177,22 @@
             var vm = this;
 
             axios(httpConfig.create)
-            .then((response) => {
-               this.serverResponseData = response.data;
-               if(this.serverResponseData.success === true) {
-                  this.categories.push(this.serverResponseData.data);
-                  this.form.successMsg = 'Category added successfully';
-               } else {
-                  this.form.errorMsg = this.serverResponseData.message;
-               }
-            })
-            .catch(errorResponse => {
-               this.form.errorMsg = errorResponse.message;
-            })
-            .finally(() => {
-               setTimeout(() => this.resetForm(), 2000);
-            });         
+               .then((response) => {
+                  this.serverResponseData = response.data;
+                  if(this.serverResponseData.success === true) {
+                     this.categories.push(this.serverResponseData.data);
+                  }
+               })
+               .catch(errorResponse => {
+                  this.serverResponseData = {
+                     success: false,
+                     msg: errorResponse.message
+                  };
+               })
+               .finally(() => {
+                  this.$emit("category-added", this.serverResponseData);
+                  this.resetForm();
+               });         
          },
 
          deleteCategory: function(categoryId) {
@@ -206,14 +204,16 @@
                   this.categories = this.categories.filter(category => {
                      return category.id !== categoryId;
                   });
-                  this.form.successMsg = "Category removed successfully";
                }
             })
             .catch(errorResponse => {
-               this.form.errorMsg = errorResponse.message;
+               this.serverResponseData = {
+                  success: false,
+                  msg: errorResponse.message
+               };
             })
             .finally(() => {
-               setTimeout(() => this.resetForm(), 2000);
+               this.$emit('category-deleted', this.serverResponseData);
             });
          },
 

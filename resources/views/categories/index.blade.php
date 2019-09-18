@@ -40,7 +40,7 @@
 					</div>
 					<div class="columns">
 						<div class="column">
-							<subcategories @category-added="newCategoryAdded" @category-deleted="categoryDeleted"></subcategories>
+							<subcategories></subcategories>
 						</div>
 					</div>
 				</div>

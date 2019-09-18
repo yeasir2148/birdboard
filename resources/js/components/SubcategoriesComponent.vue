@@ -1,6 +1,6 @@
 <template>
    <div>
-      <ValidationObserver v-slot="observerSlotProp" @submit.prevent="createCategory">
+      <ValidationObserver v-slot="observerSlotProp" @submit.prevent="createSuccategory">
          <form method="post" action="/subcategories" id="createSubCategoryForm">
             <div class="field is-horizontal">
                <div class="field-label is-normal">
@@ -10,18 +10,18 @@
                   <div class="field">
                      <div class="control">
                         <validation-provider
-                           name="category-name"
+                           name="subcategory-name"
                            rules="required|max:30|alpha_dash"
                            v-slot="{ errors, classes }">
                            <input
                               type="text"
                               class="input"
-                              :class="{ 'is-danger': form.subCategoryName && errors.length}"
+                              :class="{ 'is-danger': form.subcategoryName && errors.length}"
                               name="name"
                               v-model="form.subcategoryName">
                            <span
                               class="has-text-danger"
-                              v-show="form.subCategoryName && form.subCategoryName.length">
+                              v-show="form.subcategoryName && form.subcategoryName.length">
                               {{ errors[0] }}
                            </span>
                         </validation-provider>
@@ -38,7 +38,7 @@
                   <div class="field">
                      <div class="control">
                         <validation-provider
-                           name="category-code"
+                           name="subcategory-code"
                            rules="required|max:30|alpha_dash"
                            v-slot="{ errors }">
                            <input
@@ -59,6 +59,36 @@
                </div>
             </div>
 
+            <div class="field is-horizontal">
+               <div class="field-label is-normal">
+                  <label for="category_name" class="label">Category Name</label>
+               </div>
+               <div class="field-body">
+                  <div class="field">
+                     <div class="control">
+                        <validation-provider
+                           name="category"
+                           rules="required"
+                           v-slot="{ errors }">
+                           <div class="select">
+                              <select
+                                 :class="{'is-danger': form.category.id && errors.length}"
+                                 id="category"
+                                 name="category"
+                                 v-model="form.category">
+                                    <option value="">Please select category</option>
+                                    <option value="1">Meat</option>
+                                    <option value="2">Fish</option>
+                              </select>
+                              <span class="has-text-danger" v-show="form.category">
+                                 {{ errors[0] }}
+                              </span>
+                           </div>
+                        </validation-provider>
+                     </div>
+                  </div>
+               </div>
+            </div>
             <div class="field is-horizontal">
                <div class="field-label"></div>
                <div class="field-body">
@@ -122,12 +152,12 @@
    const httpConfig = {
       create: {
          method: "post",
-         url: "/categories",
+         url: "/subcategory",
          responseType: "json"
       },
-      get: {
+      getAll: {
          method: "get",
-         url: "/categories",
+         url: "/subcategories",
          responseType: "json"
       },
       delete: {
@@ -147,14 +177,15 @@
                subCategories:[],
                form: {
                   subcategoryName: null,
-                  subcategoryCode: null
+                  subcategoryCode: null,
+                  category: {}
                },
                serverResponseData: {}
             };
          },
 
       mounted: function() {
-         axios(httpConfig.get)
+         axios(httpConfig.getAll)
          .then(({ data }) => {
             if(data.length) {
                this.categories = data;
@@ -165,14 +196,15 @@
       computed: {
          postData: function() {
             return {
-               name: this.form.name,
-               category_code: this.form.categoryCode.toLowerCase(),
+               subcat_name: this.form.subcategoryName,
+               subcat_code: this.form.subcategoryCode.toLowerCase(),
+               category_id: this.form.category.id,
                // _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
             };
          }
       },
       methods: {
-         createCategory: function() {
+         createSuccategory: function() {
             httpConfig.create.data = this.postData;
             var vm = this;
 

@@ -16,11 +16,16 @@ class SubcategoriesController extends Controller
    public function index()
    {
       $subCategories = Subcategory::all();
+      $categories = Category::all();
       if(request()->ajax() || App()->runningUnitTests()) {
-         return response()->json($subCategories);
+         $data = [
+            'subcategories' => $subCategories,
+            'categories' => $categories
+         ];
+         return response()->json($data);
       }
       // dd(App()->runningUnitTests());
-      return view('subcategories.index', compact('subCategories'));
+      return view('subcategories.index', compact('data'));
    }
 
    /**
@@ -42,7 +47,10 @@ class SubcategoriesController extends Controller
    public function store(Request $request)
    {
       $maxCategoryId = Category::all('id')->max()->id;
+      // var_dump('hi');
+      // var_dump($maxCategoryId);
       // dd($maxCategoryId);
+      // var_dump($request->all());
       $validatedAttr = $request->validate([
          'subcat_name' => 'required | alpha_dash',
          'subcat_code' => 'required | alpha_dash',

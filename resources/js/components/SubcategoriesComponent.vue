@@ -72,15 +72,16 @@
                            v-slot="{ errors }">
                            <div class="select">
                               <select
-                                 :class="{'is-danger': form.category.id && errors.length}"
+                                 :class="{'is-danger': form.category && errors.length}"
                                  id="category"
                                  name="category"
-                                 v-model="form.category">
-                                    <option value="">Please select category</option>
-                                    <option value="1">Meat</option>
-                                    <option value="2">Fish</option>
+                                 v-model="form.categoryId">
+                                    <option value="" disabled>Please select category</option>
+                                    <option v-for="category in categories" :key="category.id" :value="category.id">
+                                       {{ category.name }}
+                                    </option>
                               </select>
-                              <span class="has-text-danger" v-show="form.category">
+                              <span class="has-text-danger" v-show="form.categoryId">
                                  {{ errors[0] }}
                               </span>
                            </div>
@@ -109,7 +110,7 @@
 
       <div class="columns">
          <div class="column has-text-centered">
-            <h4 class="title is-4">All Sub</h4>
+            <h4 class="title is-4">Subcategories</h4>
          </div>
       </div>
 
@@ -119,15 +120,17 @@
                <thead>
                   <tr>
                      <th class="has-text-centered">Name</th>
-                     <th class="has-text-centered">Category code</th>
+                     <th class="has-text-centered">Code</th>
+                     <th class="has-text-centered">Category Name</th>
                      <th class="has-text-centered">Action</th>
                   </tr>
                </thead>
 
                <tbody>
-                  <!-- <tr v-for="category in categories" :key="category.id">
-                     <td class="has-text-centered">{{ category.name }}</td>
-                     <td class="has-text-centered">{{ category.category_code }}</td>
+                  <!-- <tr v-for="subcat in subcategories" :key="subcat.id">
+                     <td class="has-text-centered">{{ subcat.subcat_name }}</td>
+                     <td class="has-text-centered">{{ subcat.subcat_code }}</td>
+                     <td class="has-text-centered">{{ subcat.subcat_code }}</td>
                      <td class="has-text-centered">
                         <button class="btn btn-primary" @click="deleteCategory(category.id)">Delete</button>
                      </td>
@@ -174,11 +177,11 @@
          data() {
             return {
                categories: [],
-               subCategories:[],
+               subcategories:[],
                form: {
                   subcategoryName: null,
                   subcategoryCode: null,
-                  category: {}
+                  categoryId: null
                },
                serverResponseData: {}
             };
@@ -187,8 +190,11 @@
       mounted: function() {
          axios(httpConfig.getAll)
          .then(({ data }) => {
-            if(data.length) {
-               this.categories = data;
+            // console.log(data);
+            if(data !== null && data !== 'undefined') {
+               // console.log(data);
+               this.categories = data.categories;
+               this.subcategories = data.subcategories;
             }
          });
       },
@@ -198,7 +204,7 @@
             return {
                subcat_name: this.form.subcategoryName,
                subcat_code: this.form.subcategoryCode.toLowerCase(),
-               category_id: this.form.category.id,
+               category_id: this.form.categoryId,
                // _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
             };
          }
@@ -210,6 +216,7 @@
 
             axios(httpConfig.create)
                .then((response) => {
+                  console.log(response);
                   this.serverResponseData = response.data;
                   if(this.serverResponseData.success === true) {
                      this.categories.push(this.serverResponseData.data);

@@ -51,13 +51,6 @@ const app = new Vue({
       }
    },
    methods: {
-      // newCategoryAdded: function (responseData) {
-      //    if (responseData.success === true) {
-      //       this.form.successMsg = 'Category added successfully';
-      //    } else {
-      //       this.form.errorMsg = responseData.msg;
-      //    }
-
       //    // setTimeout(() => this.resetForm(), 2000);
       // },
       // categoryDeleted: function (serverResponse) {

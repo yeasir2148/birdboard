@@ -1,6 +1,8 @@
 <template>
    <div>
-      <ValidationObserver v-slot="observerSlotProp" @submit.prevent="createSuccategory">
+      <div class="alert alert-success" v-if="form.successMsg && form.successMsg.length">{{form.successMsg}}</div>
+      <div class="alert alert-danger" v-if="form.errorMsg && form.errorMsg.length">{{form.errorMsg}}</div>
+      <ValidationObserver v-slot="observerSlotProp" @submit.prevent="createSubcategory">
          <form method="post" action="/subcategories" id="createSubCategoryForm">
             <div class="field is-horizontal">
                <div class="field-label is-normal">
@@ -127,14 +129,14 @@
                </thead>
 
                <tbody>
-                  <!-- <tr v-for="subcat in subcategories" :key="subcat.id">
+                  <tr v-for="subcat in subcategories" :key="subcat.id">
                      <td class="has-text-centered">{{ subcat.subcat_name }}</td>
                      <td class="has-text-centered">{{ subcat.subcat_code }}</td>
-                     <td class="has-text-centered">{{ subcat.subcat_code }}</td>
+                     <td class="has-text-centered">{{ subcat.category.name }}</td>
                      <td class="has-text-centered">
-                        <button class="btn btn-primary" @click="deleteCategory(category.id)">Delete</button>
+                        <button class="btn btn-primary" @click="deleteSubcategory(subcat.id)">Delete</button>
                      </td>
-                  </tr> -->
+                  </tr>
                </tbody>
             </table>
          </div>
@@ -146,6 +148,7 @@
 <script>
    import { ValidationObserver, ValidationProvider, extend } from "vee-validate";
    import { required, email, max, alpha_dash } from "vee-validate/dist/rules";
+   import { EventBus } from '../__vue_event-bus.js';
   
    extend("required", required);
    extend("email", email);
@@ -164,7 +167,7 @@
          responseType: "json"
       },
       delete: {
-         url: "/categories/{category_id}",
+         url: "/subcategory/{subcat_id}",
          params: {
             data: {
                _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
@@ -181,13 +184,19 @@
                form: {
                   subcategoryName: null,
                   subcategoryCode: null,
-                  categoryId: null
+                  categoryId: null,
+                  successMsg: null,
+                  errorMsg: null
                },
                serverResponseData: {}
             };
          },
 
       mounted: function() {
+         EventBus.$on('new-category-added', (newCategory) => {
+            this.categories.push(newCategory);
+         });
+
          axios(httpConfig.getAll)
          .then(({ data }) => {
             // console.log(data);
@@ -210,49 +219,42 @@
          }
       },
       methods: {
-         createSuccategory: function() {
+         createSubcategory: function() {
             httpConfig.create.data = this.postData;
             var vm = this;
 
             axios(httpConfig.create)
                .then((response) => {
-                  console.log(response);
                   this.serverResponseData = response.data;
                   if(this.serverResponseData.success === true) {
-                     this.categories.push(this.serverResponseData.data);
+                     this.subcategories.push(this.serverResponseData.data);
+                     this.form.successMsg = 'subcategory added successfully';
                   }
                })
-               .catch(errorResponse => {
-                  this.serverResponseData = {
-                     success: false,
-                     msg: errorResponse.message
-                  };
+               .catch(response => {
+                  this.form.errorMsg = response.data.msg;
                })
                .finally(() => {
-                  this.$emit("category-added", this.serverResponseData);
-                  this.resetForm();
-               });         
+                  setTimeout(() => this.resetForm(), 2000);
+               });
          },
 
-         deleteCategory: function(categoryId) {
-            axios.delete(httpConfig.delete.url.replace('{category_id}', categoryId), httpConfig.delete.params)
+         deleteSubcategory: function(subcategoryId) {
+            axios.delete(httpConfig.delete.url.replace('{subcat_id}', subcategoryId), httpConfig.delete.params)
             .then( response => {
                this.serverResponseData = response.data;
-
                if(response.data.success === true) {
-                  this.categories = this.categories.filter(category => {
-                     return category.id !== categoryId;
+                  this.subcategories = this.subcategories.filter(subcategory => {
+                     return subcategory.id !== subcategoryId;
                   });
+                  this.form.successMsg = 'Subcategory removed successfully.';
                }
             })
             .catch(errorResponse => {
-               this.serverResponseData = {
-                  success: false,
-                  msg: errorResponse.message
-               };
+               this.form.errorMsg = response.data.msg;
             })
             .finally(() => {
-               this.$emit('category-deleted', this.serverResponseData);
+               // this.$emit('category-deleted', this.serverResponseData);
             });
          },
 

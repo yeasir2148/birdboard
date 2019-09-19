@@ -5,6 +5,8 @@ namespace Tests\Feature;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Subcategory;
+use App\Category;
 
 class CategoriesTest extends TestCase
 {
@@ -52,5 +54,17 @@ class CategoriesTest extends TestCase
       $category = factory('App\Category')->create();
       $this->delete('categories/'.$category->id);
       $this->assertDatabaseMissing('categories',['id' => $category->id]);
-   }    
+   }
+   
+   /** @test */
+   public function a_category_has_subcategories()
+   {
+      $category = factory(Category::class)->create();
+      $subCategory = factory(Subcategory::class)->create();
+
+      // modify the category relation of the subcategory
+      $subCategory->category()->associate($category);
+      $this->assertInstanceOf(Subcategory::class, $category->subcategories->first());
+   }
+   
 }

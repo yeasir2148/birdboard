@@ -10,8 +10,9 @@ use App\Subcategory;
 
 class SubcategoriesTest extends TestCase
 {
-
    use RefreshDatabase;
+
+   private const TABLE = 'subcategories'; 
 
    protected function setUp() : void
    {
@@ -29,6 +30,15 @@ class SubcategoriesTest extends TestCase
    }
 
    /** @test */
+   public function a_user_can_remove_a_subcategory()
+   {
+      $subcat = factory(Subcategory::class)->create();
+      $this->assertDatabaseHas(self::TABLE, $subcat->getAttributes());
+      $this->delete($subcat->getCrudPath());
+      $this->assertDatabaseMissing(self::TABLE,$subcat->getAttributes());
+   }
+   
+   /** @test */
    public function it_fetches_all_subcategories_form_database()
    {
       $subcategories = factory(Subcategory::class, 2)->create();
@@ -45,6 +55,14 @@ class SubcategoriesTest extends TestCase
       $data = $this->get('/subcategories')->decodeResponseJson();
       // var_dump($data);
       $this->assertEquals(count($data['categories']), count($categories));
+   }
+
+   /** @test */
+   public function a_subcategory_has_a_category()
+   {
+      $subcat = factory(Subcategory::class)->create();
+      // $this->assertObjectHasAttribute('category', $subcat);
+      $this->assertInstanceOf(Category::class, $subcat->category);
    }
    
    

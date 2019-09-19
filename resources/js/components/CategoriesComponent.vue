@@ -116,6 +116,7 @@
 <script>
    import { ValidationObserver, ValidationProvider, extend } from "vee-validate";
    import { required, email, max, alpha_dash } from "vee-validate/dist/rules";
+   import { EventBus } from '../__vue_event-bus.js';
    extend("required", required);
    extend("email", email);
    extend("max", max);
@@ -185,6 +186,8 @@
                if(this.serverResponseData.success === true) {
                   this.categories.push(this.serverResponseData.data);
                   this.form.successMsg = 'Category added successfully';
+                  EventBus.$emit('new-category-added',this.serverResponseData.data);
+                  // this.$emit('new-category-added');
                } else {
                   this.form.errorMsg = this.serverResponseData.message;
                }

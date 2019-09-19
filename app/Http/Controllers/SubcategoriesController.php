@@ -15,7 +15,7 @@ class SubcategoriesController extends Controller
     */
    public function index()
    {
-      $subCategories = Subcategory::all();
+      $subCategories = Subcategory::with('category')->get();
       $categories = Category::all();
       if(request()->ajax() || App()->runningUnitTests()) {
          $data = [
@@ -47,17 +47,13 @@ class SubcategoriesController extends Controller
    public function store(Request $request)
    {
       $maxCategoryId = Category::all('id')->max()->id;
-      // var_dump('hi');
-      // var_dump($maxCategoryId);
-      // dd($maxCategoryId);
-      // var_dump($request->all());
+
       $validatedAttr = $request->validate([
          'subcat_name' => 'required | alpha_dash',
          'subcat_code' => 'required | alpha_dash',
          'category_id' => "required | integer | between:1,$maxCategoryId"
       ]);
 
-      // dd($validatedAttr);
       $newSubcategory = Subcategory::firstOrCreate(
          ['subcat_code' => $validatedAttr['subcat_code']],
          array_diff_key($validatedAttr, ['subcat_code' => $validatedAttr['subcat_code']])
@@ -68,7 +64,11 @@ class SubcategoriesController extends Controller
          $response['message'] = 'Record already exists';
       } else {
          $response['success'] = true;
-         $response['data'] = $newSubcategory;
+         $response['data'] = $newSubcategory->load('category');
+      }
+
+      if($this->isRequestAjaxOrTesting($request)) {
+         return response()->json($response);
       }
    }
 
@@ -112,8 +112,17 @@ class SubcategoriesController extends Controller
     * @param  \App\Subcategory  $subcategory
     * @return \Illuminate\Http\Response
     */
-   public function destroy(Subcategory $subcategory)
+   public function destroy(Request $request, Subcategory $subcategory)
    {
-        //
+      $success = $subcategory->delete();
+      if($this->isRequestAjaxOrTesting($request)) {
+         return response()->json([
+            'success' => $success
+         ]);
+      }
+   }
+
+   public function isRequestAjaxOrTesting($request) {
+      return $request->ajax() || app()->runningUnitTests();
    }
 }

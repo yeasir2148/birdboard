@@ -26,6 +26,7 @@ Route::delete('/categories/{category}','CategoriesController@destroy');
 
 Route::get('/subcategories','SubcategoriesController@index');
 Route::post('/subcategory','SubcategoriesController@store');
+Route::delete('/subcategory/{subcategory}','SubcategoriesController@destroy');
 
 Auth::routes();
 

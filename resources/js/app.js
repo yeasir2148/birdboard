@@ -9,7 +9,7 @@ require('./bootstrap');
 window.Vue = require('vue');
 import Categories from './components/CategoriesComponent.vue';
 import Subcategories from './components/SubcategoriesComponent.vue';
-
+import Items from './components/ItemsComponent.vue';
 // import VeeValidate from 'vee-validate';
 // import { ValidationProvider, extend } from 'vee-validate';
 
@@ -40,7 +40,7 @@ Vue.component('example-component', require('./components/ExampleComponent.vue').
 const app = new Vue({
    el: '#app',
    components: {
-      Categories, Subcategories
+      Categories, Subcategories, Items
    },
    data() {
       return {

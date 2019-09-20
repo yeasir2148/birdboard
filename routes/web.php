@@ -28,6 +28,9 @@ Route::get('/subcategories','SubcategoriesController@index');
 Route::post('/subcategory','SubcategoriesController@store');
 Route::delete('/subcategory/{subcategory}','SubcategoriesController@destroy');
 
+Route::get('items','ItemsController@index');
+Route::post('/item','ItemsController@store');
+
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');

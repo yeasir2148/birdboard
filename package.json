@@ -11,6 +11,7 @@
       "test": "mocha-webpack --timeout 10000 --webpack-config=node_modules/laravel-mix/setup/webpack.config.js --require tests/vue/setup.js tests/vue/**/*.spec.js"
    },
    "devDependencies": {
+      "@fortawesome/fontawesome-free": "^5.11.1",
       "@vue/test-utils": "^1.0.0-beta.29",
       "axios": "^0.18",
       "bootstrap": "^4.1.0",

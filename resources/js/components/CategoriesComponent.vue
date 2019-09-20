@@ -80,9 +80,16 @@
          </form>
       </ValidationObserver>
 
-      <div class="columns">
+      <br>
+
+      <div class="columns is-vcentered">
          <div class="column has-text-centered">
             <h4 class="title is-4">All Categories</h4>
+         </div>
+         <div class="column is-2 has-text-centered">
+            <div class="toolbar has-text-centered">
+               <span @click="fetchCategory" class="icon fas fa-sync"></span>
+            </div>            
          </div>
       </div>
 
@@ -157,13 +164,8 @@
             };
          },
 
-      mounted: function() { 
-         axios(httpConfig.get)
-         .then(({ data }) => {
-            if(data.length) {
-               this.categories = data;
-            }
-         });
+      mounted: function() {
+         this.fetchCategory();
       },
 
       computed: {
@@ -176,6 +178,14 @@
          }
       },
       methods: {
+         fetchCategory: function() {
+             axios(httpConfig.get)
+            .then(({ data }) => {
+               if(data.length) {
+                  this.categories = data;
+               }
+            });
+         },
          createCategory: function() {
             httpConfig.create.data = this.postData;
             var vm = this;
@@ -196,7 +206,7 @@
                this.form.errorMsg = errorResponse.message;
             })
             .finally(() => {
-               setTimeout(() => this.resetForm(), 2000);
+               setTimeout(() => this.resetForm(), 1000);
             });         
          },
 
@@ -229,3 +239,14 @@
       }
    };
 </script>
+
+<style lang="scss">
+   .fas.icon {
+      line-height: inherit;
+      cursor: pointer;
+      &:hover {
+         background-color: #EDE7E6;
+      }
+   }
+
+</style>

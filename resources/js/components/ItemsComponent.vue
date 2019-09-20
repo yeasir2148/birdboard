@@ -81,10 +81,10 @@
                                  v-model="form.subCategoryId">
                                     <option value="" disabled>Please select subcategory</option>
                                     <option v-for="subcat in subcategories" :key="subcat.id" :value="subcat.id">
-                                       {{ subcat.name + ' - ' + subcat.name }}
+                                       {{ subcat.subcat_name + ' - ' + subcat.category.name }}
                                     </option>
                               </select>
-                              <span class="has-text-danger" v-show="form.subCategoryId">
+                              <span class="has-text-danger" v-show="errors.length">
                                  {{ errors[0] }}
                               </span>
                            </div>
@@ -129,20 +129,20 @@
             <table class="table is-bordered is-hoverable">
                <thead>
                   <tr>
-                     <th class="has-text-centered">Name</th>
-                     <th class="has-text-centered">Code</th>
+                     <th class="has-text-centered">Item Name</th>
+                     <th class="has-text-centered">Item Code</th>
                      <th class="has-text-centered">Subcategory</th>
                      <th class="has-text-centered">Action</th>
                   </tr>
                </thead>
 
                <tbody>
-                  <tr v-for="subcat in subcategories" :key="subcat.id">
-                     <td class="has-text-centered">{{ subcat.subcat_name }}</td>
-                     <td class="has-text-centered">{{ subcat.subcat_code }}</td>
-                     <td class="has-text-centered">{{ subcat.subcat_code }}</td>
+                  <tr v-for="item in items" :key="item.id">
+                     <td class="has-text-centered">{{ item.item_name }}</td>
+                     <td class="has-text-centered">{{ item.item_code }}</td>
+                     <td class="has-text-centered">{{ item.subcategory.subcat_name }}</td>
                      <td class="has-text-centered">
-                        <button class="btn btn-primary" @click="deleteSubcategory(subcat.id)">Delete</button>
+                        <button class="btn btn-primary" @click="deleteItem(item.id)">Delete</button>
                      </td>
                   </tr>
                </tbody>
@@ -203,19 +203,15 @@ import { setTimeout } from 'timers';
          },
 
       mounted: function() {
-         // EventBus.$on('new-subcategory-added', (newCategory) => {
-         //    this.categories.push(newCategory);
-         // });
+         EventBus.$on('new-subcategory-added', (newSubcategory) => {
+            this.subcategories.push(newSubcategory);
+         });
 
-         // EventBus.$on('subcategory-deleted', deletedCategoryId => {
-         //    this.categories = this.categories.filter(category => {
-         //       return category.id != deletedCategoryId;
-         //    });
-
-         //    this.subcategories = this.subcategories.filter(subcat => {
-         //       return subcat.category.id != deletedCategoryId;
-         //    });
-         // });
+         EventBus.$on('subcategory-deleted', (deletedSubcategory) => {
+            this.subcategories = this.subcategories.filter( subcat => {
+               return subcat.id != deletedSubcategory;
+            });
+         });
 
          this.fetchItems();
       },
@@ -225,7 +221,7 @@ import { setTimeout } from 'timers';
             return {
                item_name: this.form.itemName,
                item_code: this.form.itemCode.toLowerCase(),
-               subcategory_id: this.form.subCategoryId,
+               subcat_id: this.form.subCategoryId,
                // _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
             };
          }
@@ -242,19 +238,8 @@ import { setTimeout } from 'timers';
                   this.subcategories = data.subcategories;
                }
             });
-
-
-            // axios(httpConfig.getAll)
-            // .then(({ data }) => {
-            //    // console.log(data);
-            //    if(data !== null && data !== 'undefined') {
-            //       // console.log(data);
-            //       this.categories = data.categories;
-            //       this.subcategories = data.subcategories;
-            //    }
-            // });
          },
-         createSubcategory: function() {
+         createItem: function() {
             httpConfig.create.data = this.postData;
             var vm = this;
 
@@ -262,8 +247,8 @@ import { setTimeout } from 'timers';
                .then((response) => {
                   this.serverResponseData = response.data;
                   if(this.serverResponseData.success === true) {
-                     this.subcategories.push(this.serverResponseData.data);
-                     this.form.successMsg = 'subcategory added successfully';
+                     this.items.push(this.serverResponseData.data);
+                     this.form.successMsg = 'Item added successfully';
                   }
                })
                .catch(response => {
@@ -274,15 +259,15 @@ import { setTimeout } from 'timers';
                });
          },
 
-         deleteSubcategory: function(subcategoryId) {
-            axios.delete(httpConfig.delete.url.replace('{subcat_id}', subcategoryId), httpConfig.delete.params)
+         deleteItem: function(itemId) {
+            axios.delete(httpConfig.delete.url.replace('{item_id}', itemId), httpConfig.delete.params)
             .then( response => {
                this.serverResponseData = response.data;
                if(response.data.success === true) {
-                  this.subcategories = this.subcategories.filter(subcategory => {
-                     return subcategory.id !== subcategoryId;
+                  this.items = this.items.filter(item => {
+                     return item.id !== itemId;
                   });
-                  this.form.successMsg = 'Subcategory removed successfully.';
+                  this.form.successMsg = 'Item removed successfully.';
                }
             })
             .catch(errorResponse => {

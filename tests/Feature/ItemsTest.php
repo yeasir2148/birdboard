@@ -6,6 +6,8 @@ use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Item;
+use App\Category;
+use App\Subcategory;
 
 class ItemsTest extends TestCase
 {
@@ -24,6 +26,15 @@ class ItemsTest extends TestCase
       $item = factory(Item::class)->raw();
       $this->post('/item', $item);
       $this->assertDatabaseHas('items',$item);
+   }
+
+   /** @test */
+   public function a_user_can_remove_an_item()
+   {
+      $item = factory(Item::class)->create();
+      $this->assertDatabaseHas('items', $item->getAttributes());
+      $this->delete('/item/' . $item->id);
+      $this->assertDatabaseMissing('items',$item->getAttributes());
    }
 
    /** @test */
@@ -53,6 +64,36 @@ class ItemsTest extends TestCase
       $items = factory(Item::class, 3)->create();
       $response = $this->get('/items');
       $data = $response->decodeResponseJson();
-      $this->assertEquals(count($items), count($data));
-   }   
+      // var_dump($data);
+      $this->assertEquals(count($items), count($data['items']));
+   }
+
+   /** @test */
+   public function it_fetches_all_subcategories_and_categories()
+   {
+      $items = factory(Item::class, 3)->create();  // creating items also creates subcategories in the factory
+      $subcategories = Subcategory::all();
+      $subcategories = $subcategories ?? factory(Subcategory::class, 2)->create();
+      $categories = factory(Category::class, 2)->create();
+
+      $data = $this->get('items')->decodeResponseJson();
+
+      $this->assertEquals(count($subcategories), count($data['subcategories']));
+      $this->assertEquals(count($items), count($data['categories']));
+   }
+
+   /** @test */
+   public function an_item_belongs_to_a_subcategory()
+   {
+      $this->withExceptionHandling();
+      $item = seedDb(Item::class, 1, 'create')->get(0);
+      // var_dump($item);
+      $this->assertInstanceOf(Subcategory::class, $item->subcategory);
+   }
+
+   // protected function seedDb($model, $quantity, $method) {
+   //    return factory($model, $quantity)->$method();
+   // }
+   
+   
 }

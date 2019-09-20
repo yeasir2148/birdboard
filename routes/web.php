@@ -30,6 +30,7 @@ Route::delete('/subcategory/{subcategory}','SubcategoriesController@destroy');
 
 Route::get('items','ItemsController@index');
 Route::post('/item','ItemsController@store');
+Route::delete('/item/{item}','ItemsController@destroy');
 
 Auth::routes();
 

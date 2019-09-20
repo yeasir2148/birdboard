@@ -196,7 +196,7 @@
                if(this.serverResponseData.success === true) {
                   this.categories.push(this.serverResponseData.data);
                   this.form.successMsg = 'Category added successfully';
-                  EventBus.$emit('new-category-added',this.serverResponseData.data);
+                  EventBus.$emit('new-category-added', this.serverResponseData.data);
                   // this.$emit('new-category-added');
                } else {
                   this.form.errorMsg = this.serverResponseData.message;

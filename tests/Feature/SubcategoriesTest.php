@@ -2,11 +2,12 @@
 
 namespace Tests\Feature;
 
-use App\Category;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Subcategory;
+use App\Category;
+use App\Item;
 
 class SubcategoriesTest extends TestCase
 {
@@ -58,12 +59,21 @@ class SubcategoriesTest extends TestCase
    }
 
    /** @test */
-   public function a_subcategory_has_a_category()
+   public function a_subcategory_belongs_to_a_category()
    {
       $subcat = factory(Subcategory::class)->create();
       // $this->assertObjectHasAttribute('category', $subcat);
       $this->assertInstanceOf(Category::class, $subcat->category);
    }
+
+   /** @test */
+   public function a_subcategory_has_items()
+   {
+      $item = seedDb(Item::class, 1, 'create')->get(0);
+      $subcat = $item->subcategory;
+      $this->assertInstanceOf(Subcategory::class, $subcat);
+   }
+   
    
    
 }

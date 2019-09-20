@@ -16,8 +16,8 @@ class ItemsController extends Controller
     */
    public function index()
    {
-      $items = Item::all();
-      $subcategories = Subcategory::all();
+      $items = Item::with('subcategory.category')->get();
+      $subcategories = Subcategory::with('category')->get();
       $categories = Category::all();
 
       if(isRequestAjaxOrTesting()) {
@@ -67,7 +67,7 @@ class ItemsController extends Controller
          $response['message'] = 'Record already exists';
       } else {
          $response['success'] = true;
-         $response['data'] = $newItem;
+         $response['data'] = $newItem->load('subcategory.category');
          //->load('category');
       }
 
@@ -120,6 +120,11 @@ class ItemsController extends Controller
     */
    public function destroy(Item $item)
    {
-        //
+      $success = $item->delete();
+      if(isRequestAjaxOrTesting()) {
+         return response()->json([
+            'success' => $success
+         ]);
+      }
    }
 }

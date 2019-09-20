@@ -5,3 +5,9 @@ if(!function_exists('isRequestAjaxOrTesting')) {
       return request()->ajax() || app()->runningUnitTests();
    }
 }
+
+if(!function_exists('seedDb')) {
+   function seedDb($model, $quantity, $method = 'create') {
+      return factory($model, $quantity)->$method();
+   }
+}

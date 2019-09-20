@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Item;
 
 class Subcategory extends Model
 {
@@ -12,7 +13,14 @@ class Subcategory extends Model
       return $this->belongsTo(category::class);
    }
 
+   public function items() {
+      return $this->hasMany(Item::class, 'subcat_id');
+   }
+
    public function getCrudPath() {
       return "/subcategory/{$this->id}";
    }
+
+   
+
 }

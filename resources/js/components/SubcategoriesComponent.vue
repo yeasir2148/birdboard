@@ -257,6 +257,7 @@ import { setTimeout } from 'timers';
                   this.serverResponseData = response.data;
                   if(this.serverResponseData.success === true) {
                      this.subcategories.push(this.serverResponseData.data);
+                     EventBus.$emit('new-subcategory-added', this.serverResponseData.data);
                      this.form.successMsg = 'subcategory added successfully';
                   }
                })

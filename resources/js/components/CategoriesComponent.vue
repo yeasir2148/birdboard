@@ -210,13 +210,14 @@
                      return category.id !== categoryId;
                   });
                   this.form.successMsg = "Category removed successfully";
+                  EventBus.$emit('category-deleted', categoryId);
                }
             })
             .catch(errorResponse => {
                this.form.errorMsg = errorResponse.message;
             })
             .finally(() => {
-               setTimeout(() => this.resetForm(), 2000);
+               setTimeout(() => this.resetForm(), 1000);
             });
          },
 

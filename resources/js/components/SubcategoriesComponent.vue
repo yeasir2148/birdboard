@@ -197,6 +197,16 @@
             this.categories.push(newCategory);
          });
 
+         EventBus.$on('category-deleted', deletedCategoryId => {
+            this.categories = this.categories.filter(category => {
+               return category.id != deletedCategoryId;
+            });
+
+            this.subcategories = this.subcategories.filter(subcat => {
+               return subcat.category.id != deletedCategoryId;
+            });
+         });
+
          axios(httpConfig.getAll)
          .then(({ data }) => {
             // console.log(data);

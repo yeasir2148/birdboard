@@ -9,13 +9,17 @@ use App\Category;
 
 $factory->define(Subcategory::class, function (Faker $faker) {
    $name = $faker->word;
-   $existingCategories = Category::all('id');
-   $maxCat = (count($existingCategories)) ? $existingCategories->max()->id : factory(Category::class,5)->create()->pluck('id')->max();
-   // $maxCat = Category::all('id')->max()->id;
-   // dd($allCat);
+   $existingCategories = Category::all('id')->pluck('id')->toArray();
+
+   if(empty($existingCategories)) {
+      $categoryId = factory(Category::class)->create()->id;
+   } else {
+      $index = rand(0, count($existingCategories) - 1);
+      $categoryId = $existingCategories[$index];
+   }
    return [
       'subcat_name' => $name,
       'subcat_code' => strtolower($name),
-      'category_id' => rand(1, $maxCat)
+      'category_id' => $categoryId
    ];
 });

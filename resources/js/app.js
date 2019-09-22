@@ -7,16 +7,12 @@
 require('./bootstrap');
 
 window.Vue = require('vue');
+import { EventBus } from './__vue_event-bus.js';
 import Categories from './components/CategoriesComponent.vue';
 import Subcategories from './components/SubcategoriesComponent.vue';
+// import ConfirmDelete from './components/Utility/ConfirmDeleteComponent.vue';
 import Items from './components/ItemsComponent.vue';
-// import VeeValidate from 'vee-validate';
-// import { ValidationProvider, extend } from 'vee-validate';
 
-// // Vue.use(VeeValidate);
-// import { required, email } from 'vee-validate/dist/rules';
-// extend('required', required);
-// extend('email', email);
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue
@@ -42,23 +38,64 @@ const app = new Vue({
    components: {
       Categories, Subcategories, Items
    },
-   data() {
-      return {
-         form: {
-            successMsg: null,
-            errorMsg: null
+   data: {
+      form: {
+         successMsg: null,
+         errorMsg: null
+      },
+      categories: [],
+      subcategories: [],
+      items: []
+   },
+
+   mounted: function () {
+      EventBus.$on('update-data', (entityName, data) => {
+         switch (entityName) {
+            case 'category':
+               this.categories = data;
+               break;
+            case 'subcategory':
+               this.subcategories = data;
+               break;
+            case 'item':
+               this.items = data;
+               break;
          }
-      }
+      });
+
+      EventBus.$on('new-category-added', newCategory => {
+         this.categories.push(newCategory);
+      });
    },
    methods: {
-      //    // setTimeout(() => this.resetForm(), 2000);
-      // },
-      // categoryDeleted: function (serverResponse) {
-      //    (serverResponse.success) ? this.form.successMsg = 'Category removed successfully' : this.form.errorMsg = (serverResponse.msg);
-      // },
-      // resetForm: function (component) {
-      //    console.log('called');
-      //    component.form.successMsg = component.form.errorMsg = null;
-      // }
+      categoryDeleted: function(deletedCategoryId) {
+         this.categories = this.categories.filter(category => {
+            return category.id != deletedCategoryId;
+         });
+
+         this.subcategories = this.subcategories.filter(subcat => {
+            return subcat.category.id != deletedCategoryId;
+         });
+
+         this.items = this.items.filter(item => {
+            return item.subcategory.category.id != deletedCategoryId;
+         });
+      },
+
+      subcategoryDeleted: function(deletedSubcatId) {
+         this.subcategories = this.subcategories.filter(subcat => {
+            return subcat.id != deletedSubcatId;
+         });
+
+         this.items = this.items.filter(item => {
+            return item.subcategory.id != deletedSubcatId;
+         });
+      },
+
+      itemDeleted: function(deletedItemid) {
+         this.items = this.items.filter(item => {
+            return item.id != deletedItemid;
+         });
+      }
    }
 });

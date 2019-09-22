@@ -19,6 +19,8 @@ class CreateItemsTable extends Migration
             $table->string('item_code', 30)->unique();
             $table->unsignedBigInteger('subcat_id');
             $table->timestamps();
+
+            $table->foreign('subcat_id')->references('id')->on('subcategories')->onDelete('cascade');
         });
     }
 

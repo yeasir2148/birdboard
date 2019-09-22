@@ -83,7 +83,7 @@
                                        {{ category.name }}
                                     </option>
                               </select>
-                              <span class="has-text-danger" v-show="form.categoryId">
+                              <span class="has-text-danger" v-show="errors.length">
                                  {{ errors[0] }}
                               </span>
                            </div>
@@ -185,45 +185,22 @@ import { setTimeout } from 'timers';
    };
    export default {
       components: { ValidationObserver, ValidationProvider },
-         data() {
-            return {
-               categories: [],
-               subcategories:[],
-               form: {
-                  subcategoryName: null,
-                  subcategoryCode: null,
-                  categoryId: null,
-                  successMsg: null,
-                  errorMsg: null
-               },
-               serverResponseData: {}
-            };
-         },
+      props: ['categories', 'subcategories'],
+      data() {
+         return {
+            form: {
+               subcategoryName: null,
+               subcategoryCode: null,
+               categoryId: null,
+               successMsg: null,
+               errorMsg: null
+            },
+            serverResponseData: {}
+         };
+      },
 
       mounted: function() {
-         EventBus.$on('new-category-added', (newCategory) => {
-            this.categories.push(newCategory);
-         });
-
-         EventBus.$on('category-deleted', deletedCategoryId => {
-            this.categories = this.categories.filter(category => {
-               return category.id != deletedCategoryId;
-            });
-
-            this.subcategories = this.subcategories.filter(subcat => {
-               return subcat.category.id != deletedCategoryId;
-            });
-         });
-
-         axios(httpConfig.getAll)
-         .then(({ data }) => {
-            // console.log(data);
-            if(data !== null && data !== 'undefined') {
-               // console.log(data);
-               this.categories = data.categories;
-               this.subcategories = data.subcategories;
-            }
-         });
+         this.fetchSubcategory();
       },
 
       computed: {
@@ -240,11 +217,8 @@ import { setTimeout } from 'timers';
          fetchSubcategory: function() {
             axios(httpConfig.getAll)
             .then(({ data }) => {
-               // console.log(data);
                if(data !== null && data !== 'undefined') {
-                  // console.log(data);
-                  this.categories = data.categories;
-                  this.subcategories = data.subcategories;
+                  EventBus.$emit('update-data','subcategory',data.subcategories);
                }
             });
          },
@@ -256,8 +230,7 @@ import { setTimeout } from 'timers';
                .then((response) => {
                   this.serverResponseData = response.data;
                   if(this.serverResponseData.success === true) {
-                     this.subcategories.push(this.serverResponseData.data);
-                     EventBus.$emit('new-subcategory-added', this.serverResponseData.data);
+                     this.$emit('new-subcategory-added', this.serverResponseData.data);
                      this.form.successMsg = 'subcategory added successfully';
                   }
                })
@@ -274,9 +247,7 @@ import { setTimeout } from 'timers';
             .then( response => {
                this.serverResponseData = response.data;
                if(response.data.success === true) {
-                  this.subcategories = this.subcategories.filter(subcategory => {
-                     return subcategory.id !== subcategoryId;
-                  });
+                  this.$emit('subcategory-deleted',subcategoryId);
                   this.form.successMsg = 'Subcategory removed successfully.';
                }
             })

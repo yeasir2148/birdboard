@@ -93,6 +93,7 @@
                   </div>
                </div>
             </div>
+            <br>
             <div class="field is-horizontal">
                <div class="field-label"></div>
                <div class="field-body">
@@ -186,33 +187,24 @@ import { setTimeout } from 'timers';
    };
    export default {
       components: { ValidationObserver, ValidationProvider },
-         data() {
-            return {
-               categories: [],
-               subcategories:[],
-               items: [],
-               form: {
-                  itemName: null,
-                  itemCode: null,
-                  subCategoryId: null,
-                  successMsg: null,
-                  errorMsg: null
-               },
-               serverResponseData: {}
-            };
-         },
+      props: ['categories','subcategories','items'],
+      data() {
+         return {
+            // categories: [],
+            // subcategories:[],
+            // items: [],
+            form: {
+               itemName: null,
+               itemCode: null,
+               subCategoryId: null,
+               successMsg: null,
+               errorMsg: null
+            },
+            serverResponseData: {}
+         };
+      },
 
       mounted: function() {
-         EventBus.$on('new-subcategory-added', (newSubcategory) => {
-            this.subcategories.push(newSubcategory);
-         });
-
-         EventBus.$on('subcategory-deleted', (deletedSubcategory) => {
-            this.subcategories = this.subcategories.filter( subcat => {
-               return subcat.id != deletedSubcategory;
-            });
-         });
-
          this.fetchItems();
       },
 
@@ -230,12 +222,8 @@ import { setTimeout } from 'timers';
          fetchItems: function() {
             axios(httpConfig.getAll)
             .then(({ data }) => {
-               // console.log(data);
                if(data !== null && data !== 'undefined') {
-                  // console.log(data);
-                  this.items = data.items,
-                  this.categories = data.categories;
-                  this.subcategories = data.subcategories;
+                  EventBus.$emit('update-data', 'item', data.items);
                }
             });
          },
@@ -247,7 +235,7 @@ import { setTimeout } from 'timers';
                .then((response) => {
                   this.serverResponseData = response.data;
                   if(this.serverResponseData.success === true) {
-                     this.items.push(this.serverResponseData.data);
+                     this.$emit('new-item-added', this.serverResponseData.data);
                      this.form.successMsg = 'Item added successfully';
                   }
                })
@@ -264,9 +252,7 @@ import { setTimeout } from 'timers';
             .then( response => {
                this.serverResponseData = response.data;
                if(response.data.success === true) {
-                  this.items = this.items.filter(item => {
-                     return item.id !== itemId;
-                  });
+                  this.$emit('item-deleted', itemId);
                   this.form.successMsg = 'Item removed successfully.';
                }
             })

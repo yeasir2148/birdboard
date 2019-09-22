@@ -109,12 +109,19 @@
                      <td class="has-text-centered">{{ category.name }}</td>
                      <td class="has-text-centered">{{ category.category_code }}</td>
                      <td class="has-text-centered">
-                        <button class="btn btn-primary" @click="deleteCategory(category.id)">Delete</button>
+                        <button class="btn btn-primary" @click="confirmDelete(category.id)">Delete</button>
                      </td>
                   </tr>
                </tbody>
             </table>
          </div>
+      </div>
+      <div class="columns">
+         <confirm-delete :deleteCategoryId="categoryIdToDelete">
+            <template v-slot:body>
+               Confirm Delete? All related subcategories and items will also be deleted!!
+            </template>
+         </confirm-delete>
       </div>
    </div>
 </template>
@@ -122,6 +129,7 @@
 
 <script>
    import { ValidationObserver, ValidationProvider, extend } from "vee-validate";
+   import ConfirmDelete from './Utility/ConfirmDeleteComponent.vue';
    import { required, email, max, alpha_dash } from "vee-validate/dist/rules";
    import { EventBus } from '../__vue_event-bus.js';
    extend("required", required);
@@ -150,19 +158,20 @@
       }
    };
    export default {
-      components: { ValidationObserver, ValidationProvider },
-         data() {
-            return {
-               categories:[],
-               form: {
-                  name: null,
-                  categoryCode: null,
-                  successMsg: null,
-                  errorMsg: null
-               },
-               serverResponseData: {}
-            };
-         },
+      components: { ValidationObserver, ValidationProvider, ConfirmDelete },
+      props: ['categories'],
+      data() {
+         return {
+            form: {
+               name: null,
+               categoryCode: null,
+               successMsg: null,
+               errorMsg: null
+            },
+            serverResponseData: {},
+            categoryIdToDelete: null
+         };
+      },
 
       mounted: function() {
          this.fetchCategory();
@@ -182,9 +191,9 @@
              axios(httpConfig.get)
             .then(({ data }) => {
                if(data.length) {
-                  this.categories = data;
+                  EventBus.$emit('update-data','category',data);
                }
-            });
+            });            
          },
          createCategory: function() {
             httpConfig.create.data = this.postData;
@@ -194,10 +203,8 @@
             .then((response) => {
                this.serverResponseData = response.data;
                if(this.serverResponseData.success === true) {
-                  this.categories.push(this.serverResponseData.data);
                   this.form.successMsg = 'Category added successfully';
-                  EventBus.$emit('new-category-added', this.serverResponseData.data);
-                  // this.$emit('new-category-added');
+                  this.$emit('new-category-added', this.serverResponseData.data);
                } else {
                   this.form.errorMsg = this.serverResponseData.message;
                }
@@ -210,23 +217,27 @@
             });         
          },
 
+         confirmDelete: function(categoryId) {
+            this.categoryIdToDelete = categoryId;
+            $("#confirmDelete").modal({
+               backdrop: 'static'
+            });
+         },
+
          deleteCategory: function(categoryId) {
             axios.delete(httpConfig.delete.url.replace('{category_id}', categoryId), httpConfig.delete.params)
             .then( response => {
                this.serverResponseData = response.data;
-
                if(response.data.success === true) {
-                  this.categories = this.categories.filter(category => {
-                     return category.id !== categoryId;
-                  });
                   this.form.successMsg = "Category removed successfully";
-                  EventBus.$emit('category-deleted', categoryId);
+                  this.$emit('category-deleted', categoryId);
                }
             })
             .catch(errorResponse => {
                this.form.errorMsg = errorResponse.message;
             })
             .finally(() => {
+               $("#confirmDelete").modal('hide');
                setTimeout(() => this.resetForm(), 1000);
             });
          },

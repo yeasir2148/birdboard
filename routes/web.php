@@ -24,7 +24,7 @@ Route::post('/projects', 'ProjectsController@store');
 Route::get('/projects', 'ProjectsController@index');
 Route::get('/projects/{project}','ProjectsController@show');
 
-Route::get('categories','CategoriesController@index');
+Route::get('/categories','CategoriesController@index')->name('inventory');
 Route::post('/categories','CategoriesController@store');
 Route::delete('/categories/{category}','CategoriesController@destroy');
 
@@ -35,6 +35,10 @@ Route::delete('/subcategory/{subcategory}','SubcategoriesController@destroy');
 Route::get('items','ItemsController@index');
 Route::post('/item','ItemsController@store');
 Route::delete('/item/{item}','ItemsController@destroy');
+
+Route::get('stores','StoresController@index');
+Route::post('/store','StoresController@store');
+Route::delete('/store/{store}','StoresController@destroy');
 
 Auth::routes();
 

@@ -5,18 +5,22 @@
 	<div class="columns">
 		<div class="column is-three-fifths">
 			<ul class="nav nav-tabs" id="categories_tab" role="tablist">
-					<li class="nav-item">
-						<a class="nav-link active" id="category_tab" data-toggle="tab" href="#category_content" role="tab"
-							aria-controls="home" aria-selected="true">Category</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" id="subcategory_tab" data-toggle="tab" href="#subcategory_content" role="tab"
-							aria-controls="profile" aria-selected="false">Sub-category</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" id="items_tab" data-toggle="tab" href="#food_type_content" role="tab"
-							aria-controls="contact" aria-selected="false">Items</a>
-					</li>
+            <li class="nav-item">
+               <a class="nav-link active" id="category_tab" data-toggle="tab" href="#category_content" role="tab"
+                  aria-controls="home" aria-selected="true">Category</a>
+            </li>
+            <li class="nav-item">
+               <a class="nav-link" id="subcategory_tab" data-toggle="tab" href="#subcategory_content" role="tab"
+                  aria-controls="profile" aria-selected="false">Sub-category</a>
+            </li>
+            <li class="nav-item">
+               <a class="nav-link" id="items_tab" data-toggle="tab" href="#food_type_content" role="tab"
+                  aria-controls="contact" aria-selected="false">Items</a>
+            </li>
+            <li class="nav-item">
+               <a class="nav-link" id="stores_tab" data-toggle="tab" href="#stores_content" role="tab"
+                  aria-controls="contact" aria-selected="false">Stores</a>
+            </li>
 			</ul>
 			<div class="tab-content" id="myTabContent">
 					<div class="tab-pane fade show active" id="category_content" role="tabpanel"
@@ -57,10 +61,24 @@
 						</div>
 						<div class="columns">
 							<div class="column">
-									<Items :items="items" :categories="categories" :subcategories="subcategories"
-                              @new-item-added="items.push($event)" @item-deleted="itemDeleted"
-                              :is-logged-in="<?= json_encode(Auth::check()) ?>">
-									</Items>
+                        <Items :items="items" :categories="categories" :subcategories="subcategories"
+                           @new-item-added="items.push($event)" @item-deleted="itemDeleted"
+                           :is-logged-in="<?= json_encode(Auth::check()) ?>">
+                        </Items>
+							</div>
+						</div>
+               </div>
+               <div class="tab-pane fade" id="stores_content" role="tabpanel" aria-labelledby="stores_tab">
+						<div class="columns">
+							<div class="column">
+							</div>
+						</div>
+						<div class="columns">
+							<div class="column">
+                        <Stores :stores="stores"
+                           @new-store-added="stores.push($event)" @store-deleted="storeDeleted"
+                           :is-logged-in="<?= json_encode(Auth::check()) ?>">
+                        </Stores>
 							</div>
 						</div>
 					</div>

@@ -4,7 +4,7 @@
       <div class="alert alert-danger" v-if="form.errorMsg && form.errorMsg.length">{{form.errorMsg}}</div>
       <div class="form" v-if="isAuthenticated">
          <ValidationObserver v-slot="observerSlotProp" @submit.prevent="createSubcategory">
-            <form method="post" action="/subcategories" id="createSubCategoryForm">
+            <form id="createSubCategoryForm">
                <div class="field is-horizontal">
                   <div class="field-label is-normal">
                      <label for="subcategory_name" class="label">Subcategory Name</label>
@@ -112,6 +112,7 @@
             </form>
          </ValidationObserver>
       </div>
+
       <br>
       
       <div class="columns">

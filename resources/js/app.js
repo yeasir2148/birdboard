@@ -10,6 +10,7 @@ window.Vue = require('vue');
 import { EventBus } from './__vue_event-bus.js';
 import Categories from './components/CategoriesComponent.vue';
 import Subcategories from './components/SubcategoriesComponent.vue';
+import Stores from './components/StoresComponent.vue';
 import Items from './components/ItemsComponent.vue';
 
 /**
@@ -35,7 +36,7 @@ Vue.component('example-component', require('./components/ExampleComponent.vue').
 const app = new Vue({
    el: '#app',
    components: {
-      Categories, Subcategories, Items
+      Categories, Subcategories, Items, Stores
    },
    data: {
       form: {
@@ -44,7 +45,8 @@ const app = new Vue({
       },
       categories: [],
       subcategories: [],
-      items: []
+      items: [],
+      stores: []
    },
 
    mounted: function () {
@@ -58,6 +60,9 @@ const app = new Vue({
                break;
             case 'item':
                this.items = data;
+               break;
+            case 'store':
+               this.stores = data;
                break;
          }
       });
@@ -91,9 +96,15 @@ const app = new Vue({
          });
       },
 
-      itemDeleted: function(deletedItemid) {
+      itemDeleted: function(deletedItemId) {
          this.items = this.items.filter(item => {
-            return item.id != deletedItemid;
+            return item.id != deletedItemId;
+         });
+      },
+
+      storeDeleted: function(deletedStoreId) {
+         this.stores = this.stores.filter(store => {
+            return store.id != deletedStoreId;
          });
       }
    }

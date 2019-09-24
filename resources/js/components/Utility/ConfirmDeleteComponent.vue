@@ -45,6 +45,9 @@
                case 'item':
                   this.$parent.deleteItem(objectId);
                   break;
+               case 'store':
+                  this.$parent.deleteStore(objectId);
+                  break;
                default:
                   break;
             }

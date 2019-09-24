@@ -7,18 +7,21 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Subcategory;
 use App\Category;
+use App\User;
 
 class CategoriesTest extends TestCase
 {
    use RefreshDatabase;
 
-   // protected function setUp(): void {
-   //    parent::setUp();
-   //    $this->withoutExceptionHandling();
-   // }
+   protected function setUp(): void {
+      parent::setUp();
+      $this->withoutExceptionHandling();
+   }
    /** @test */
    public function a_user_can_create_a_category()
    {
+      $user = factory(User::class)->make();
+      $this->actingAs($user);
       $category = factory('App\Category')->raw();
 
       $this->post('/categories', $category);
@@ -26,13 +29,29 @@ class CategoriesTest extends TestCase
    }
 
    /** @test */
-   public function create_category_request_has_name_and_category_id()
+   public function unauthenticated_user_cannot_create_a_category()
+   {
+      $this->withExceptionHandling();
+      $user = factory(User::class)->make();
+
+      $category = factory('App\Category')->raw();
+
+      $response = $this->json('post','/categories',$category);
+      $response->assertStatus(401);
+   }
+   
+
+   /** @test */
+   public function create_category_request_needs_name_and_category_id()
    {
       $this->withExceptionHandling();
       $category = [
          'name' => null,
          'category_code' => null
       ];
+
+      $user = factory(User::class)->make();
+      $this->actingAs($user);
 
       $this->post('/categories', $category)->assertSessionHasErrors('name');
       $this->post('/categories', $category)->assertSessionHasErrors('category_code');
@@ -50,7 +69,9 @@ class CategoriesTest extends TestCase
    /** @test */
    public function a_user_can_remove_a_category()
    {
-      // $this->withExceptionHandling();
+      $user = factory(User::class)->make();
+      $this->actingAs($user);
+
       $category = factory('App\Category')->create();
       $this->delete('categories/'.$category->id);
       $this->assertDatabaseMissing('categories',['id' => $category->id]);

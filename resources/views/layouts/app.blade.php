@@ -23,7 +23,7 @@
 
    <body>
       <div id="app">
-         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
+         <nav class="navbar navbar-expand-md navbar-dark bg-primary shadow-sm">
             <div class="container">
                   <a class="navbar-brand " href="{{ url('/') }}">
                      {{ config('app.name', 'Laravel') }}
@@ -36,20 +36,20 @@
 
                   <div class="collapse navbar-collapse" id="navbarSupportedContent">
                      <!-- Left Side Of Navbar -->
-                     <ul class="navbar-nav mr">
-                        <li class="nav-item active">
+                     <ul class="navbar-nav mx-auto justify-content-center">
+                        <li class="nav-item active px-3">
                            <a class="nav-link" href="#">Inventory <span class="sr-only">(current)</span></a>
                         </li>
-                        <li class="nav-item active">
+                        <li class="nav-item px-3">
                            <a class="nav-link" href="#">Purchases <span class="sr-only">(current)</span></a>
                         </li>
-                        <li class="nav-item active">
+                        <li class="nav-item px-3">
                            <a class="nav-link" href="#">Reports <span class="sr-only">(current)</span></a>
                         </li>
                      </ul>
 
                      <!-- Right Side Of Navbar -->
-                     <ul class="navbar-nav ml-auto">
+                     <ul class="navbar-nav">
                         <!-- Authentication Links -->
                         @guest
                         <li class="nav-item">

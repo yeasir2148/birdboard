@@ -8,6 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Subcategory;
 use App\Category;
 use App\Item;
+use App\User;
 
 class SubcategoriesTest extends TestCase
 {
@@ -22,10 +23,12 @@ class SubcategoriesTest extends TestCase
       $this->withoutExceptionHandling();
    }
 
-   public function test_a_user_can_create_a_subcategory()
+   public function a_user_can_create_a_subcategory()
    {
       $subcategory = factory(Subcategory::class)->raw();
-      // var_dump($subcategory);
+      $user = factory(User::class)->make();
+      $this->actingAs($user);
+
       $this->post('/subcategory', $subcategory);
       $this->assertDatabaseHas('subcategories', $subcategory);
    }
@@ -34,7 +37,10 @@ class SubcategoriesTest extends TestCase
    public function a_user_can_remove_a_subcategory()
    {
       $subcat = factory(Subcategory::class)->create();
-      $this->assertDatabaseHas(self::TABLE, $subcat->getAttributes());
+
+      $user = factory(User::class)->make();
+      $this->actingAs($user);
+
       $this->delete($subcat->getCrudPath());
       $this->assertDatabaseMissing(self::TABLE,$subcat->getAttributes());
    }

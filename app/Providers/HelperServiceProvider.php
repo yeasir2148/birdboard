@@ -19,13 +19,13 @@ class HelperServiceProvider extends ServiceProvider
       }
    }
 
-    /**
-     * Bootstrap services.
-     *
-     * @return void
-     */
-    public function boot()
-    {
-        //
-    }
+   /**
+    * Bootstrap services.
+    *
+    * @return void
+    */
+   public function boot()
+   {
+      //
+   }
 }

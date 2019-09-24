@@ -29,7 +29,8 @@
 						<div class="columns">
 							<div class="column">
 								<categories :categories="categories" @new-category-added="categories.push($event)"
-									@category-deleted="categoryDeleted">
+                           @category-deleted="categoryDeleted"
+                           :is-logged-in="<?= json_encode(Auth::check()) ?>">
 								</categories>
 							</div>
 						</div>
@@ -43,7 +44,8 @@
 							<div class="column">
 								<subcategories :categories="categories" :subcategories="subcategories"
 									@new-subcategory-added="subcategories.push($event)"
-									@subcategory-deleted="subcategoryDeleted">
+                           @subcategory-deleted="subcategoryDeleted"
+                           :is-logged-in="<?= json_encode(Auth::check()) ?>">
 								</subcategories>
 							</div>
 						</div>
@@ -56,7 +58,8 @@
 						<div class="columns">
 							<div class="column">
 									<Items :items="items" :categories="categories" :subcategories="subcategories"
-										@new-item-added="items.push($event)" @item-deleted="itemDeleted">
+                              @new-item-added="items.push($event)" @item-deleted="itemDeleted"
+                              :is-logged-in="<?= json_encode(Auth::check()) ?>">
 									</Items>
 							</div>
 						</div>

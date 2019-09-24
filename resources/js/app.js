@@ -10,7 +10,6 @@ window.Vue = require('vue');
 import { EventBus } from './__vue_event-bus.js';
 import Categories from './components/CategoriesComponent.vue';
 import Subcategories from './components/SubcategoriesComponent.vue';
-// import ConfirmDelete from './components/Utility/ConfirmDeleteComponent.vue';
 import Items from './components/ItemsComponent.vue';
 
 /**

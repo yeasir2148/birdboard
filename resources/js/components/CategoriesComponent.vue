@@ -2,83 +2,85 @@
    <div>
       <div class="alert alert-success" v-if="form.successMsg && form.successMsg.length">{{form.successMsg}}</div>
       <div class="alert alert-danger" v-if="form.errorMsg && form.errorMsg.length">{{form.errorMsg}}</div>
-      <ValidationObserver v-slot="observerSlotProp" @submit.prevent="createCategory">
-         <form method="post" action="/categories" id="createCategoryForm">
-            <div class="field is-horizontal">
-               <div class="field-label is-normal">
-                  <label for="category_name" class="label">Category Name</label>
-               </div>
-               <div class="field-body">
-                  <div class="field">
-                     <div class="control">
-                        <validation-provider
-                           name="category-name"
-                           rules="required|max:30|alpha_dash"
-                           v-slot="{ errors, classes }"
-                        >
-                           <input
-                              type="text"
-                              class="input"
-                              :class="{ 'is-danger': form.name && errors.length}"
-                              name="name"
-                              v-model="form.name"
+      <div class="form" v-if="isAuthenticated">
+         <ValidationObserver v-slot="observerSlotProp" @submit.prevent="createCategory">
+            <form method="post" action="/categories" id="createCategoryForm">
+               <div class="field is-horizontal">
+                  <div class="field-label is-normal">
+                     <label for="category_name" class="label">Category Name</label>
+                  </div>
+                  <div class="field-body">
+                     <div class="field">
+                        <div class="control">
+                           <validation-provider
+                              name="category-name"
+                              rules="required|max:30|alpha_dash"
+                              v-slot="{ errors, classes }"
                            >
-                           <span
-                              class="has-text-danger"
-                              v-show="form.name && form.name.length"
-                           >{{ errors[0] }}</span>
-                        </validation-provider>
+                              <input
+                                 type="text"
+                                 class="input"
+                                 :class="{ 'is-danger': form.name && errors.length}"
+                                 name="name"
+                                 v-model="form.name"
+                              >
+                              <span
+                                 class="has-text-danger"
+                                 v-show="form.name && form.name.length"
+                              >{{ errors[0] }}</span>
+                           </validation-provider>
+                        </div>
                      </div>
                   </div>
                </div>
-            </div>
 
-            <div class="field is-horizontal">
-               <div class="field-label is-normal">
-                  <label for="category_code" class="label">Category Code</label>
-               </div>
-               <div class="field-body">
-                  <div class="field">
-                     <div class="control">
-                        <validation-provider
-                           name="category-code"
-                           rules="required|max:30|alpha_dash"
-                           v-slot="{ errors }"
-                        >
-                           <input
-                              type="text"
-                              class="input"
-                              :class="{'is-danger': form.categoryCode && errors.length}"
-                              id="category_code"
-                              name="category_code"
-                              v-model="form.categoryCode"
+               <div class="field is-horizontal">
+                  <div class="field-label is-normal">
+                     <label for="category_code" class="label">Category Code</label>
+                  </div>
+                  <div class="field-body">
+                     <div class="field">
+                        <div class="control">
+                           <validation-provider
+                              name="category-code"
+                              rules="required|max:30|alpha_dash"
+                              v-slot="{ errors }"
                            >
-                           <span
-                              class="has-text-danger"
-                              v-show="form.categoryCode && form.categoryCode.length"
-                           >{{ errors[0] }}</span>
-                        </validation-provider>
+                              <input
+                                 type="text"
+                                 class="input"
+                                 :class="{'is-danger': form.categoryCode && errors.length}"
+                                 id="category_code"
+                                 name="category_code"
+                                 v-model="form.categoryCode"
+                              >
+                              <span
+                                 class="has-text-danger"
+                                 v-show="form.categoryCode && form.categoryCode.length"
+                              >{{ errors[0] }}</span>
+                           </validation-provider>
+                        </div>
                      </div>
                   </div>
                </div>
-            </div>
 
-            <div class="field is-horizontal">
-               <div class="field-label"></div>
-               <div class="field-body">
-                  <div class="field">
-                     <div class="control">
-                        <button
-                           class="button is-link"
-                           type="submit"
-                           :disabled="!observerSlotProp.valid || observerSlotProp.pristine"
-                        >Create</button>
+               <div class="field is-horizontal">
+                  <div class="field-label"></div>
+                  <div class="field-body">
+                     <div class="field">
+                        <div class="control">
+                           <button
+                              class="button is-link"
+                              type="submit"
+                              :disabled="!observerSlotProp.valid || observerSlotProp.pristine"
+                           >Create</button>
+                        </div>
                      </div>
                   </div>
                </div>
-            </div>
-         </form>
-      </ValidationObserver>
+            </form>
+         </ValidationObserver>
+      </div>
 
       <br>
 
@@ -100,7 +102,7 @@
                   <tr>
                      <th class="has-text-centered">Name</th>
                      <th class="has-text-centered">Category code</th>
-                     <th class="has-text-centered">Action</th>
+                     <th class="has-text-centered" v-if="isAuthenticated">Action</th>
                   </tr>
                </thead>
 
@@ -108,7 +110,7 @@
                   <tr v-for="category in categories" :key="category.id">
                      <td class="has-text-centered">{{ category.name }}</td>
                      <td class="has-text-centered">{{ category.category_code }}</td>
-                     <td class="has-text-centered">
+                     <td class="has-text-centered" v-if="isAuthenticated">
                         <button class="btn btn-primary" @click="confirmDelete(category.id)">Delete</button>
                      </td>
                   </tr>
@@ -117,7 +119,7 @@
          </div>
       </div>
       <div class="columns">
-         <confirm-delete :deleteCategoryId="categoryIdToDelete">
+         <confirm-delete :entityId="categoryIdToDelete" entityType="category">
             <template v-slot:body>
                Confirm Delete? All related subcategories and items will also be deleted!!
             </template>
@@ -132,6 +134,7 @@
    import ConfirmDelete from './Utility/ConfirmDeleteComponent.vue';
    import { required, email, max, alpha_dash } from "vee-validate/dist/rules";
    import { EventBus } from '../__vue_event-bus.js';
+
    extend("required", required);
    extend("email", email);
    extend("max", max);
@@ -159,7 +162,7 @@
    };
    export default {
       components: { ValidationObserver, ValidationProvider, ConfirmDelete },
-      props: ['categories'],
+      props: ['categories', 'isLoggedIn'],
       data() {
          return {
             form: {
@@ -169,7 +172,8 @@
                errorMsg: null
             },
             serverResponseData: {},
-            categoryIdToDelete: null
+            categoryIdToDelete: null,
+            isAuthenticated: this.isLoggedIn
          };
       },
 
@@ -184,7 +188,10 @@
                category_code: this.form.categoryCode.toLowerCase(),
                // _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
             };
-         }
+         },
+         removeModal: function() {
+            return '#remove_category_modal';
+         },
       },
       methods: {
          fetchCategory: function() {
@@ -219,7 +226,7 @@
 
          confirmDelete: function(categoryId) {
             this.categoryIdToDelete = categoryId;
-            $("#confirmDelete").modal({
+            $(this.removeModal).modal({
                backdrop: 'static'
             });
          },
@@ -237,7 +244,7 @@
                this.form.errorMsg = errorResponse.message;
             })
             .finally(() => {
-               $("#confirmDelete").modal('hide');
+               $(this.removeModal).modal('hide');
                setTimeout(() => this.resetForm(), 1000);
             });
          },

@@ -15,6 +15,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/is-authenticated', function() {
+   $resposne = ['data' => []];
+   return response()->json($response['data']['is_authenticated'] = Auth::check());
+});
 Route::post('/projects', 'ProjectsController@store');
 
 Route::get('/projects', 'ProjectsController@index');

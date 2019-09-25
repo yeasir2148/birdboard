@@ -5,27 +5,28 @@
       <div class="form">
          <ValidationObserver v-slot="observerSlotProp" @submit.prevent="createItem">
             <form id="createInvoiceForm">
+               <!-- Invoice No -->
                <div class="field is-horizontal">
                   <div class="field-label is-normal">
-                     <label for="item_id" class="label">Item Name</label>
+                     <label for="invoice_no" class="label">Invoice No</label>
                   </div>
                   <div class="field-body">
                      <div class="field">
                         <div class="control">
                            <validation-provider
-                              name="Item-Name"
-                              rules="required|max:30|alpha_space_dash"
+                              name="Invoice-Number"
+                              rules="required"
                               v-slot="{ errors, classes }">
                               <input
                                  type="text"
                                  class="input"
-                                 :class="{ 'is-danger': form.itemName && errors.length}"
-                                 id="item_id"
-                                 name="item_id"
-                                 v-model="form.itemName">
+                                 :class="{ 'is-danger': form.invoiceNo && errors.length}"
+                                 id="invoice_no"
+                                 name="invoice_no"
+                                 v-model="form.invoiceNo">
                               <span
                                  class="has-text-danger"
-                                 v-show="form.itemName && form.itemName.length">
+                                 v-show="form.invoiceNo && form.invoiceNo.length">
                                  {{ errors[0] }}
                               </span>
                            </validation-provider>
@@ -33,28 +34,121 @@
                      </div>
                   </div>
                </div>
-
+               <!-- Item Id -->
                <div class="field is-horizontal">
                   <div class="field-label is-normal">
-                     <label for="item_code" class="label">Item Code</label>
+                     <label for="item_id" class="label">Item</label>
                   </div>
                   <div class="field-body">
                      <div class="field">
                         <div class="control">
                            <validation-provider
-                              name="Item-Code"
-                              rules="required|max:30|alpha_dash"
+                              name="Item"
+                              rules="required"
+                              v-slot="{ errors }">
+                              <div class="select">
+                                 <select
+                                    :class="{'is-danger': form.itemId && errors.length}"
+                                    id="item_id"
+                                    name="item_id"
+                                    v-model="form.itemId">
+                                       <option value="" disabled>Please select item</option>
+                                       <option v-for="item in items" :key="item.id" :value="item.id">
+                                          {{ item.item_name }}
+                                       </option>
+                                 </select>
+                                 <span class="has-text-danger" v-show="errors.length">
+                                    {{ errors[0] }}
+                                 </span>
+                              </div>
+                           </validation-provider>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               <!-- quantity -->
+               <div class="field is-horizontal">
+                  <div class="field-label is-normal">
+                     <label for="quantity" class="label">Quantity</label>
+                  </div>
+                  <div class="field-body">
+                     <div class="field">
+                        <div class="control">
+                           <validation-provider
+                              name="quantity"
+                              rules="required"
+                              v-slot="{ errors, classes }">
+                              <input
+                                 type="text"
+                                 class="input"
+                                 :class="{ 'is-danger': form.quantity && errors.length}"
+                                 id="quantity"
+                                 name="quantity"
+                                 v-model="form.quantity">
+                              <span
+                                 class="has-text-danger"
+                                 v-show="form.quantity && form.quantity.length">
+                                 {{ errors[0] }}
+                              </span>
+                           </validation-provider>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               <!--Unit -->
+               <div class="field is-horizontal">
+                  <div class="field-label is-normal">
+                     <label for="unit_id" class="label">Unit</label>
+                  </div>
+                  <div class="field-body">
+                     <div class="field">
+                        <div class="control">
+                           <validation-provider
+                              name="Unit"
+                              rules="required"
+                              v-slot="{ errors }">
+                              <div class="select">
+                                 <select
+                                    :class="{'is-danger': form.unitId && errors.length}"
+                                    id="unit_id"
+                                    name="unit_id"
+                                    v-model="form.unitId">
+                                       <option value="" disabled>Select unit</option>
+                                       <option v-for="unit in units" :key="unit.id" :value="unit.id">
+                                          {{ unit.unit_name }}
+                                       </option>
+                                 </select>
+                                 <span class="has-text-danger" v-show="errors.length">
+                                    {{ errors[0] }}
+                                 </span>
+                              </div>
+                           </validation-provider>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               <!-- Price -->
+               <div class="field is-horizontal">
+                  <div class="field-label is-normal">
+                     <label for="price" class="label">Price</label>
+                  </div>
+                  <div class="field-body">
+                     <div class="field">
+                        <div class="control">
+                           <validation-provider
+                              name="price"
+                              rules="required"
                               v-slot="{ errors }">
                               <input
                                  type="text"
                                  class="input"
-                                 :class="{'is-danger': form.itemCode && errors.length}"
-                                 id="item_code"
-                                 name="item_code"
-                                 v-model="form.itemCode">
+                                 :class="{'is-danger': form.price && errors.length}"
+                                 id="price"
+                                 name="price"
+                                 v-model="form.price">
                               <span
                                  class="has-text-danger"
-                                 v-show="form.itemCode && form.itemCode.length">
+                                 v-show="form.price && form.price.length">
                                     {{ errors[0] }}
                               </span>
                            </validation-provider>
@@ -62,33 +156,30 @@
                      </div>
                   </div>
                </div>
-
+               <!-- Invoice Date -->
                <div class="field is-horizontal">
                   <div class="field-label is-normal">
-                     <label for="subcategory_id" class="label">Subcategory</label>
+                     <label for="invoice_date" class="label">Invoice Date</label>
                   </div>
                   <div class="field-body">
                      <div class="field">
                         <div class="control">
                            <validation-provider
-                              name="Subcategory"
+                              name="Invoice date"
                               rules="required"
                               v-slot="{ errors }">
-                              <div class="select">
-                                 <select
-                                    :class="{'is-danger': form.subCategoryId && errors.length}"
-                                    id="subcategory_id"
-                                    name="subcategory_id"
-                                    v-model="form.subCategoryId">
-                                       <option value="" disabled>Please select subcategory</option>
-                                       <option v-for="subcat in subcategories" :key="subcat.id" :value="subcat.id">
-                                          {{ subcat.subcat_name + ' - ' + subcat.category.name }}
-                                       </option>
-                                 </select>
-                                 <span class="has-text-danger" v-show="errors.length">
+                              <input
+                                 type="text"
+                                 class="input"
+                                 :class="{'is-danger': form.invoiceDate && errors.length}"
+                                 id="invoice_date"
+                                 name="invoice_date"
+                                 v-model="form.invoiceDate">
+                              <span
+                                 class="has-text-danger"
+                                 v-show="form.invoiceDate && form.invoiceDate.length">
                                     {{ errors[0] }}
-                                 </span>
-                              </div>
+                              </span>
                            </validation-provider>
                         </div>
                      </div>
@@ -151,21 +242,23 @@
    };
    export default {
       components: { ValidationObserver, ValidationProvider, ConfirmDelete },
-      props: ['items', 'units'],
+      props: ['items', 'units', 'invoices'],
       data() {
          return {
             // items: [],
             // units: [],
             form: {
-               itemName: null,
-               itemCode: null,
-               subCategoryId: null,
+               invoiceNo: null,
+               itemId: null,
+               quantity: null,
+               unitId: null,               
+               price: null,
+               invoiceDate: null,
                successMsg: null,
                errorMsg: null
             },
             serverResponseData: {},
-            itemIdToDelete: null,
-            isAuthenticated: this.isLoggedIn
+            invoiceIdToDelete: null,
          };
       },
 

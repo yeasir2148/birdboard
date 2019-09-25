@@ -12,7 +12,8 @@ import Categories from './components/CategoriesComponent.vue';
 import Subcategories from './components/SubcategoriesComponent.vue';
 import Stores from './components/StoresComponent.vue';
 import Items from './components/ItemsComponent.vue';
-
+import InvoiceForm from './components/InvoiceFormComponent.vue';
+import Axios from 'axios';
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue
@@ -36,7 +37,7 @@ Vue.component('example-component', require('./components/ExampleComponent.vue').
 const app = new Vue({
    el: '#app',
    components: {
-      Categories, Subcategories, Items, Stores
+      Categories, Subcategories, Items, Stores, InvoiceForm
    },
    data: {
       form: {
@@ -46,10 +47,15 @@ const app = new Vue({
       categories: [],
       subcategories: [],
       items: [],
-      stores: []
+      stores: [],
+      units: [],
+      invoices: [],
+      activeNav: null,
    },
 
    mounted: function () {
+      this.fetchInvoices();
+
       EventBus.$on('update-data', (entityName, data) => {
          switch (entityName) {
             case 'category':
@@ -72,6 +78,17 @@ const app = new Vue({
       });
    },
    methods: {
+      fetchInvoices: function() {
+         axios.get('/invoices')
+         .then(({ data }) => {
+            // console.log(response);
+            if(data !== null && data !== undefined) {
+               this.units = data.units;
+               this.invoices = data.invoices;
+            }
+         });
+      },
+
       categoryDeleted: function(deletedCategoryId) {
          this.categories = this.categories.filter(category => {
             return category.id != deletedCategoryId;
@@ -108,9 +125,9 @@ const app = new Vue({
          });
       },
 
-      setActiveNav: function(event) {
-         $(event.target).parents('ul.navbar-nav').find('li.nav-item').removeClass('active');
-         event.target.parentNode.classList.add('active');
+      setActiveNav: function() {
+         // $(event.target).parents('ul.navbar-nav').find('li.nav-item').removeClass('active');
+         // event.target.parentNode.classList.add('active');
       }
    }
 });

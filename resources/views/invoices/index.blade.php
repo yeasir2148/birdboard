@@ -21,11 +21,8 @@
                <div class="columns">
                   <div class="column">
                      <div>
-                        <div class="alert alert-success" v-if="form.successMsg && form.successMsg.length">{{form.successMsg}}</div>
-                        <div class="alert alert-danger" v-if="form.errorMsg && form.errorMsg.length">{{form.errorMsg}}</div>
-                        
                         @auth
-                           <InvoicesComponent></<InvoicesComponent>
+                           <invoice-form :items="items" :units="units" :invoices="invoices"></<invoice-form>
                         @endauth
                         <br>
                         
@@ -35,36 +32,12 @@
                            </div>
                            <div class="column is-2 has-text-centered">
                               <div class="toolbar has-text-centered">
-                                 <span @click="fetchItems" class="icon fas fa-sync"></span>
+                                 <span  class="icon fas fa-sync"></span>
                               </div>            
                            </div>
                         </div>      
 
-                        <div class="columns">
-                           <div class="column">
-                              <table class="table is-bordered is-hoverable">
-                                 <thead>
-                                    <tr>
-                                       <th class="has-text-centered">Item Name</th>
-                                       <th class="has-text-centered">Item Code</th>
-                                       <th class="has-text-centered">Subcategory</th>
-                                       <th class="has-text-centered" v-if="isAuthenticated">Action</th>
-                                    </tr>
-                                 </thead>
 
-                                 <tbody>
-                                    <tr v-for="item in items" :key="item.id">
-                                       <td class="has-text-centered">{{ item.item_name }}</td>
-                                       <td class="has-text-centered">{{ item.item_code }}</td>
-                                       <td class="has-text-centered">{{ item.subcategory.subcat_name }}</td>
-                                       <td class="has-text-centered" v-if="isAuthenticated">
-                                          <button class="btn btn-primary" @click="confirmDelete(item.id)">Delete</button>
-                                       </td>
-                                    </tr>
-                                 </tbody>
-                              </table>
-                           </div>
-                        </div>
 
                         <div class="columns">
                            Confirm Delete?

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Invoice;
 use App\Item;
+use App\Unit;
 use Illuminate\Http\Request;
 
 class InvoicesController extends Controller
@@ -16,11 +17,20 @@ class InvoicesController extends Controller
    public function index()
    {
       $invoices = Invoice::all();
+      $items = Item::all();
+      $units = Unit::all();
+
+      $response = [
+         'invoices' => $invoices,
+         'items' => $items,
+         'units' => $units
+      ];
+
       if(request()->ajax() || App()->runningUnitTests()) {
-         return response()->json($invoices);
+         return response()->json($response);
       }
       // dd(App()->runningUnitTests());
-      return view('invoices.index', compact('invoices'));
+      return view('invoices.index', compact('response'));
    
    }
 

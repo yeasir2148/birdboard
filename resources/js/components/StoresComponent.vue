@@ -14,7 +14,7 @@
                         <div class="control">
                            <validation-provider
                               name="store-name"
-                              rules="required|max:100|alpha_dash|alpha_spaces"
+                              rules="required|max:100|alpha_space_dash"
                               v-slot="{ errors, classes }"
                            >
                               <input
@@ -44,7 +44,7 @@
                         <div class="control">
                            <validation-provider
                               name="store-code"
-                              rules="required|max:30|alpha_spaces|alpha_dash"
+                              rules="required|max:50|alpha_dash"
                               v-slot="{ errors }"
                            >
                               <input
@@ -133,13 +133,17 @@
 <script>
    import { ValidationObserver, ValidationProvider, extend } from "vee-validate";
    import ConfirmDelete from './Utility/ConfirmDeleteComponent.vue';
-   import { required, max, alpha_dash, alpha_spaces } from "vee-validate/dist/rules";
+   import { required, max, alpha_dash } from "vee-validate/dist/rules";
+   import { alpha_space_dash } from '../__custom_validation_rules.js';
    import { EventBus } from '../__vue_event-bus.js';
 
    extend("required", required);
    extend("max", max);
-   extend("alpha_dash", alpha_dash);
-   extend("alpha_spaces", alpha_spaces);
+   // extend("alpha_space_dash", {
+   //    validate: value => {
+   //       return value.match(/[^\w\- ]+/g) === null;
+   //    }
+   // });
 
    const httpConfig = {
       create: {

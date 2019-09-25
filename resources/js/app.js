@@ -106,6 +106,11 @@ const app = new Vue({
          this.stores = this.stores.filter(store => {
             return store.id != deletedStoreId;
          });
+      },
+
+      setActiveNav: function(event) {
+         $(event.target).parents('ul.navbar-nav').find('li.nav-item').removeClass('active');
+         event.target.parentNode.classList.add('active');
       }
    }
 });

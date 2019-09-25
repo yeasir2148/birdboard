@@ -32,13 +32,16 @@ Route::get('/subcategories','SubcategoriesController@index');
 Route::post('/subcategory','SubcategoriesController@store');
 Route::delete('/subcategory/{subcategory}','SubcategoriesController@destroy');
 
-Route::get('items','ItemsController@index');
+Route::get('/items','ItemsController@index');
 Route::post('/item','ItemsController@store');
 Route::delete('/item/{item}','ItemsController@destroy');
 
-Route::get('stores','StoresController@index');
+Route::get('/stores','StoresController@index');
 Route::post('/store','StoresController@store');
 Route::delete('/store/{store}','StoresController@destroy');
+
+Route::get('/invoices','InvoicesController@index');
+Route::post('/invoice','InvoicesController@store');
 
 Auth::routes();
 

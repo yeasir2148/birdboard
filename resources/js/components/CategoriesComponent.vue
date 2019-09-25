@@ -14,7 +14,7 @@
                         <div class="control">
                            <validation-provider
                               name="category-name"
-                              rules="required|max:30|alpha_dash"
+                              rules="required|max:30|alpha_space_dash"
                               v-slot="{ errors, classes }"
                            >
                               <input
@@ -132,11 +132,11 @@
 <script>
    import { ValidationObserver, ValidationProvider, extend } from "vee-validate";
    import ConfirmDelete from './Utility/ConfirmDeleteComponent.vue';
-   import { required, email, max, alpha_dash } from "vee-validate/dist/rules";
+   import { required, max, alpha_dash } from "vee-validate/dist/rules";
+   import { alpha_space_dash } from '../__custom_validation_rules.js';
    import { EventBus } from '../__vue_event-bus.js';
 
    extend("required", required);
-   extend("email", email);
    extend("max", max);
    extend("alpha_dash", alpha_dash);
 

@@ -27149,3 +27149,7 @@ readers do not read off random characters that represent icons */
   padding-top: 20px;
 }
 
+#site_navbar .nav-item.btn a {
+  color: black;
+}
+

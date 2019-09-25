@@ -2,29 +2,30 @@
    <div>
       <div class="alert alert-success" v-if="form.successMsg && form.successMsg.length">{{form.successMsg}}</div>
       <div class="alert alert-danger" v-if="form.errorMsg && form.errorMsg.length">{{form.errorMsg}}</div>
-      <div class="form" v-if="isAuthenticated">
-         <ValidationObserver v-slot="observerSlotProp" @submit.prevent="createSubcategory">
-            <form id="createSubCategoryForm">
+      <div class="form">
+         <ValidationObserver v-slot="observerSlotProp" @submit.prevent="createItem">
+            <form id="createInvoiceForm">
                <div class="field is-horizontal">
                   <div class="field-label is-normal">
-                     <label for="subcategory_name" class="label">Subcategory Name</label>
+                     <label for="item_id" class="label">Item Name</label>
                   </div>
                   <div class="field-body">
                      <div class="field">
                         <div class="control">
                            <validation-provider
-                              name="subcategory-name"
+                              name="Item-Name"
                               rules="required|max:30|alpha_space_dash"
                               v-slot="{ errors, classes }">
                               <input
                                  type="text"
                                  class="input"
-                                 :class="{ 'is-danger': form.subcategoryName && errors.length}"
-                                 name="name"
-                                 v-model="form.subcategoryName">
+                                 :class="{ 'is-danger': form.itemName && errors.length}"
+                                 id="item_id"
+                                 name="item_id"
+                                 v-model="form.itemName">
                               <span
                                  class="has-text-danger"
-                                 v-show="form.subcategoryName && form.subcategoryName.length">
+                                 v-show="form.itemName && form.itemName.length">
                                  {{ errors[0] }}
                               </span>
                            </validation-provider>
@@ -35,25 +36,25 @@
 
                <div class="field is-horizontal">
                   <div class="field-label is-normal">
-                     <label for="subcategory_code" class="label">Subcategory Code</label>
+                     <label for="item_code" class="label">Item Code</label>
                   </div>
                   <div class="field-body">
                      <div class="field">
                         <div class="control">
                            <validation-provider
-                              name="subcategory-code"
+                              name="Item-Code"
                               rules="required|max:30|alpha_dash"
                               v-slot="{ errors }">
                               <input
                                  type="text"
                                  class="input"
-                                 :class="{'is-danger': form.subcategoryCode && errors.length}"
-                                 id="category_code"
-                                 name="category_code"
-                                 v-model="form.subcategoryCode">
+                                 :class="{'is-danger': form.itemCode && errors.length}"
+                                 id="item_code"
+                                 name="item_code"
+                                 v-model="form.itemCode">
                               <span
                                  class="has-text-danger"
-                                 v-show="form.subcategoryCode && form.subcategoryCode.length">
+                                 v-show="form.itemCode && form.itemCode.length">
                                     {{ errors[0] }}
                               </span>
                            </validation-provider>
@@ -64,24 +65,24 @@
 
                <div class="field is-horizontal">
                   <div class="field-label is-normal">
-                     <label for="category_name" class="label">Category Name</label>
+                     <label for="subcategory_id" class="label">Subcategory</label>
                   </div>
                   <div class="field-body">
                      <div class="field">
                         <div class="control">
                            <validation-provider
-                              name="category"
+                              name="Subcategory"
                               rules="required"
                               v-slot="{ errors }">
                               <div class="select">
                                  <select
-                                    :class="{'is-danger': form.category && errors.length}"
-                                    id="category"
-                                    name="category"
-                                    v-model="form.categoryId">
-                                       <option value="" disabled>Please select category</option>
-                                       <option v-for="category in categories" :key="category.id" :value="category.id">
-                                          {{ category.name }}
+                                    :class="{'is-danger': form.subCategoryId && errors.length}"
+                                    id="subcategory_id"
+                                    name="subcategory_id"
+                                    v-model="form.subCategoryId">
+                                       <option value="" disabled>Please select subcategory</option>
+                                       <option v-for="subcat in subcategories" :key="subcat.id" :value="subcat.id">
+                                          {{ subcat.subcat_name + ' - ' + subcat.category.name }}
                                        </option>
                                  </select>
                                  <span class="has-text-danger" v-show="errors.length">
@@ -112,52 +113,6 @@
             </form>
          </ValidationObserver>
       </div>
-
-      <br>
-      
-      <div class="columns">
-         <div class="column has-text-centered">
-            <h4 class="title is-4">Subcategories</h4>
-         </div>
-         <div class="column is-2 has-text-centered">
-            <div class="toolbar has-text-centered">
-               <span @click="fetchSubcategory" class="icon fas fa-sync"></span>
-            </div>            
-         </div>
-      </div>      
-
-      <div class="columns">
-         <div class="column">
-            <table class="table is-bordered is-hoverable">
-               <thead>
-                  <tr>
-                     <th class="has-text-centered">Name</th>
-                     <th class="has-text-centered">Code</th>
-                     <th class="has-text-centered">Category Name</th>
-                     <th class="has-text-centered" v-if="isAuthenticated">Action</th>
-                  </tr>
-               </thead>
-
-               <tbody>
-                  <tr v-for="subcat in subcategories" :key="subcat.id">
-                     <td class="has-text-centered">{{ subcat.subcat_name }}</td>
-                     <td class="has-text-centered">{{ subcat.subcat_code }}</td>
-                     <td class="has-text-centered">{{ subcat.category.name }}</td>
-                     <td class="has-text-centered" v-if="isAuthenticated">
-                        <button class="btn btn-primary" @click="confirmDelete(subcat.id)">Delete</button>
-                     </td>
-                  </tr>
-               </tbody>
-            </table>
-         </div>
-      </div>
-      <div class="columns">
-         <confirm-delete :entityId="subcategoryIdToDelete" entityType="subcategory">
-            <template v-slot:body>
-               Confirm Delete? All related Items will also be deleted!!
-            </template>
-         </confirm-delete>
-      </div>
    </div>
 </template>
 
@@ -177,16 +132,16 @@
    const httpConfig = {
       create: {
          method: "post",
-         url: "/subcategory",
+         url: "/item",
          responseType: "json"
       },
       getAll: {
          method: "get",
-         url: "/subcategories",
+         url: "/items",
          responseType: "json"
       },
       delete: {
-         url: "/subcategory/{subcat_id}",
+         url: "/item/{item_id}",
          params: {
             data: {
                _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
@@ -196,49 +151,51 @@
    };
    export default {
       components: { ValidationObserver, ValidationProvider, ConfirmDelete },
-      props: ['categories', 'subcategories','isLoggedIn'],
+      props: ['items', 'units'],
       data() {
          return {
+            // items: [],
+            // units: [],
             form: {
-               subcategoryName: null,
-               subcategoryCode: null,
-               categoryId: null,
+               itemName: null,
+               itemCode: null,
+               subCategoryId: null,
                successMsg: null,
                errorMsg: null
             },
             serverResponseData: {},
-            subcategoryIdToDelete: null,
+            itemIdToDelete: null,
             isAuthenticated: this.isLoggedIn
          };
       },
 
       mounted: function() {
-         this.fetchSubcategory();
+         this.fetchItems();
       },
 
       computed: {
          postData: function() {
             return {
-               subcat_name: this.form.subcategoryName,
-               subcat_code: this.form.subcategoryCode.toLowerCase(),
-               category_id: this.form.categoryId,
+               item_name: this.form.itemName,
+               item_code: this.form.itemCode.toLowerCase(),
+               subcat_id: this.form.subCategoryId,
                // _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
             };
          },
          removeModal: function() {
-            return '#remove_subcategory_modal';
+            return '#remove_item_modal';
          },
       },
       methods: {
-         fetchSubcategory: function() {
+         fetchItems: function() {
             axios(httpConfig.getAll)
             .then(({ data }) => {
                if(data !== null && data !== 'undefined') {
-                  EventBus.$emit('update-data','subcategory',data.subcategories);
+                  EventBus.$emit('update-data', 'item', data.items);
                }
             });
          },
-         createSubcategory: function() {
+         createItem: function() {
             httpConfig.create.data = this.postData;
             var vm = this;
 
@@ -246,8 +203,8 @@
                .then((response) => {
                   this.serverResponseData = response.data;
                   if(this.serverResponseData.success === true) {
-                     this.$emit('new-subcategory-added', this.serverResponseData.data);
-                     this.form.successMsg = 'subcategory added successfully';
+                     this.$emit('new-item-added', this.serverResponseData.data);
+                     this.form.successMsg = 'Item added successfully';
                   }
                })
                .catch(response => {
@@ -258,20 +215,20 @@
                });
          },
 
-         confirmDelete: function(subcategoryId) {
-            this.subcategoryIdToDelete = subcategoryId;
+         confirmDelete: function(itemId) {
+            this.itemIdToDelete = itemId;
             $(this.removeModal).modal({
                backdrop: 'static'
             });
          },
 
-         deleteSubcategory: function(subcategoryId) {
-            axios.delete(httpConfig.delete.url.replace('{subcat_id}', subcategoryId), httpConfig.delete.params)
+         deleteItem: function(itemId) {
+            axios.delete(httpConfig.delete.url.replace('{item_id}', itemId), httpConfig.delete.params)
             .then( response => {
                this.serverResponseData = response.data;
                if(response.data.success === true) {
-                  this.$emit('subcategory-deleted',subcategoryId);
-                  this.form.successMsg = 'Subcategory removed successfully.';
+                  this.$emit('item-deleted', itemId);
+                  this.form.successMsg = 'Item removed successfully.';
                }
             })
             .catch(errorResponse => {

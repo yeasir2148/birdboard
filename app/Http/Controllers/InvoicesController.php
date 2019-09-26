@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Invoice;
+use App\InvoiceSummary;
+use App\Store;
+use Illuminate\Http\Request;
 use App\Item;
 use App\Unit;
-use Illuminate\Http\Request;
 
 class InvoicesController extends Controller
 {
@@ -16,22 +17,22 @@ class InvoicesController extends Controller
     */
    public function index()
    {
-      $invoices = Invoice::all();
+      $invoices = InvoiceSummary::all();
+      $stores = Store::all();
       $items = Item::all();
       $units = Unit::all();
 
-      $response = [
+      $data = [
          'invoices' => $invoices,
+         'stores' => $stores,
          'items' => $items,
          'units' => $units
       ];
 
       if(request()->ajax() || App()->runningUnitTests()) {
-         return response()->json($response);
+         return response()->json($data);
       }
-      // dd(App()->runningUnitTests());
-      return view('invoices.index', compact('response'));
-   
+      return view('invoices.invoices-index', compact('data'));   
    }
 
    /**
@@ -56,21 +57,19 @@ class InvoicesController extends Controller
       // var_dump($request->all());
       $validatedAttributes = $request->validate([
          'invoice_no' => 'required',
-         'item_id' => 'required | exists:items,id',
-         'quantity' => 'required | numeric',
-         'unit_id' => 'required | exists:units,id',
-         'price' => 'required | numeric',
-         'invoice_date' => 'required | date'
+         'value' => 'required | number',
+         'invoice_date' => 'required | date',
+         'store_id' => 'required | exists:stores,id'
       ]);
 
-      $newInvoice = Invoice::create($validatedAttributes);
+      $newInvoiceSummary = InvoiceSummary::create($validatedAttributes);
 
-      if($newInvoice->wasRecentlyCreated !== true) {
+      if($newInvoiceSummary->wasRecentlyCreated !== true) {
          $response['success'] = false;
          $response['message'] = 'Record already exists';
       } else {
          $response['success'] = true;
-         $response['data'] = $newInvoice;
+         $response['data'] = $newInvoiceSummary;
       }
 
       if(isRequestAjaxOrTesting()) {

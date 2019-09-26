@@ -32,9 +32,17 @@ $app = require_once __DIR__.'/bootstrap/app.php';
 
 $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
 
+// $status = $kernel->handle(
+//     $input = new Symfony\Component\Console\Input\ArgvInput,
+//     new Symfony\Component\Console\Output\ConsoleOutput
+// );
+
+$output = new Symfony\Component\Console\Output\ConsoleOutput;
+$output->getFormatter()->setStyle('error', new \Symfony\Component\Console\Formatter\OutputFormatterStyle('yellow', 'blue'));
+
 $status = $kernel->handle(
     $input = new Symfony\Component\Console\Input\ArgvInput,
-    new Symfony\Component\Console\Output\ConsoleOutput
+    $output
 );
 
 /*

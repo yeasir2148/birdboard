@@ -12,7 +12,8 @@ import Categories from './components/CategoriesComponent.vue';
 import Subcategories from './components/SubcategoriesComponent.vue';
 import Stores from './components/StoresComponent.vue';
 import Items from './components/ItemsComponent.vue';
-import InvoiceForm from './components/InvoiceFormComponent.vue';
+import InvoiceSummaryForm from './components/InvoiceSummaryFormComponent.vue';
+import InvoiceDetailForm from './components/InvoiceDetailFormComponent.vue';
 import Axios from 'axios';
 /**
  * The following block of code may be used to automatically register your
@@ -37,7 +38,7 @@ Vue.component('example-component', require('./components/ExampleComponent.vue').
 const app = new Vue({
    el: '#app',
    components: {
-      Categories, Subcategories, Items, Stores, InvoiceForm
+      Categories, Subcategories, Items, Stores, InvoiceSummaryForm, InvoiceDetailForm
    },
    data: {
       form: {
@@ -50,7 +51,7 @@ const app = new Vue({
       stores: [],
       units: [],
       invoices: [],
-      activeNav: null,
+      // activeNav: null,
    },
 
    mounted: function () {
@@ -83,8 +84,10 @@ const app = new Vue({
          .then(({ data }) => {
             // console.log(response);
             if(data !== null && data !== undefined) {
-               this.units = data.units;
                this.invoices = data.invoices;
+               this.units = data.units;
+               this.items = data.items;
+               this.stores = data.stores;
             }
          });
       },

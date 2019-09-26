@@ -24,5 +24,15 @@
 #site_navbar {
    .nav-item.btn a {
       color: black;
-   }   
+   }
+
+   .dropdown-toggle.auth-user {
+      background-color: orange;
+      color: black;
+      border-radius: 5px;
+
+      ~ .dropdown-menu {
+         background-color: #FAEBD7;
+      }
+   }
 }

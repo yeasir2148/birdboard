@@ -143,7 +143,7 @@
                   <tr v-for="item in items" :key="item.id">
                      <td class="has-text-centered">{{ item.item_name }}</td>
                      <td class="has-text-centered">{{ item.item_code }}</td>
-                     <td class="has-text-centered">{{ item.subcategory.subcat_name }}</td>
+                     <td class="has-text-centered" v-if="item.subcategory">{{ item.subcategory.category.name }}</td>
                      <td class="has-text-centered" v-if="isAuthenticated">
                         <button class="btn btn-primary" @click="confirmDelete(item.id)">Delete</button>
                      </td>
@@ -283,7 +283,7 @@
                this.form.errorMsg = response.data.msg;
             })
             .finally(() => {
-               this.removeModal.modal('hide');
+               $(this.removeModal).modal('hide');
                setTimeout(() => this.resetForm(), 1000);
             });
          },

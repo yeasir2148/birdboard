@@ -8,16 +8,12 @@ use Faker\Generator as Faker;
 
 $factory->define(InvoiceSummary::class, function (Faker $faker) {
 
-   $storeIds = Store::all('id')->pluck('id');
-   $storeCount = count($storeIds);
-   $index  = rand(1, $storeCount - 1);
+   $storeId = factory(Store::class)->create();
 
-   $storeId = $storeIds[$index];
-  
    return [
       'invoice_no' => $faker->randomNumber(6),
-      'value' => 0,
-      'invoice_date' => $faker->dateTimeThisYear('now','Australia/Melbourne'),
+      'value' => rand(1,100),
+      'invoice_date' => $faker->date('Y-m-d'),
       'store_id' => $storeId,
    ];
 });

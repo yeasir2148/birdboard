@@ -7,6 +7,7 @@ use App\Store;
 use Illuminate\Http\Request;
 use App\Item;
 use App\Unit;
+use DB;
 
 class InvoicesController extends Controller
 {
@@ -17,7 +18,7 @@ class InvoicesController extends Controller
     */
    public function index()
    {
-      $invoices = InvoiceSummary::all();
+      $invoices = InvoiceSummary::with('store')->get();
       $stores = Store::all();
       $items = Item::all();
       $units = Unit::all();
@@ -53,11 +54,9 @@ class InvoicesController extends Controller
     */
    public function store(Request $request)
    {
-      // var_dump(Item::all('id')->pluck('id'));
-      // var_dump($request->all());
       $validatedAttributes = $request->validate([
          'invoice_no' => 'required',
-         'value' => 'required | number',
+         // 'value' => 'required | numeric',
          'invoice_date' => 'required | date',
          'store_id' => 'required | exists:stores,id'
       ]);
@@ -85,18 +84,39 @@ class InvoicesController extends Controller
     * @param  \App\Invoice  $invoice
     * @return \Illuminate\Http\Response
     */
-   public function show(Invoice $invoice)
+   public function show(InvoiceSummary $invoiceSummary)
    {
-      //
+      if(isRequestAjaxOrTesting()) {
+         return response()->json($invoiceSummary);
+      }
    }
 
+
+   /**
+   * Display the items that belong to an invoice
+   *
+   * @param  \App\Invoice  $invoice
+   * @return \Illuminate\Http\Response
+   */
+   public function getDetails(InvoiceSummary $invoiceSummary)
+   {
+      $invoiceItems = $invoiceSummary->getAllItems();
+
+      $response = [
+         'invoice_summary' => $invoiceSummary,
+         'invoice_details' => $invoiceItems
+      ];
+      if(isRequestAjaxOrTesting()) {
+         return response()->json($response);
+      }
+   }
    /**
     * Show the form for editing the specified resource.
     *
     * @param  \App\Invoice  $invoice
     * @return \Illuminate\Http\Response
     */
-   public function edit(Invoice $invoice)
+   public function edit(InvoiceSummary $invoice)
    {
       //
    }
@@ -108,7 +128,7 @@ class InvoicesController extends Controller
     * @param  \App\Invoice  $invoice
     * @return \Illuminate\Http\Response
     */
-   public function update(Request $request, Invoice $invoice)
+   public function update(Request $request, InvoiceSummary $invoice)
    {
       //
    }
@@ -119,8 +139,13 @@ class InvoicesController extends Controller
     * @param  \App\Invoice  $invoice
     * @return \Illuminate\Http\Response
     */
-   public function destroy(Invoice $invoice)
+   public function destroy(InvoiceSummary $invoice)
    {
-      //
+      $success = $invoice->delete();
+      if(isRequestAjaxOrTesting()) {
+         return response()->json([
+            'success' => $success
+         ]);
+      }
    }
 }

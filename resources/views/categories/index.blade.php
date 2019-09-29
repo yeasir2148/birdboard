@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
+<div class="container" v-cloak>
 	<div class="columns">
 		<div class="column is-three-fifths">
 			<ul class="nav nav-tabs" id="inventories_tablist" role="tablist">

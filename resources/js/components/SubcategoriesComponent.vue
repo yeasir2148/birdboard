@@ -278,7 +278,7 @@
                this.form.errorMsg = response.data.msg;
             })
             .finally(() => {
-               this.removeModal.modal('hide');
+               $(this.removeModal).modal('hide');
                setTimeout(() => this.resetForm(), 1000);
             });
          },

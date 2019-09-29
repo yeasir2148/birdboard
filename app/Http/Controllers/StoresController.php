@@ -49,7 +49,7 @@ class StoresController extends Controller
       ]);
       $newStore = Store::firstOrCreate(
          ['store_code' => $validatedAttr['store_code']],
-         ['store_name' => $validatedAttr['store_code']]
+         ['store_name' => $validatedAttr['store_name']]
       );
 
       if ($newStore->wasRecentlyCreated !== true) {

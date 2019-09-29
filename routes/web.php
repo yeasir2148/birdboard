@@ -41,7 +41,16 @@ Route::post('/store','StoresController@store');
 Route::delete('/store/{store}','StoresController@destroy');
 
 Route::get('/invoices','InvoicesController@index');
-Route::post('/invoice-summary','InvoicesController@store');
+Route::post('/invoice','InvoicesController@store');
+Route::delete('/invoice/{invoice}','InvoicesController@destroy');
+
+Route::get('/invoice/items/{invoiceSummary}','InvoicesController@getDetails');
+
+// Route::post('/invoice-summary','InvoicesController@store');
+
+// Route::get('/invoice-detail/{invoiceSummary}','InvoicesController@index');
+Route::post('/invoice-detail','InvoiceDetailsController@store');
+// Route::delete('/invoice/{invoice}','InvoicesController@destroy');
 
 Auth::routes();
 

@@ -17,8 +17,20 @@
 @import '../../node_modules/@fortawesome/fontawesome-free/scss/regular.scss';
 @import '../../node_modules/@fortawesome/fontawesome-free/scss/solid.scss';
 
+// jquery-ui
+@import '../../node_modules/jquery-ui/themes/base/all.css';
+
+[v-cloak] {
+   display: none;
+ }
+
 .tab-content {
    padding-top: 20px;
+}
+
+.icon.fa-sync {
+   background-color: #00CED1;
+   border-radius: 5px;
 }
 
 #site_navbar {
@@ -27,7 +39,7 @@
    }
 
    .dropdown-toggle.auth-user {
-      background-color: orange;
+      background-color: gold;
       color: black;
       border-radius: 5px;
 

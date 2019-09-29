@@ -139,11 +139,6 @@
 
    extend("required", required);
    extend("max", max);
-   // extend("alpha_space_dash", {
-   //    validate: value => {
-   //       return value.match(/[^\w\- ]+/g) === null;
-   //    }
-   // });
 
    const httpConfig = {
       create: {
@@ -157,7 +152,7 @@
          responseType: "json"
       },
       delete: {
-         url: "/stores/{store_id}",
+         url: "/store/{store_id}",
          params: {
             data: {
                // _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")

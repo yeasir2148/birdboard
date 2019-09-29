@@ -7,13 +7,18 @@
 require('./bootstrap');
 
 window.Vue = require('vue');
+import 'jquery-ui/ui/widgets/datepicker.js';
 import { EventBus } from './__vue_event-bus.js';
+import { ValidationObserver, ValidationProvider } from "vee-validate";
 import Categories from './components/CategoriesComponent.vue';
 import Subcategories from './components/SubcategoriesComponent.vue';
 import Stores from './components/StoresComponent.vue';
 import Items from './components/ItemsComponent.vue';
 import InvoiceSummaryForm from './components/InvoiceSummaryFormComponent.vue';
+import InvoiceSummaryList from './components/InvoiceSummaryListComponent.vue';
 import InvoiceDetailForm from './components/InvoiceDetailFormComponent.vue';
+import InvoiceDetailList from './components/InvoiceDetailListComponent.vue';
+import DatePickerComponent from './components/Utility/DatePickerComponent.vue';
 import Axios from 'axios';
 /**
  * The following block of code may be used to automatically register your
@@ -27,6 +32,7 @@ import Axios from 'axios';
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default));
 
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
+Vue.component('date-picker', DatePickerComponent);
 
 // Vue.component('ValidationProvider', ValidationProvider);
 /**
@@ -38,7 +44,9 @@ Vue.component('example-component', require('./components/ExampleComponent.vue').
 const app = new Vue({
    el: '#app',
    components: {
-      Categories, Subcategories, Items, Stores, InvoiceSummaryForm, InvoiceDetailForm
+      Categories, Subcategories, Items, Stores, 
+      InvoiceSummaryForm, InvoiceSummaryList, InvoiceDetailForm,
+      InvoiceDetailList
    },
    data: {
       form: {
@@ -55,7 +63,8 @@ const app = new Vue({
    },
 
    mounted: function () {
-      this.fetchInvoices();
+      // this.fetchInvoices();
+      // $('#invoice_date').datepicker();
 
       EventBus.$on('update-data', (entityName, data) => {
          switch (entityName) {
@@ -71,6 +80,12 @@ const app = new Vue({
             case 'store':
                this.stores = data;
                break;
+            case 'invoiceSummary':
+               this.invoices = data.invoices;
+               this.stores = data.stores;
+               this.items = data.items;
+               this.units = data.units;
+               break;
          }
       });
 
@@ -78,6 +93,7 @@ const app = new Vue({
          this.categories.push(newCategory);
       });
    },
+
    methods: {
       fetchInvoices: function() {
          axios.get('/invoices')
@@ -125,6 +141,12 @@ const app = new Vue({
       storeDeleted: function(deletedStoreId) {
          this.stores = this.stores.filter(store => {
             return store.id != deletedStoreId;
+         });
+      },
+
+      invoiceSummaryDeleted: function(deletedInvoiceSummaryId) {
+         this.invoices = this.invoices.filter(invoice => {
+            return invoice.id != deletedInvoiceSummaryId;
          });
       },
 

@@ -3,7 +3,7 @@
       <div class="alert alert-success" v-if="form.successMsg && form.successMsg.length">{{form.successMsg}}</div>
       <div class="alert alert-danger" v-if="form.errorMsg && form.errorMsg.length">{{form.errorMsg}}</div>
       <div class="form">
-         <ValidationObserver v-slot="observerSlotProp" @submit.prevent="createItem">
+         <ValidationObserver v-slot="observerSlotProp" @submit.prevent="createInvoiceDetail">
             <form id="createInvoiceForm">
                <!--Invoice Id -->
                <div class="field is-horizontal">
@@ -14,7 +14,7 @@
                      <div class="field">
                         <div class="control">
                            <validation-provider
-                              name="Invoice-No"
+                              name="Invoice No"
                               rules="required"
                               v-slot="{ errors }">
                               <div class="select">
@@ -28,7 +28,7 @@
                                           {{ invoice.invoice_no }}
                                        </option>
                                  </select>
-                                 <span class="has-text-danger" v-show="errors.length">
+                                 <span class="has-text-danger" v-show="form.invoiceId && errors.length">
                                     {{ errors[0] }}
                                  </span>
                               </div>
@@ -52,7 +52,7 @@
                               v-slot="{ errors }">
                               <div class="select">
                                  <select
-                                    :class="{'is-danger': errors.length}"
+                                    :class="{'is-danger': form.itemId && errors.length}"
                                     id="item_id"
                                     name="item_id"
                                     v-model="form.itemId">
@@ -61,7 +61,7 @@
                                           {{ item.item_name }}
                                        </option>
                                  </select>
-                                 <span class="has-text-danger" v-show="errors.length">
+                                 <span class="has-text-danger" v-show="form.itemId && errors.length">
                                     {{ errors[0] }}
                                  </span>
                               </div>
@@ -81,7 +81,7 @@
                         <div class="control">
                            <validation-provider
                               name="quantity"
-                              rules="required|numeric"
+                              :rules="{ regex:/^[0-9\.]+$/ }"
                               v-slot="{ errors, classes }">
                               <input
                                  type="text"
@@ -114,7 +114,7 @@
                               v-slot="{ errors }">
                               <div class="select">
                                  <select
-                                    :class="{'is-danger': errors.length}"
+                                    :class="{'is-danger': form.unitId && errors.length}"
                                     id="unit_id"
                                     name="unit_id"
                                     v-model="form.unitId">
@@ -123,7 +123,7 @@
                                           {{ unit.unit_name }}
                                        </option>
                                  </select>
-                                 <span class="has-text-danger" v-show="errors.length">
+                                 <span class="has-text-danger" v-show="form.unitId && errors.length">
                                     {{ errors[0] }}
                                  </span>
                               </div>
@@ -148,12 +148,12 @@
                               <input
                                  type="text"
                                  class="input"
-                                 :class="{'is-danger': errors.length}"
+                                 :class="{'is-danger': form.price && errors.length}"
                                  id="price"
                                  name="price"
                                  v-model="form.price">
                               <span
-                                 class="has-text-danger" v-show="errors.length">
+                                 class="has-text-danger" v-show="form.price && errors.length">
                                     {{ errors[0] }}
                               </span>
                            </validation-provider>
@@ -191,6 +191,7 @@
    import { alpha_space_dash } from '../__custom_validation_rules.js';
    import { EventBus } from '../__vue_event-bus.js';
    import { setTimeout } from 'timers';
+   import { invoiceDetailStore } from '../Shared_State/invoice_detail_store.js';
   
    extend("required", required);
    extend("max", max);
@@ -200,32 +201,28 @@
    extend("regex", regex);
    
    const httpConfig = {
-      create: {
-         method: "post",
-         url: "/item",
+      get: {
+         method: "get",
+         url: "/invoice-detail/{invoice_detial_id}",
          responseType: "json"
       },
       getAll: {
          method: "get",
-         url: "/items",
+         url: "/invoices",
          responseType: "json"
       },
-      delete: {
-         url: "/item/{item_id}",
-         params: {
-            data: {
-               _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
-            }
-         }         
-      }
+      create: {
+         method: "post",
+         url: "/invoice-detail",
+         responseType: "json"
+      },
    };
+
    export default {
       components: { ValidationObserver, ValidationProvider, ConfirmDelete },
       props: ['items', 'units', 'invoices'],
       data() {
          return {
-            // items: [],
-            // units: [],
             form: {
                invoiceId: null,
                itemId: null,
@@ -242,15 +239,20 @@
       },
 
       mounted: function() {
-         this.fetchItems();
+         if(!this.items) {
+            this.fetchInvoices();
+         }
+         // this.fetchItems();
       },
 
       computed: {
          postData: function() {
             return {
-               item_name: this.form.itemName,
-               item_code: this.form.itemCode.toLowerCase(),
-               subcat_id: this.form.subCategoryId,
+               invoice_id: this.form.invoiceId,
+               item_id: this.form.itemId,
+               quantity: this.form.quantity,
+               unit_id: this.form.unitId,
+               price: this.form.price
                // _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
             };
          },
@@ -259,15 +261,15 @@
          },
       },
       methods: {
-         fetchItems: function() {
+         fetchInvoices: function() {
             axios(httpConfig.getAll)
             .then(({ data }) => {
                if(data !== null && data !== 'undefined') {
-                  EventBus.$emit('update-data', 'item', data.items);
+                  EventBus.$emit('update-data', 'invoiceSummary', data);
                }
             });
          },
-         createItem: function() {
+         createInvoiceDetail: function() {
             httpConfig.create.data = this.postData;
             var vm = this;
 
@@ -275,8 +277,10 @@
                .then((response) => {
                   this.serverResponseData = response.data;
                   if(this.serverResponseData.success === true) {
-                     this.$emit('new-item-added', this.serverResponseData.data);
-                     this.form.successMsg = 'Item added successfully';
+                     // this.$emit('invoice-detail-added', this.serverResponseData.data);
+                     this.form.successMsg = 'Item added to invoice successfully';
+                     invoiceDetailStore.setSelectedInvoiceId(this.serverResponseData.data.invoice_id, 'invoice-detail-form');
+
                   }
                })
                .catch(response => {
@@ -291,24 +295,6 @@
             this.itemIdToDelete = itemId;
             $(this.removeModal).modal({
                backdrop: 'static'
-            });
-         },
-
-         deleteItem: function(itemId) {
-            axios.delete(httpConfig.delete.url.replace('{item_id}', itemId), httpConfig.delete.params)
-            .then( response => {
-               this.serverResponseData = response.data;
-               if(response.data.success === true) {
-                  this.$emit('item-deleted', itemId);
-                  this.form.successMsg = 'Item removed successfully.';
-               }
-            })
-            .catch(errorResponse => {
-               this.form.errorMsg = response.data.msg;
-            })
-            .finally(() => {
-               this.removeModal.modal('hide');
-               setTimeout(() => this.resetForm(), 1000);
             });
          },
 

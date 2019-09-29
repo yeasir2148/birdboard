@@ -25,7 +25,6 @@
       props: ['entityId', 'entityType'],
       data() {
          return {
-            // toDeleteId: this.deleteCategory
          }
       },
       computed: {
@@ -47,6 +46,12 @@
                   break;
                case 'store':
                   this.$parent.deleteStore(objectId);
+                  break;
+               case 'invoiceSummary':
+                  this.$parent.deleteInvoiceSummary(objectId);
+                  break;
+               case 'invoiceDetail':
+                  this.$parent.deleteInvoiceDetail(objectId);
                   break;
                default:
                   break;

@@ -52,9 +52,9 @@ class ItemsController extends Controller
       $maxSubcategoryId = Subcategory::all('id')->max()->id;
 
       $validatedAttributes = $request->validate([
-         'item_name' => 'required | max:30 | alpha_dash',
+         'item_name' => 'required | regex:/[\w\d ]+/i | max:30',
          'item_code' => 'required | max:30 | alpha_dash',
-         'subcat_id' => "required | integer | between:1,{$maxSubcategoryId}"
+         'subcat_id' => "required | integer | exists:subcategories,id"
       ]);
 
       $newItem = Item::firstOrCreate(

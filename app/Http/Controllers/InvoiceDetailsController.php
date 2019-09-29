@@ -43,31 +43,31 @@ class InvoiceDetailsController extends Controller
     * @return \Illuminate\Http\Response
     */
    public function store(Request $request)
-{
-   $validatedAttributes = $request->validate([
-      'invoice_id' => 'required',
-      'item_id' => 'required | exists:items,id',
-      'quantity' => 'required | numeric',
-      'unit_id' => 'required | exists:units,id',
-      'price' => 'required | numeric',
-   ]);
+   {
+      $validatedAttributes = $request->validate([
+         'invoice_id' => 'required',
+         'item_id' => 'required | exists:items,id',
+         'quantity' => 'required | regex:/^[\d\.]+$/',
+         'unit_id' => 'required | exists:units,id',
+         'price' => 'required | regex:/^[\d\.]+$/',
+      ]);
 
-   $newInvoice = Invoice::create($validatedAttributes);
+      $newInvoiceDetail = InvoiceDetail::create($validatedAttributes);
 
-   if($newInvoice->wasRecentlyCreated !== true) {
-      $response['success'] = false;
-      $response['message'] = 'Record already exists';
-   } else {
-      $response['success'] = true;
-      $response['data'] = $newInvoice;
+      if($newInvoiceDetail->wasRecentlyCreated !== true) {
+         $response['success'] = false;
+         $response['message'] = 'Record already exists';
+      } else {
+         $response['success'] = true;
+         $response['data'] = $newInvoiceDetail;
+      }
+
+      if(isRequestAjaxOrTesting()) {
+         return response()->json($response);
+      }
+
+      return back();
    }
-
-   if(isRequestAjaxOrTesting()) {
-      return response()->json($response);
-   }
-
-   return back();
-}
 
    /**
     * Display the specified resource.

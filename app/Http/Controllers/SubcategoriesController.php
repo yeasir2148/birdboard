@@ -53,7 +53,7 @@ class SubcategoriesController extends Controller
       $maxCategoryId = Category::all('id')->max()->id;
 
       $validatedAttr = $request->validate([
-         'subcat_name' => 'required | alpha_dash',
+         'subcat_name' => 'required | regex:/[\w\d ]+/i',
          'subcat_code' => 'required | alpha_dash',
          'category_id' => "required | integer | between:1,$maxCategoryId"
       ]);

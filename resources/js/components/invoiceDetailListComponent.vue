@@ -29,13 +29,13 @@
                </thead>
 
                <tbody>
-                  <tr v-for="row in shared.selectedInvoiceDetails">
-                     <td class="has-text-centered">{{ row.item_name }}</td>
-                     <td class="has-text-centered">{{ row.quantity }}</td>
-                     <td class="has-text-centered">{{ row.unit_name }}</td>
-                     <td class="has-text-centered">{{ row.price }}</td>
+                  <tr v-for="invoiceDetail in shared.selectedInvoiceDetails">
+                     <td class="has-text-centered">{{ invoiceDetail.item_name }}</td>
+                     <td class="has-text-centered">{{ invoiceDetail.quantity }}</td>
+                     <td class="has-text-centered">{{ invoiceDetail.unit_name }}</td>
+                     <td class="has-text-centered">{{ invoiceDetail.price }}</td>
                      <td class="has-text-centered">
-                        <slot name="delete-btn" v-bind:confirmDelete="confirmDelete">Delete</slot>
+                        <slot name="delete-btn" v-bind:invoiceDetail="invoiceDetail" v-bind:confirmDelete="confirmDelete">Delete</slot>
                      </td>
                   </tr>
                </tbody>
@@ -88,7 +88,7 @@
                successMsg: null,
                errorMsg: null
             },
-            entityType: 'invoice_detail',
+            entityType: 'invoiceDetail',
             serverResponseData: {},
             invoiceDetailIdToDelete: null,
             shared: invoiceDetailStore.state,
@@ -101,7 +101,7 @@
 
       computed: {
          removeModal: function() {
-            return '#remove_invoice_detail_modal';
+            return '#remove_invoiceDetail_modal';
          },
          selectedInvoiceId: function() {
             return this.shared.selectedInvoiceId;
@@ -113,16 +113,16 @@
             // console.log(newValue);
             if(newValue !== oldValue) {
                httpConfig.getItems.url = httpConfig.getItems.url.replace('{invoice_id}', newValue);
-               console.log(httpConfig.getItems);
                axios(httpConfig.getItems)
                .then(response => {
                   this.selectedInvoice = response.data.invoice_summary;
-                  invoiceDetailStore.setSelectedInvoiceDetails(response.data.invoice_details);
+                  invoiceDetailStore.setSelectedInvoiceDetails(response.data.invoice_details,'invoice-detail-list component');
                })
                .catch(errorResponse => {
                   this.form.errorMsg = errorResponse.message;
                })
                .finally(() => {
+                  //reset to placeholder string for invoice summary id
                   httpConfig.getItems.url = '/invoice/items/{invoice_id}';
                });
             }
@@ -144,7 +144,8 @@
             .then( response => {
                this.serverResponseData = response.data;
                if(response.data.success === true) {
-                  this.$emit('invoice-detail-deleted', invoiceDetailId);
+                  // this.$emit('invoice-detail-deleted', invoiceDetailId);
+                  invoiceDetailStore.removeInvoiceDetail(this.selectedInvoiceId, invoiceDetailId, 'invoice-detail-list component');
                   this.form.successMsg = 'Item removed successfully from Invoice';
                }
             })
@@ -152,8 +153,8 @@
                this.form.errorMsg = errorResponse.message;
             })
             .finally(() => {
-               this.removeModal.modal('hide');
-               setTimeout(() => this.resetForm(), 1000);
+               $(this.removeModal).modal('hide');
+               // setTimeout(() => this.resetForm(), 1000);
             });
          },
 

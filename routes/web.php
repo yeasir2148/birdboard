@@ -50,6 +50,7 @@ Route::get('/invoice/items/{invoiceSummary}','InvoicesController@getDetails');
 
 // Route::get('/invoice-detail/{invoiceSummary}','InvoicesController@index');
 Route::post('/invoice-detail','InvoiceDetailsController@store');
+Route::delete('/invoice-detail/{invoice_detail}','InvoiceDetailsController@destroy');
 // Route::delete('/invoice/{invoice}','InvoicesController@destroy');
 
 Auth::routes();

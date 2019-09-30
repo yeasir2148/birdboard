@@ -43,6 +43,11 @@
 
                   <div class="column is-two-fifths">
                      <invoice-detail-list>
+                     @auth
+                        <template v-slot:delete-btn="{ invoiceDetail, confirmDelete }">
+                           <button class="btn btn-danger" @click="confirmDelete(invoiceDetail.id)">Delete</button>
+                        </template>
+                     @endauth
                      </invoice-detail-list>
                   </div>
                </div>

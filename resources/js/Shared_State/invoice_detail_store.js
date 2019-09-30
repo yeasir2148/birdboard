@@ -19,6 +19,15 @@
             addSelectedInvoiceDetail(invoiceDetail, comp) {
                console.log('InvoiceDetail added by ' + comp + ' with value ' + invoiceDetail);
                this.state.selectedInvoiceDetails.push(invoiceDetail);
+            },
+
+            removeInvoiceDetail(invoiceId, deletedInvoiceDetailId, comp) {
+               console.log('InvoiceDetail deleted by ' + comp + ' with invoice detail id ' + deletedInvoiceDetailId);
+               if(invoiceId === this.state.selectedInvoiceId) {
+                  this.state.selectedInvoiceDetails = this.state.selectedInvoiceDetails.filter(invDetail => {
+                     return invDetail.id !== deletedInvoiceDetailId;
+                  });
+               }
             }
          };
 

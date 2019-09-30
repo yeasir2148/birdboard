@@ -115,6 +115,11 @@ class InvoiceDetailsController extends Controller
     */
    public function destroy(InvoiceDetail $invoiceDetail)
    {
-      //
+      $success = $invoiceDetail->delete();
+      if(isRequestAjaxOrTesting()) {
+         return response()->json([
+            'success' => $success
+         ]);
+      }
    }
 }

@@ -35,5 +35,14 @@ class InvoiceDetailsTest extends TestCase
        $response = $this->post('/invoice-detail', $invoiceDetail);
     //    dd($response);
        $this->assertDatabaseHas('invoice_details', $invoiceDetail);
-    }    
+    }
+
+    /** @test */
+    public function an_invoice_detail_belongs_to_an_invoice()
+    {
+        $invoiceDetail = factory(InvoiceDetail::class)->create();
+        // $invoiceId = $invoiceDetail->invoice_id;
+        $this->assertInstanceOf(InvoiceSummary::class, $invoiceDetail->invoice);
+    }
+    
 }

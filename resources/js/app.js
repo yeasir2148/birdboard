@@ -59,7 +59,10 @@ const app = new Vue({
       stores: [],
       units: [],
       invoices: [],
-      // activeNav: null,
+      // activeNav: {
+      //    inventory: null,
+      //    purchases: 'invoices_tab'
+      // }
    },
 
    mounted: function () {

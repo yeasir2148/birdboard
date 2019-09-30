@@ -61,7 +61,7 @@ class InvoicesController extends Controller
          'store_id' => 'required | exists:stores,id'
       ]);
 
-      $newInvoiceSummary = InvoiceSummary::create($validatedAttributes);
+      $newInvoiceSummary = InvoiceSummary::create($validatedAttributes)->load('store');
 
       if($newInvoiceSummary->wasRecentlyCreated !== true) {
          $response['success'] = false;

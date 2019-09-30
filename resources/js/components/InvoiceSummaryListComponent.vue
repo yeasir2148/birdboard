@@ -29,7 +29,9 @@
 
                <tbody>
                   <tr v-for="invoice in invoices">
-                     <td class="has-text-centered">{{ invoice.invoice_no }}</td>
+                     <td class="has-text-centered">
+                        <a href="#" @click="showInvoiceDetails(invoice.id)">{{ invoice.invoice_no }}</a>
+                     </td>
                      <td class="has-text-centered">{{ invoice.value }}</td>
                      <td class="has-text-centered">{{ invoice.invoice_date }}</td>
                      <td class="has-text-centered" v-if="invoice.store">{{ invoice.store.store_name }}</td>
@@ -60,6 +62,7 @@
    import { alpha_space_dash } from '../__custom_validation_rules.js';
    import { EventBus } from '../__vue_event-bus.js';
    import { setTimeout } from 'timers';
+   import { invoiceDetailStore } from '../Shared_State/invoice_detail_store.js';
   
    extend("required", required);
    extend("max", max);
@@ -95,7 +98,8 @@
             },
             serverResponseData: {},
             invoiceSummaryIdToDelete: null,
-            entityType: 'invoiceSummary'
+            entityType: 'invoiceSummary',
+            shared: invoiceDetailStore.state
          };
       },
 
@@ -109,6 +113,10 @@
          },
       },
       methods: {
+         showInvoiceDetails: function(invoiceId) {
+            invoiceDetailStore.setSelectedInvoiceId(invoiceId, 'invoiceSummaryList');
+            // $('#invoice_detail_tab').trigger('click');
+         },
          fetchInvoices: function() {
             axios(httpConfig.getAll)
             .then(({ data }) => {

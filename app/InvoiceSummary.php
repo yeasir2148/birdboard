@@ -28,4 +28,14 @@ class InvoiceSummary extends Model
       ->where('inD.invoice_id','=', $this->id)
       ->get();
    }
+
+   public function getItem($invoiceDetailId) {
+      return 
+      DB::table('invoice_details AS inD')
+      ->join('items AS i','i.id', '=', 'inD.item_id')
+      ->join('units AS u', 'u.id', '=', 'inD.unit_id')
+      ->select('i.item_name','u.unit_name','inD.*')
+      ->where('inD.id','=', $invoiceDetailId)
+      ->get();
+   }
 }

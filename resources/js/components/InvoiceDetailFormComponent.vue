@@ -220,7 +220,7 @@
 
    export default {
       components: { ValidationObserver, ValidationProvider, ConfirmDelete },
-      props: ['items', 'units', 'invoices'],
+      props: ['items', 'units', 'invoices','active-nav'],
       data() {
          return {
             form: {
@@ -279,12 +279,12 @@
                   if(this.serverResponseData.success === true) {
                      // this.$emit('invoice-detail-added', this.serverResponseData.data);
                      this.form.successMsg = 'Item added to invoice successfully';
-                     invoiceDetailStore.setSelectedInvoiceId(this.serverResponseData.data.invoice_id, 'invoice-detail-form');
-
+                     invoiceDetailStore.setSelectedInvoiceId(this.serverResponseData.data.model.invoice_id, 'invoice-detail-form');
+                     invoiceDetailStore.addSelectedInvoiceDetail(this.serverResponseData.data.withDetails, 'invoice-detail-form');
                   }
                })
-               .catch(response => {
-                  this.form.errorMsg = response.data.msg;
+               .catch(errorResponse => {
+                  this.form.errorMsg = errorResponse.message;
                })
                .finally(() => {
                   setTimeout(() => this.resetForm(), 1000);

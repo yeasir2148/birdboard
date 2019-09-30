@@ -5,11 +5,11 @@
 
       <div class="columns">
          <div class="column has-text-centered">
-            <h4 class="title is-4">Invoice Detail</h4>
+            <h4 class="title is-4">Invoice Detail - <span v-if="selectedInvoice">{{ selectedInvoice.invoice_no }}</span></h4>
          </div>
          <div class="column is-2 has-text-centered">
             <div class="toolbar has-text-centered">
-               <span class="icon fas fa-sync" id="sync_invoices"></span>
+               <span class="icon fas fa-sync" id="sync_invoice_details" @click="fetchInvoiceDetails(selectedInvoiceId)"></span>
             </div>            
          </div>
       </div>                    
@@ -29,7 +29,7 @@
                </thead>
 
                <tbody>
-                  <tr v-for="row in selectedInvoiceDetails">
+                  <tr v-for="row in shared.selectedInvoiceDetails">
                      <td class="has-text-centered">{{ row.item_name }}</td>
                      <td class="has-text-centered">{{ row.quantity }}</td>
                      <td class="has-text-centered">{{ row.unit_name }}</td>
@@ -40,7 +40,6 @@
                   </tr>
                </tbody>
             </table>
-            <div>{{ shared.selectedInvoiceId }}</div>
          </div>
       </div>
 
@@ -56,21 +55,10 @@
 
 
 <script>
-   // import { ValidationObserver, ValidationProvider, extend } from "vee-validate";
    import ConfirmDelete from './Utility/ConfirmDeleteComponent.vue';
-   // import { required, max, alpha_dash, alpha, numeric, regex } from "vee-validate/dist/rules";
-   // import { alpha_space_dash } from '../__custom_validation_rules.js';
-   // import { EventBus } from '../__vue_event-bus.js';
    import { setTimeout } from 'timers';
    import { invoiceDetailStore } from '../Shared_State/invoice_detail_store.js';
   
-   // extend("required", required);
-   // extend("max", max);
-   // extend("alpha_dash", alpha_dash);
-   // extend("alpha", alpha);
-   // extend("numeric", numeric);
-   // extend("regex", regex);
-   
    const httpConfig = {
       getItems: {
          method: "get",
@@ -93,7 +81,7 @@
    };
    export default {
       components: { ConfirmDelete },
-      props: ['items', 'invoices'],
+      props: ['items', 'invoices', 'active-nav'],
       data() {
          return {
             form: {
@@ -105,12 +93,10 @@
             invoiceDetailIdToDelete: null,
             shared: invoiceDetailStore.state,
             selectedInvoice: {},
-            selectedInvoiceDetails: {}
          };
       },
 
       mounted: function() {
-         // this.fetchItems();
       },
 
       computed: {
@@ -124,26 +110,28 @@
 
       watch: {
          selectedInvoiceId: function(newValue, oldValue) {
+            // console.log(newValue);
             if(newValue !== oldValue) {
                httpConfig.getItems.url = httpConfig.getItems.url.replace('{invoice_id}', newValue);
+               console.log(httpConfig.getItems);
                axios(httpConfig.getItems)
                .then(response => {
                   this.selectedInvoice = response.data.invoice_summary;
-                  this.selectedInvoiceDetails = response.data.invoice_details;
+                  invoiceDetailStore.setSelectedInvoiceDetails(response.data.invoice_details);
+               })
+               .catch(errorResponse => {
+                  this.form.errorMsg = errorResponse.message;
+               })
+               .finally(() => {
+                  httpConfig.getItems.url = '/invoice/items/{invoice_id}';
                });
             }
          }
       },
       methods: {
-         // fetchItems: function() {
-         //    axios(httpConfig.getAll)
-         //    .then(({ data }) => {
-         //       if(data !== null && data !== 'undefined') {
-         //          EventBus.$emit('update-data', 'item', data.items);
-         //       }
-         //    });
-         // },
-
+         fetchInvoiceDetails: function(invoiceId) {
+            console.log(invoiceId);
+         },
          confirmDelete: function(invoiceDetailId) {
             this.invoiceDetailIdToDelete = invoiceDetailId;
             $(this.removeModal).modal({
@@ -161,7 +149,7 @@
                }
             })
             .catch(errorResponse => {
-               this.form.errorMsg = response.data.msg;
+               this.form.errorMsg = errorResponse.message;
             })
             .finally(() => {
                this.removeModal.modal('hide');

@@ -53,13 +53,17 @@ class InvoiceDetailsController extends Controller
       ]);
 
       $newInvoiceDetail = InvoiceDetail::create($validatedAttributes);
+      $result = [
+         'model' => $newInvoiceDetail,
+         'withDetails' => $newInvoiceDetail->withRelatedInformation()
+      ];
 
       if($newInvoiceDetail->wasRecentlyCreated !== true) {
          $response['success'] = false;
          $response['message'] = 'Record already exists';
       } else {
          $response['success'] = true;
-         $response['data'] = $newInvoiceDetail;
+         $response['data'] = $result;
       }
 
       if(isRequestAjaxOrTesting()) {

@@ -12,7 +12,7 @@ $factory->define(InvoiceSummary::class, function (Faker $faker) {
 
    return [
       'invoice_no' => $faker->randomNumber(6),
-      'value' => rand(1,100),
+      'value' => 0,
       'invoice_date' => $faker->date('Y-m-d'),
       'store_id' => $storeId,
    ];

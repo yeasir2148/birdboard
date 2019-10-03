@@ -6,7 +6,7 @@ use App\Unit;
 use Faker\Generator as Faker;
 
 $factory->define(Unit::class, function (Faker $faker) {
-   $units = ['KG','GRAM','LITER'];
+   $units = ['KG','GRAM','LITER', 'POUND', 'TON', 'EACH', 'DOZEN'];
    $ind = rand(0, count($units) - 1);
    return [
       'unit_name' => $units[$ind],

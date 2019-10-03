@@ -49,17 +49,23 @@ class ItemsController extends Controller
     */
    public function store(Request $request)
    {
-      $maxSubcategoryId = Subcategory::all('id')->max()->id;
+      // $maxSubcategoryId = Subcategory::all('id')->max()->id;
 
       $validatedAttributes = $request->validate([
          'item_name' => 'required | regex:/[\w\d ]+/i | max:30',
-         'item_code' => 'required | max:30 | alpha_dash',
+         // 'item_code' => 'required | max:30 | alpha_dash',
          'subcat_id' => "required | integer | exists:subcategories,id"
       ]);
 
+      $itemCode = explode(" ", $validatedAttributes['item_name']);
+      $itemCode = array_map(function($item){
+         return strtolower($item);
+      }, $itemCode);
+
+      $itemCode = implode("_", $itemCode);
       $newItem = Item::firstOrCreate(
-         ['item_code' => $validatedAttributes['item_code']],
-         array_diff_key($validatedAttributes, ['item_code' => $validatedAttributes['item_code']])
+         ['item_code' => $itemCode],
+         array_diff_key($validatedAttributes, ['item_code' => $itemCode])
       );
 
       if($newItem->wasRecentlyCreated !== true) {

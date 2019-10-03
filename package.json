@@ -36,6 +36,7 @@
       "vue-template-compiler": "^2.6.10"
    },
    "dependencies": {
+      "disableautofill": "^1.2.8",
       "flush-promises": "^1.0.2",
       "vee-validate": "^3.0.3"
    }

@@ -40,6 +40,7 @@ Route::get('/stores','StoresController@index');
 Route::post('/store','StoresController@store');
 Route::delete('/store/{store}','StoresController@destroy');
 
+Route::get('/invoice/{invoice_summary}','InvoicesController@show');
 Route::get('/invoices','InvoicesController@index');
 Route::post('/invoice','InvoicesController@store');
 Route::delete('/invoice/{invoice}','InvoicesController@destroy');

@@ -45,10 +45,17 @@ class StoresController extends Controller
       $response = [];
       $validatedAttr = $request->validate([
          'store_name' => 'required | max:100',
-         'store_code' => 'required | max:100'
+         // 'store_code' => 'required | max:100'
       ]);
+
+      $storeCode = explode(" ", $validatedAttr['store_name']);
+      $storeCode = array_map(function($str){
+         return strtolower($str);
+      }, $storeCode);
+
+      $storeCode = implode("_", $storeCode);
       $newStore = Store::firstOrCreate(
-         ['store_code' => $validatedAttr['store_code']],
+         ['store_code' => $storeCode],
          ['store_name' => $validatedAttr['store_name']]
       );
 

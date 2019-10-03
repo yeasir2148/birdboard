@@ -24,7 +24,14 @@
                                  name="store_name"
                                  id="store_name"
                                  v-model="form.storeName"
+                                 autocomplete="off"
                               >
+                              <div class="field-suggest" v-if="form.status == 'pending' && form.storeName && filteredStores.length">
+                                 <ul>
+                                    <li>Available stores....</li>
+                                    <li v-for="store of filteredStores" :key="store.id">{{store.store_name}}</li>
+                                 </ul>
+                              </div>
                               <span
                                  class="has-text-danger"
                                  v-show="form.storeName && form.storeName.length"
@@ -32,10 +39,19 @@
                            </validation-provider>
                         </div>
                      </div>
-                  </div>
+                     <div class="field">
+                        <div class="control">
+                           <button
+                              class="button is-link"
+                              type="submit"
+                              :disabled="!observerSlotProp.valid || observerSlotProp.pristine"
+                           >Create</button>
+                        </div>
+                     </div>
+                  </div> 
                </div>
 
-               <div class="field is-horizontal">
+               <div class="field is-horizontal" v-if="false">
                   <div class="field-label is-normal">
                      <label for="store_code" class="label">Store Code</label>
                   </div>
@@ -65,20 +81,6 @@
                   </div>
                </div>
 
-               <div class="field is-horizontal">
-                  <div class="field-label"></div>
-                  <div class="field-body">
-                     <div class="field">
-                        <div class="control">
-                           <button
-                              class="button is-link"
-                              type="submit"
-                              :disabled="!observerSlotProp.valid || observerSlotProp.pristine"
-                           >Create</button>
-                        </div>
-                     </div>
-                  </div>
-               </div>
             </form>
          </ValidationObserver>
       </div>
@@ -166,6 +168,7 @@
       data() {
          return {
             form: {
+               status: 'pending',
                storeName: null,
                storeCode: null,
                successMsg: null,
@@ -182,16 +185,24 @@
       },
 
       computed: {
+         formStatus: function() {
+            return this.form.status == 'pending' && this.form.storeName && this.filteredStores.length;
+         },
          postData: function() {
             return {
-               store_name: this.form.storeName,
-               store_code: this.form.storeCode.toLowerCase(),
+               store_name: this.form.storeName
+               // store_code: this.form.storeCode.toLowerCase(),
                // _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
             };
          },
          removeModal: function() {
             return '#remove_store_modal';
          },
+         filteredStores: function() {
+            return this.stores.filter(store => {
+               return this.form.storeName && store.store_name.toLowerCase().startsWith(this.form.storeName.toLowerCase());
+            });
+         }
       },
       methods: {
          fetchStores: function() {
@@ -203,7 +214,9 @@
             });            
          },
          createStore: function() {
+            this.form.status = 'submitting';
             httpConfig.create.data = this.postData;
+            this.form.storeName = null;
             var vm = this;
 
             axios(httpConfig.create)
@@ -220,7 +233,8 @@
                this.form.errorMsg = errorResponse.message;
             })
             .finally(() => {
-               setTimeout(() => this.resetForm(), 1000);
+               setTimeout(() => this.resetForm(), 500);
+               this.form.status = 'pending';
             });         
          },
 
@@ -251,7 +265,10 @@
 
          resetForm: function() {
             for (var key in this.form) {
-               this.form[key] = null;
+               this.form.status = 'pending';
+               if(key !== 'status') {
+                  this.form[key] = null;
+               }               
             }
          }
       }
@@ -265,6 +282,20 @@
       &:hover {
          background-color: #EDE7E6;
       }
+   }
+
+   .field-suggest {
+      position: absolute;
+      background-color: white;
+      z-index: 9999;
+      border: 1px solid lightgrey;
+      padding: 5px;
+      width: 200px;
+      border-radius: 5px;
+   }
+   input:-webkit-autofill {
+      // z-index: 999;
+      border: 1px solid red;
    }
 
 </style>

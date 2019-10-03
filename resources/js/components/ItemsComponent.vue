@@ -34,7 +34,7 @@
                   </div>
                </div>
 
-               <div class="field is-horizontal">
+               <div class="field is-horizontal" v-if="false">
                   <div class="field-label is-normal">
                      <label for="item_code" class="label">Item Code</label>
                   </div>
@@ -225,7 +225,7 @@
          postData: function() {
             return {
                item_name: this.form.itemName,
-               item_code: this.form.itemCode.toLowerCase(),
+               // item_code: this.form.itemCode.toLowerCase(),
                subcat_id: this.form.subCategoryId,
                // _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
             };

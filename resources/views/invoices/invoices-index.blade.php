@@ -28,7 +28,8 @@
                         <br>
 
                         <invoice-summary-list :invoices="invoices" :items="items" :stores="stores" :units="units"
-                           @invoice-summary-deleted="invoiceSummaryDeleted">
+                           @invoice-summary-deleted="invoiceSummaryDeleted"
+                           @new-invoice-detail-added="newInvoiceDetailAdded">
                         @auth
                            <template v-slot:delete-btn="{ invoice, confirmDelete }">
                               <button class="btn btn-danger" @click="confirmDelete(invoice.id)">Delete</button>

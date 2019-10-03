@@ -45,10 +45,10 @@ class StoresTest extends TestCase
 
       $this->post('/store', $store)->assertSessionHasErrors('store_name');
 
-      $store = factory(Store::class)->raw(
-         ['store_code' => '']
-      );
-      $this->post('/store', $store)->assertSessionHasErrors('store_code');
+      // $store = factory(Store::class)->raw(
+      //    ['store_code' => '']
+      // );
+      // $this->post('/store', $store)->assertSessionHasErrors('store_code');
    }
    
    /** @test */

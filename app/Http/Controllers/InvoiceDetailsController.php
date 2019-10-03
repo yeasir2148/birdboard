@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\InvoiceDetail;
+use App\InvoiceSummary;
 use Illuminate\Http\Request;
 
 class InvoiceDetailsController extends Controller
@@ -53,15 +54,16 @@ class InvoiceDetailsController extends Controller
       ]);
 
       $newInvoiceDetail = InvoiceDetail::create($validatedAttributes);
-      $result = [
-         'model' => $newInvoiceDetail,
-         'withDetails' => $newInvoiceDetail->withRelatedInformation()
-      ];
 
       if($newInvoiceDetail->wasRecentlyCreated !== true) {
          $response['success'] = false;
          $response['message'] = 'Record already exists';
       } else {
+         $this->updateInvoiceSummaryValue($newInvoiceDetail);
+         $result = [
+            'model' => $newInvoiceDetail,
+            'withDetails' => $newInvoiceDetail->withRelatedInformation()
+         ];
          $response['success'] = true;
          $response['data'] = $result;
       }
@@ -81,7 +83,7 @@ class InvoiceDetailsController extends Controller
     */
    public function show(InvoiceDetail $invoiceDetail)
    {
-      //
+      
    }
 
    /**
@@ -115,11 +117,26 @@ class InvoiceDetailsController extends Controller
     */
    public function destroy(InvoiceDetail $invoiceDetail)
    {
+      $price = $invoiceDetail->price;
+      $invoiceSummary = $invoiceDetail->invoice;
+
       $success = $invoiceDetail->delete();
+      if($success) {
+         $invoiceSummary->value = $invoiceSummary->value - $price;
+         $invoiceSummary->save();
+      }
+
       if(isRequestAjaxOrTesting()) {
          return response()->json([
             'success' => $success
          ]);
       }
+   }
+
+   protected function updateInvoiceSummaryValue(InvoiceDetail $invoiceDetail) {
+      $invoiceSummary = $invoiceDetail->invoice;
+
+      $invoiceSummary->value += $invoiceDetail->price;
+      $invoiceSummary->save();
    }
 }

@@ -5,7 +5,6 @@
  */
 
 require('./bootstrap');
-
 window.Vue = require('vue');
 import 'jquery-ui/ui/widgets/datepicker.js';
 import { EventBus } from './__vue_event-bus.js';
@@ -153,6 +152,13 @@ const app = new Vue({
          });
       },
 
+      newInvoiceDetailAdded: function(invoiceSummaryForWhichDetailWasAdded) {
+         let targetObjIndex = this.invoices.findIndex(invoice => {
+            return invoice.id === invoiceSummaryForWhichDetailWasAdded.id;
+         });
+         console.log(targetObjIndex);
+         this.invoices[targetObjIndex] = invoiceSummaryForWhichDetailWasAdded;
+      },
       setActiveNav: function() {
          // $(event.target).parents('ul.navbar-nav').find('li.nav-item').removeClass('active');
          // event.target.parentNode.classList.add('active');

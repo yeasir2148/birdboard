@@ -47,10 +47,10 @@ class ItemsTest extends TestCase
 
       $this->post('/item', $item)->assertSessionHasErrors('item_name');
 
-      $item = factory(Item::class)->raw(
-         ['item_code' => '']
-      );
-      $this->post('/item', $item)->assertSessionHasErrors('item_code');
+      // $item = factory(Item::class)->raw(
+      //    ['item_code' => '']
+      // );
+      // $this->post('/item', $item)->assertSessionHasErrors('item_code');
 
       $item = factory(Item::class)->raw(
          ['subcat_id' => '']

@@ -75,6 +75,11 @@
          url: "/invoices",
          responseType: "json"
       },
+      get: {
+         method: "get",
+         url: "/invoice/{invoice_id}",
+         responseType: "json"
+      },
       delete: {
          url: "/invoice/{invoice_id}",
          params: {
@@ -111,6 +116,29 @@
          removeModal: function() {
             return '#remove_invoiceSummary_modal';
          },
+
+         selectedInvoiceDetails: function() {
+            return this.shared.selectedInvoiceDetails;
+         }
+      },
+
+      watch: {
+         selectedInvoiceDetails: function(newVal) {
+            // console.log('changed');
+            // Since new detail/item was added to an invoice, we need to fetch that invoice again from server
+            
+            httpConfig.get.url = httpConfig.get.url.replace('{invoice_id}', this.shared.selectedInvoiceId);
+            console.log(httpConfig.get);
+            axios(httpConfig.get)
+            .then(successResponse => {
+               // notify parent with fetched InvoiceSummary object for which new detail/item was added.
+               // parent will update it's invocie array by replacing existing invoice object with new one
+               this.$emit('new-invoice-detail-added', successResponse.data);
+            })
+            .finally(() => {
+               httpConfig.get.url = "/invoice/{invoice_id}";
+            });
+         }
       },
       methods: {
          showInvoiceDetails: function(invoiceId) {

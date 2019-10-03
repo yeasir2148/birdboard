@@ -111,7 +111,7 @@
       watch: {
          selectedInvoiceId: function(newValue, oldValue) {
             // console.log(newValue);
-            if(newValue !== oldValue) {
+            if(newValue && newValue !== oldValue) {
                httpConfig.getItems.url = httpConfig.getItems.url.replace('{invoice_id}', newValue);
                axios(httpConfig.getItems)
                .then(response => {

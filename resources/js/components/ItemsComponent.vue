@@ -143,7 +143,7 @@
                   <tr v-for="item in items" :key="item.id">
                      <td class="has-text-centered">{{ item.item_name }}</td>
                      <td class="has-text-centered">{{ item.item_code }}</td>
-                     <td class="has-text-centered" v-if="item.subcategory">{{ item.subcategory.category.name }}</td>
+                     <td class="has-text-centered" v-if="item.subcategory">{{ item.subcategory.subcat_name }}</td>
                      <td class="has-text-centered" v-if="isAuthenticated">
                         <button class="btn btn-primary" @click="confirmDelete(item.id)">Delete</button>
                      </td>

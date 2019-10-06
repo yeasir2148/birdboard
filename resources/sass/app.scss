@@ -34,8 +34,12 @@
 }
 
 #site_navbar {
-   .nav-item.btn a {
-      color: black;
+   .nav-item.btn {
+      background-color: #F0E68C; 
+      border: 1px solid gray;
+      a {
+         color: black;
+      }
    }
 
    .dropdown-toggle.auth-user {

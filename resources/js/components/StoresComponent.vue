@@ -293,9 +293,4 @@
       width: 200px;
       border-radius: 5px;
    }
-   input:-webkit-autofill {
-      // z-index: 999;
-      border: 1px solid red;
-   }
-
 </style>

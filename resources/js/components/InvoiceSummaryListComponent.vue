@@ -28,7 +28,7 @@
                </thead>
 
                <tbody>
-                  <tr v-for="invoice in invoices">
+                  <tr v-for="invoice in invoices" :key="invoice.id">
                      <td class="has-text-centered">
                         <a href="#" @click="showInvoiceDetails(invoice.id)">{{ invoice.invoice_no }}</a>
                      </td>
@@ -124,26 +124,24 @@
 
       watch: {
          selectedInvoiceDetails: function(newVal) {
-            // console.log('changed');
-            // Since new detail/item was added to an invoice, we need to fetch that invoice again from server
+            // Since new detail/item was added/removed to an invoice, we need to fetch that invoice again from server
             
-            httpConfig.get.url = httpConfig.get.url.replace('{invoice_id}', this.shared.selectedInvoiceId);
-            console.log(httpConfig.get);
-            axios(httpConfig.get)
-            .then(successResponse => {
-               // notify parent with fetched InvoiceSummary object for which new detail/item was added.
-               // parent will update it's invocie array by replacing existing invoice object with new one
-               this.$emit('new-invoice-detail-added', successResponse.data);
-            })
-            .finally(() => {
-               httpConfig.get.url = "/invoice/{invoice_id}";
-            });
+            // httpConfig.get.url = httpConfig.get.url.replace('{invoice_id}', this.shared.selectedInvoiceId);
+
+            // axios(httpConfig.get)
+            // .then(successResponse => {
+
+            // })
+            // .finally(() => {
+            //    httpConfig.get.url = "/invoice/{invoice_id}";
+            // });
          }
       },
+
       methods: {
          showInvoiceDetails: function(invoiceId) {
             invoiceDetailStore.setSelectedInvoiceId(invoiceId, 'invoiceSummaryList');
-            // $('#invoice_detail_tab').trigger('click');
+            // $('#invoice_detail_tab').trigger('click');                                 // Switch view to the invoice details tab 
          },
          fetchInvoices: function() {
             axios(httpConfig.getAll)

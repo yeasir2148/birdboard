@@ -29,7 +29,7 @@
                </thead>
 
                <tbody>
-                  <tr v-for="invoiceDetail in shared.selectedInvoiceDetails">
+                  <tr v-for="invoiceDetail in shared.selectedInvoiceDetails" :key="invoiceDetail.id">
                      <td class="has-text-centered">{{ invoiceDetail.item_name }}</td>
                      <td class="has-text-centered">{{ invoiceDetail.quantity }}</td>
                      <td class="has-text-centered">{{ invoiceDetail.unit_name }}</td>
@@ -110,8 +110,8 @@
 
       watch: {
          selectedInvoiceId: function(newValue, oldValue) {
-            // console.log(newValue);
             if(newValue && newValue !== oldValue) {
+               // console.log(newValue);
                httpConfig.getItems.url = httpConfig.getItems.url.replace('{invoice_id}', newValue);
                axios(httpConfig.getItems)
                .then(response => {
@@ -133,6 +133,7 @@
             console.log(invoiceId);
          },
          confirmDelete: function(invoiceDetailId) {
+            console.log(invoiceDetailId);
             this.invoiceDetailIdToDelete = invoiceDetailId;
             $(this.removeModal).modal({
                backdrop: 'static'
@@ -144,9 +145,9 @@
             .then( response => {
                this.serverResponseData = response.data;
                if(response.data.success === true) {
-                  // this.$emit('invoice-detail-deleted', invoiceDetailId);
                   invoiceDetailStore.removeInvoiceDetail(this.selectedInvoiceId, invoiceDetailId, 'invoice-detail-list component');
                   this.form.successMsg = 'Item removed successfully from Invoice';
+                  this.$emit('invoice-detail-removed', this.serverResponseData.invoice);
                }
             })
             .catch(errorResponse => {
@@ -154,7 +155,7 @@
             })
             .finally(() => {
                $(this.removeModal).modal('hide');
-               // setTimeout(() => this.resetForm(), 1000);
+               setTimeout(() => this.resetForm(), 1000);
             });
          },
 

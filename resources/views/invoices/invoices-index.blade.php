@@ -28,8 +28,7 @@
                         <br>
 
                         <invoice-summary-list :invoices="invoices" :items="items" :stores="stores" :units="units"
-                           @invoice-summary-deleted="invoiceSummaryDeleted"
-                           @new-invoice-detail-added="newInvoiceDetailAdded">
+                           @invoice-summary-deleted="invoiceSummaryDeleted">
                         @auth
                            <template v-slot:delete-btn="{ invoice, confirmDelete }">
                               <button class="btn btn-danger" @click="confirmDelete(invoice.id)">Delete</button>
@@ -43,7 +42,7 @@
                   </div>
 
                   <div class="column is-two-fifths">
-                     <invoice-detail-list>
+                     <invoice-detail-list @invoice-detail-removed="refreshInvoice">
                      @auth
                         <template v-slot:delete-btn="{ invoiceDetail, confirmDelete }">
                            <button class="btn btn-danger" @click="confirmDelete(invoiceDetail.id)">Delete</button>
@@ -63,14 +62,14 @@
                         <invoice-detail-form :items="items" :stores="stores" 
                            :invoices="invoices"
                            :units="units"
-                        >
+                           @new-invoice-detail-added="refreshInvoice">
                         </invoice-detail-form>
                         @endauth
 
                         <br>
                         <br>
 
-                        <invoice-detail-list>
+                        <invoice-detail-list @invoice-detail-removed="refreshInvoice">
                         </invoice-detail-list>
                 
                      </div>

@@ -277,10 +277,11 @@
                .then((response) => {
                   this.serverResponseData = response.data;
                   if(this.serverResponseData.success === true) {
-                     // this.$emit('invoice-detail-added', this.serverResponseData.data);
                      this.form.successMsg = 'Item added to invoice successfully';
+                     let relatedInvoice = this.serverResponseData.data.model.invoice;
                      invoiceDetailStore.setSelectedInvoiceId(this.serverResponseData.data.model.invoice_id, 'invoice-detail-form');
                      invoiceDetailStore.addSelectedInvoiceDetail(this.serverResponseData.data.withDetails, 'invoice-detail-form');
+                     this.$emit('new-invoice-detail-added', relatedInvoice);
                   }
                })
                .catch(errorResponse => {

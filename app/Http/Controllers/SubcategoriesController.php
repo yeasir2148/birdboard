@@ -54,13 +54,20 @@ class SubcategoriesController extends Controller
 
       $validatedAttr = $request->validate([
          'subcat_name' => 'required | regex:/[\w\d ]+/i',
-         'subcat_code' => 'required | alpha_dash',
+         // 'subcat_code' => 'required | alpha_dash',
          'category_id' => "required | integer | between:1,$maxCategoryId"
       ]);
 
+      $subcategoryCode = explode(" ", $validatedAttr['subcat_name']);
+      $subcategoryCode = array_map(function($str){
+         return strtolower($str);
+      }, $subcategoryCode);
+
+      $subcategoryCode = implode("_", $subcategoryCode);
+
       $newSubcategory = Subcategory::firstOrCreate(
-         ['subcat_code' => $validatedAttr['subcat_code']],
-         array_diff_key($validatedAttr, ['subcat_code' => $validatedAttr['subcat_code']])
+         ['subcat_code' => $subcategoryCode],
+         array_diff_key($validatedAttr, ['subcat_code' => $subcategoryCode])
       );
 
       if($newSubcategory->wasRecentlyCreated !== true) {

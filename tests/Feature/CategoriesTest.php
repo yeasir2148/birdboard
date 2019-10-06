@@ -42,19 +42,18 @@ class CategoriesTest extends TestCase
    
 
    /** @test */
-   public function create_category_request_needs_name_and_category_id()
+   public function create_category_request_needs_name()
    {
       $this->withExceptionHandling();
       $category = [
          'name' => null,
-         'category_code' => null
       ];
 
       $user = factory(User::class)->make();
       $this->actingAs($user);
 
       $this->post('/categories', $category)->assertSessionHasErrors('name');
-      $this->post('/categories', $category)->assertSessionHasErrors('category_code');
+      // $this->post('/categories', $category)->assertSessionHasErrors('category_code');
       $this->post('/categories', $category)->assertStatus(302);
    }
 

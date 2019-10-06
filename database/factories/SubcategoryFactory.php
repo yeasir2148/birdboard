@@ -11,7 +11,7 @@ $factory->define(Subcategory::class, function (Faker $faker) {
    $name = $faker->word;
    $existingCategories = Category::all('id')->pluck('id')->toArray();
 
-   if(empty($existingCategories)) {
+   if(empty($existingCategories) || count($existingCategories) == 1) {
       $categoryId = factory(Category::class)->create()->id;
    } else {
       $index = rand(0, count($existingCategories) - 1);

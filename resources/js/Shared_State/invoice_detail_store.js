@@ -17,7 +17,7 @@
             },
 
             addSelectedInvoiceDetail(invoiceDetail, comp) {
-               console.log('InvoiceDetail added by ' + comp + ' with value ' + invoiceDetail);
+               console.log('InvoiceDetail added by ' + comp + ' with value ' + JSON.stringify(invoiceDetail));
                this.state.selectedInvoiceDetails.push(invoiceDetail);
             },
 

@@ -10,6 +10,7 @@ use DB;
 class InvoiceSummary extends Model
 {
    protected $guarded = [];
+   protected $with = ['store','invoiceDetails'];
 
    public function store() {
       return $this->belongsTo(Store::class);

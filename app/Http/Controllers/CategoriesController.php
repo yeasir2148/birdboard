@@ -47,10 +47,18 @@ class CategoriesController extends Controller
       $response = [];
       $validatedAttr = $request->validate([
          'name' => 'required',
-         'category_code' => 'required'
+         // 'category_code' => 'required'
       ]);
+
+      $categoryCode = explode(" ", $validatedAttr['name']);
+      $categoryCode = array_map(function($str){
+         return strtolower($str);
+      }, $categoryCode);
+
+      $categoryCode = implode("_", $categoryCode);
+
       $newCategory = Category::firstOrCreate(
-         ['category_code' => $validatedAttr['category_code']],
+         ['category_code' => $categoryCode],
          ['name' => $validatedAttr['name']]
       );
 

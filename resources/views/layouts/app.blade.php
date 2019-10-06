@@ -37,13 +37,13 @@
                <div class="collapse navbar-collapse" id="navbarSupportedContent">
                   <!-- Left Side Of Navbar -->
                   <ul class="navbar-nav mx-auto justify-content-center">
-                     <li class="btn btn-success nav-item px-3 <?= request()->path() == 'categories' ? 'active' : ''?>">
+                     <li class="btn nav-item px-3 <?= request()->path() == 'categories' ? 'active' : ''?>">
                         <a class="nav-link font-weight-bold" href="{{ route('inventory') }} ">Inventory <span class="sr-only">(current)</span></a>
                      </li>
-                     <li class="btn btn-success nav-item px-3 <?= request()->path() == 'invoices' ? 'active' : ''?>">
+                     <li class="btn nav-item px-3 <?= request()->path() == 'invoices' ? 'active' : ''?>">
                         <a class="nav-link font-weight-bold" href="{{ url('/invoices') }}">Purchases <span class="sr-only">(current)</span></a>
                      </li>
-                     <li class="btn btn-success nav-item px-3 <?= request()->path() == 'reports' ? 'active' : ''?>">
+                     <li class="btn nav-item px-3 <?= request()->path() == 'reports' ? 'active' : ''?>">
                         <a class="nav-link font-weight-bold" href="#">Reports <span class="sr-only">(current)</span></a>
                      </li>
                   </ul>

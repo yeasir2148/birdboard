@@ -54,7 +54,7 @@ class InvoiceDetailsController extends Controller
       ]);
 
       $newInvoiceDetail = InvoiceDetail::create($validatedAttributes);
-
+      $newInvoiceDetail->load('invoice.store');
       if($newInvoiceDetail->wasRecentlyCreated !== true) {
          $response['success'] = false;
          $response['message'] = 'Record already exists';
@@ -119,6 +119,7 @@ class InvoiceDetailsController extends Controller
    {
       $price = $invoiceDetail->price;
       $invoiceSummary = $invoiceDetail->invoice;
+      // dd($invoiceSummary);
 
       $success = $invoiceDetail->delete();
       if($success) {
@@ -128,7 +129,8 @@ class InvoiceDetailsController extends Controller
 
       if(isRequestAjaxOrTesting()) {
          return response()->json([
-            'success' => $success
+            'success' => $success,
+            'invoice' => $invoiceSummary->refresh()
          ]);
       }
    }

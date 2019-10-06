@@ -152,12 +152,14 @@ const app = new Vue({
          });
       },
 
-      newInvoiceDetailAdded: function(invoiceSummaryForWhichDetailWasAdded) {
+      refreshInvoice: function(invoiceSummaryForWhichDetailWasAdded) {
          let targetObjIndex = this.invoices.findIndex(invoice => {
             return invoice.id === invoiceSummaryForWhichDetailWasAdded.id;
          });
-         console.log(targetObjIndex);
-         this.invoices[targetObjIndex] = invoiceSummaryForWhichDetailWasAdded;
+
+         this.$set(this.invoices[targetObjIndex], 'value', invoiceSummaryForWhichDetailWasAdded.value);
+         // this.invoices.splice(targetObjIndex, 1);        // remove the old item
+         // this.invoices.splice(targetObjIndex, 0, invoiceSummaryForWhichDetailWasAdded);   // add the fresh item
       },
       setActiveNav: function() {
          // $(event.target).parents('ul.navbar-nav').find('li.nav-item').removeClass('active');

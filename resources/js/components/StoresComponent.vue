@@ -7,7 +7,7 @@
             <form id="createStoreForm">
                <div class="field is-horizontal">
                   <div class="field-label is-normal">
-                     <label for="store_name" class="label">Store Name</label>
+                     <label for="store_name" class="label">Store Name <sup>*</sup></label>
                   </div>
                   <div class="field-body">
                      <div class="field" @focusout="showStoreSuggestion = false">
@@ -15,8 +15,7 @@
                            <validation-provider
                               name="store-name"
                               rules="required|max:100|alpha_space_dash"
-                              v-slot="{ errors, classes }"
-                           >
+                              v-slot="{ errors, classes }">
                               <input
                                  type="text"
                                  class="input"
@@ -38,15 +37,6 @@
                                  v-show="form.storeName && form.storeName.length"
                               >{{ errors[0] }}</span>
                            </validation-provider>
-                        </div>
-                     </div>
-                     <div class="field">
-                        <div class="control">
-                           <button
-                              class="button is-link"
-                              type="submit"
-                              :disabled="!observerSlotProp.valid || observerSlotProp.pristine"
-                           >Create</button>
                         </div>
                      </div>
                   </div> 
@@ -81,7 +71,102 @@
                      </div>
                   </div>
                </div>
+                              
+               <div class="field is-horizontal">
+                  <div class="field-label is-normal">
+                     <label for="address" class="label">Address</label>
+                  </div>
+                  <div class="field-body">
+                     <div class="field">
+                        <div class="control">
+                           <validation-provider
+                              name="store-address"
+                              rules="max:150"
+                              v-slot="{ errors, classes }">
+                              <textarea rows="3" cols="50"
+                                 class="textarea"
+                                 :class="{ 'is-danger': form.address && errors.length}"
+                                 name="address"
+                                 id="address"
+                                 v-model="form.address">
+                              </textarea>
+                              <span class="has-text-danger" v-show="form.address && form.address.length">
+                                 {{ errors[0] }}
+                              </span>
+                           </validation-provider>
+                        </div>
+                     </div>
+                  </div> 
+               </div>
 
+               <div class="field is-horizontal">
+                  <div class="field-label is-normal">
+                     <label for="abn" class="label">ABN</label>
+                  </div>
+                  <div class="field-body">
+                     <div class="field">
+                        <div class="control">
+                           <validation-provider
+                              name="store-abn"
+                              rules="max:15"
+                              v-slot="{ errors, classes }">
+                              <input
+                                 type="text"
+                                 class="input"
+                                 :class="{ 'is-danger': form.storeName && errors.length}"
+                                 name="abn"
+                                 id="abn"
+                                 v-model="form.abn"
+                                 autocomplete="off">
+                              <span
+                                 class="has-text-danger"
+                                 v-show="form.abn && form.abn.length">
+                                 {{ errors[0] }}
+                              </span>
+                           </validation-provider>
+                        </div>
+                     </div>
+                  </div> 
+               </div>
+
+               <div class="field is-horizontal">
+                  <div class="field-label is-normal">
+                     <label for="phone" class="label">Phone</label>
+                  </div>
+                  <div class="field-body">
+                     <div class="field">
+                        <div class="control">
+                           <validation-provider
+                              name="store-phone"
+                              rules="max:15"
+                              v-slot="{ errors, classes }">
+                              <input
+                                 type="text"
+                                 class="input"
+                                 :class="{ 'is-danger': form.phone && errors.length}"
+                                 name="phone"
+                                 id="phone"
+                                 v-model="form.phone"
+                                 autocomplete="off">
+                              <span
+                                 class="has-text-danger"
+                                 v-show="form.phone && form.phone.length">
+                                 {{ errors[0] }}
+                              </span>
+                           </validation-provider>
+                        </div>
+                     </div>
+                     <div class="field">
+                        <div class="control">
+                           <button
+                              class="button is-link"
+                              type="submit"
+                              :disabled="!observerSlotProp.valid || observerSlotProp.pristine"
+                           >Create</button>
+                        </div>
+                     </div>
+                  </div> 
+               </div>
             </form>
          </ValidationObserver>
       </div>
@@ -106,6 +191,8 @@
                   <tr>
                      <th class="has-text-centered">Store Name</th>
                      <th class="has-text-centered">Store code</th>
+                     <th class="has-text-centered">ABN</th>
+                     <th class="has-text-centered">Phone</th>
                      <th class="has-text-centered" v-if="isAuthenticated">Action</th>
                   </tr>
                </thead>
@@ -114,6 +201,8 @@
                   <tr v-for="store in stores" :key="store.id">
                      <td class="has-text-centered">{{ store.store_name }}</td>
                      <td class="has-text-centered">{{ store.store_code }}</td>
+                     <td class="has-text-centered">{{ store.abn }}</td>
+                     <td class="has-text-centered">{{ store.phone }}</td>
                      <td class="has-text-centered" v-if="isAuthenticated">
                         <button class="btn btn-primary" @click="confirmDelete(store.id)">Delete</button>
                      </td>
@@ -172,6 +261,9 @@
                status: 'pending',
                storeName: null,
                storeCode: null,
+               address: null,
+               abn: null,
+               phone: null,
                successMsg: null,
                errorMsg: null,
                storeSuggestion: null

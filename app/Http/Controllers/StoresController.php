@@ -56,7 +56,7 @@ class StoresController extends Controller
       $storeCode = implode("_", $storeCode);
       $newStore = Store::firstOrCreate(
          ['store_code' => $storeCode],
-         ['store_name' => $validatedAttr['store_name']]
+         array_diff_key($validatedAttr, ['store_code' => $storeCode])
       );
 
       if ($newStore->wasRecentlyCreated !== true) {

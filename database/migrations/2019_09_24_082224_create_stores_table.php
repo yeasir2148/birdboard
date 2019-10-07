@@ -17,6 +17,9 @@ class CreateStoresTable extends Migration
             $table->bigIncrements('id');
             $table->string('store_name');
             $table->string('store_code')->unique();
+            $table->string('address');
+            $table->string('abn');
+            $table->string('phone');
             $table->timestamps();
         });
     }

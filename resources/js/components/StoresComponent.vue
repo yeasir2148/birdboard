@@ -10,7 +10,7 @@
                      <label for="store_name" class="label">Store Name</label>
                   </div>
                   <div class="field-body">
-                     <div class="field">
+                     <div class="field" @focusout="showStoreSuggestion = false">
                         <div class="control">
                            <validation-provider
                               name="store-name"
@@ -25,8 +25,9 @@
                                  id="store_name"
                                  v-model="form.storeName"
                                  autocomplete="off"
+                                 @keyup="form.storeSuggestion = true"
                               >
-                              <div class="field-suggest" v-if="form.status == 'pending' && form.storeName && filteredStores.length">
+                              <div class="field-suggest" v-if="showStoreSuggestion">
                                  <ul>
                                     <li>Available stores....</li>
                                     <li v-for="store of filteredStores" :key="store.id">{{store.store_name}}</li>
@@ -172,7 +173,8 @@
                storeName: null,
                storeCode: null,
                successMsg: null,
-               errorMsg: null
+               errorMsg: null,
+               storeSuggestion: null
             },
             serverResponseData: {},
             storeIdToDelete: null,
@@ -202,6 +204,15 @@
             return this.stores.filter(store => {
                return this.form.storeName && store.store_name.toLowerCase().startsWith(this.form.storeName.toLowerCase());
             });
+         },
+         showStoreSuggestion: {
+            get() {
+               return this.form.storeSuggestion && this.form.status == 'pending' 
+                  && this.filteredStores.length;
+            },
+            set(newValue) {
+               this.form.storeSuggestion = false;
+            }            
          }
       },
       methods: {

@@ -10,7 +10,7 @@
                      <label for="item_name" class="label">Item Name</label>
                   </div>
                   <div class="field-body">
-                     <div class="field">
+                     <div class="field" @focusout="showItemNameSuggestion = false">
                         <div class="control">
                            <validation-provider
                               name="Item-Name"
@@ -22,7 +22,15 @@
                                  :class="{ 'is-danger': form.itemName && errors.length}"
                                  id="item_name"
                                  name="item_name"
-                                 v-model="form.itemName">
+                                 autocomplete="off"
+                                 v-model="form.itemName"
+                                 @keydown="form.itemNameSuggestion = true">
+                              <div class="field-suggest" v-if="showItemNameSuggestion">
+                                 <ul>
+                                    <li>Available items....</li>
+                                    <li v-for="item of filteredItems" :key="item.id">{{item.item_name}}</li>
+                                 </ul>
+                              </div>
                               <span
                                  class="has-text-danger"
                                  v-show="form.itemName && form.itemName.length">
@@ -201,13 +209,12 @@
       props: ['categories','subcategories','items','isLoggedIn'],
       data() {
          return {
-            // categories: [],
-            // subcategories:[],
-            // items: [],
             form: {
+               status: 'pending',
                itemName: null,
                itemCode: null,
                subCategoryId: null,
+               itemNameSuggestion: null,
                successMsg: null,
                errorMsg: null
             },
@@ -230,9 +237,25 @@
                // _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
             };
          },
+
          removeModal: function() {
             return '#remove_item_modal';
          },
+
+         filteredItems: function() {
+            return this.items.filter(item => {
+               return this.form.itemName && item.item_name.toLowerCase().startsWith(this.form.itemName.toLowerCase());
+            });
+         },
+
+         showItemNameSuggestion: {
+            get() {
+               return this.form.itemNameSuggestion && this.form.status == "pending" && this.filteredItems.length;
+            },
+            set(newValue) {
+               this.form.itemNameSuggestion = newValue;
+            }
+         }
       },
       methods: {
          fetchItems: function() {
@@ -244,6 +267,7 @@
             });
          },
          createItem: function() {
+            this.form.status = 'submitting';
             httpConfig.create.data = this.postData;
             var vm = this;
 
@@ -253,12 +277,15 @@
                   if(this.serverResponseData.success === true) {
                      this.$emit('new-item-added', this.serverResponseData.data);
                      this.form.successMsg = 'Item added successfully';
+                  } else {
+                     this.form.errorMsg = this.serverResponseData.message;
                   }
                })
                .catch(response => {
                   this.form.errorMsg = response.data.msg;
                })
                .finally(() => {
+                  this.form.status = 'pending';
                   setTimeout(() => this.resetForm(), 1000);
                });
          },
@@ -290,7 +317,10 @@
 
          resetForm: function() {
             for (var key in this.form) {
-               this.form[key] = null;
+               this.form.status = 'pending';
+               if(key !== 'status') {
+                  this.form[key] = null;
+               }               
             }
          }
       }

@@ -8,7 +8,7 @@
                <!--Invoice Id -->
                <div class="field is-horizontal">
                   <div class="field-label is-normal">
-                     <label for="invoice_detail_id" class="label">Invoice No</label>
+                     <label for="invoice_detail_id" class="label">Invoice No <sup>*</sup></label>
                   </div>
                   <div class="field-body">
                      <div class="field">
@@ -41,7 +41,7 @@
                <!-- Item Id -->
                <div class="field is-horizontal">
                   <div class="field-label is-normal">
-                     <label for="item_id" class="label">Item</label>
+                     <label for="item_id" class="label">Item <sup>*</sup></label>
                   </div>
                   <div class="field-body">
                      <div class="field">
@@ -74,7 +74,7 @@
                <!-- quantity -->
                <div class="field is-horizontal">
                   <div class="field-label is-normal">
-                     <label for="quantity" class="label">Quantity</label>
+                     <label for="quantity" class="label">Quantity<sup>*</sup></label>
                   </div>
                   <div class="field-body">
                      <div class="field">
@@ -103,7 +103,7 @@
                <!--Unit -->
                <div class="field is-horizontal">
                   <div class="field-label is-normal">
-                     <label for="unit_id" class="label">Unit</label>
+                     <label for="unit_id" class="label">Unit <sup>*</sup></label>
                   </div>
                   <div class="field-body">
                      <div class="field">
@@ -136,7 +136,7 @@
                <!-- Price -->
                <div class="field is-horizontal">
                   <div class="field-label is-normal">
-                     <label for="price" class="label">Price</label>
+                     <label for="price" class="label">Price <sup>*</sup></label>
                   </div>
                   <div class="field-body">
                      <div class="field">

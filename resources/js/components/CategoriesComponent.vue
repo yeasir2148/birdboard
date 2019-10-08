@@ -7,7 +7,7 @@
             <form method="post" action="/categories" id="createCategoryForm">
                <div class="field is-horizontal">
                   <div class="field-label is-normal">
-                     <label for="category_name" class="label">Category Name</label>
+                     <label for="category_name" class="label">Category Name <sup>*</sup></label>
                   </div>
                   <div class="field-body">
                      <div class="field">

@@ -45,7 +45,7 @@ class StoresController extends Controller
       $response = [];
       $validatedAttr = $request->validate([
          'store_name' => 'required | max:100',
-         // 'store_code' => 'required | max:100'
+         'suburb' => 'required | max:100',
       ]);
 
       $storeCode = explode(" ", $validatedAttr['store_name']);

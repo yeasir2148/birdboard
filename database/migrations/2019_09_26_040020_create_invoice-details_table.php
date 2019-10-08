@@ -15,11 +15,11 @@ class CreateInvoiceDetailsTable extends Migration
    {
       Schema::create('invoice_details', function (Blueprint $table) {
          $table->bigIncrements('id');
-         $table->unsignedBigInteger('invoice_id');
-         $table->unsignedBigInteger('item_id');
-         $table->float('quantity', 8, 2);
-         $table->unsignedBigInteger('unit_id');
-         $table->float('price', 8, 2);
+         $table->unsignedBigInteger('invoice_id')->nullable(false);
+         $table->unsignedBigInteger('item_id')->nullable(false);
+         $table->float('quantity', 8, 2)->nullable(false);
+         $table->unsignedBigInteger('unit_id')->nullable(false);
+         $table->float('price', 8, 2)->nullable(false);
          $table->timestamps();
 
          $table->foreign('invoice_id')->references('id')->on('invoice_summaries')->onDelete('restrict');

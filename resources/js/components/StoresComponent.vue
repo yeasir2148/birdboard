@@ -42,7 +42,7 @@
                   </div> 
                </div>
 
-               <div class="field is-horizontal" v-if="false">
+               <!--<div class="field is-horizontal" v-if="false">
                   <div class="field-label is-normal">
                      <label for="store_code" class="label">Store Code</label>
                   </div>
@@ -70,7 +70,7 @@
                         </div>
                      </div>
                   </div>
-               </div>
+               </div>-->
                               
                <div class="field is-horizontal">
                   <div class="field-label is-normal">
@@ -91,6 +91,33 @@
                                  v-model="form.address">
                               </textarea>
                               <span class="has-text-danger" v-show="form.address && form.address.length">
+                                 {{ errors[0] }}
+                              </span>
+                           </validation-provider>
+                        </div>
+                     </div>
+                  </div> 
+               </div>
+
+               <div class="field is-horizontal">
+                  <div class="field-label is-normal">
+                     <label for="suburb" class="label">Suburb *</label>
+                  </div>
+                  <div class="field-body">
+                     <div class="field">
+                        <div class="control">
+                           <validation-provider
+                              name="store-suburb"
+                              rules="max:20"
+                              v-slot="{ errors, classes }">
+                              <input
+                                 class="input"
+                                 :class="{ 'is-danger': form.suburb && errors.length}"
+                                 name="suburb"
+                                 id="suburb"
+                                 v-model="form.suburb">
+                              </input>
+                              <span class="has-text-danger" v-show="form.suburb && form.suburb.length">
                                  {{ errors[0] }}
                               </span>
                            </validation-provider>
@@ -262,6 +289,7 @@
                storeName: null,
                storeCode: null,
                address: null,
+               suburb: null,
                abn: null,
                phone: null,
                successMsg: null,
@@ -284,9 +312,11 @@
          },
          postData: function() {
             return {
-               store_name: this.form.storeName
-               // store_code: this.form.storeCode.toLowerCase(),
-               // _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+               store_name: this.form.storeName,
+               address: this.form.address,
+               suburb: this.form.suburb,
+               abn: this.form.abn,
+               phone: this.form.phone,
             };
          },
          removeModal: function() {

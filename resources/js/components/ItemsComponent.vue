@@ -7,7 +7,7 @@
             <form id="createItemForm">
                <div class="field is-horizontal">
                   <div class="field-label is-normal">
-                     <label for="item_name" class="label">Item Name</label>
+                     <label for="item_name" class="label">Item Name <sup>*</sup></label>
                   </div>
                   <div class="field-body">
                      <div class="field" @focusout="showItemNameSuggestion = false">
@@ -42,7 +42,7 @@
                   </div>
                </div>
 
-               <div class="field is-horizontal" v-if="false">
+               <!--<div class="field is-horizontal" v-if="false">
                   <div class="field-label is-normal">
                      <label for="item_code" class="label">Item Code</label>
                   </div>
@@ -69,11 +69,11 @@
                         </div>
                      </div>
                   </div>
-               </div>
+               </div>-->
 
                <div class="field is-horizontal">
                   <div class="field-label is-normal">
-                     <label for="subcategory_id" class="label">Subcategory</label>
+                     <label for="subcategory_id" class="label">Subcategory <sup>*</sup></label>
                   </div>
                   <div class="field-body">
                      <div class="field">

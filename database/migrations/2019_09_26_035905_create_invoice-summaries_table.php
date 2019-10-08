@@ -15,13 +15,13 @@ class CreateInvoiceSummariesTable extends Migration
     {
       Schema::create('invoice_summaries', function (Blueprint $table) {
          $table->bigIncrements('id');
-         $table->unsignedBigInteger('invoice_no')->unique();
+         $table->string('invoice_no')->unique()->nullable(false);
          $table->float('value', 8, 2)->nullable();
-         $table->dateTimeTz('invoice_date');
-         $table->unsignedBigInteger('store_id')->nullable();
+         $table->dateTimeTz('invoice_date')->nullable(false);
+         $table->unsignedBigInteger('store_id')->nullable(false);
          $table->timestamps();
 
-         $table->foreign('store_id')->references('id')->on('stores')->onDelete('set null');
+         $table->foreign('store_id')->references('id')->on('stores')->onDelete('restrict');
       });
     }
 

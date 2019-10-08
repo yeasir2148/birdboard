@@ -15,11 +15,12 @@ class CreateStoresTable extends Migration
     {
         Schema::create('stores', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('store_name');
-            $table->string('store_code')->unique();
-            $table->string('address');
-            $table->string('abn');
-            $table->string('phone');
+            $table->string('store_name')->nullable(false);
+            $table->string('store_code')->unique()->nullable(false);
+            $table->string('address')->nullable();
+            $table->string('suburb')->nullable(false);
+            $table->string('abn')->nullable();
+            $table->string('phone')->nullable();
             $table->timestamps();
         });
     }

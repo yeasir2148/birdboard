@@ -15,9 +15,9 @@ class CreateItemsTable extends Migration
     {
         Schema::create('items', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('item_name', 30);
-            $table->string('item_code', 30)->unique();
-            $table->unsignedBigInteger('subcat_id');
+            $table->string('item_name', 30)->nullable(false);
+            $table->string('item_code', 30)->unique()->nullable(false);
+            $table->unsignedBigInteger('subcat_id')->nullable(false);
             $table->timestamps();
 
             $table->foreign('subcat_id')->references('id')->on('subcategories')->onDelete('cascade');

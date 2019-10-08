@@ -9,7 +9,7 @@
                <!-- Invoice No -->
                <div class="field is-horizontal">
                   <div class="field-label is-normal">
-                     <label for="invoice_no" class="label">Invoice No</label>
+                     <label for="invoice_no" class="label">Invoice No <sup>*</sup></label>
                   </div>
                   <div class="field-body">
                      <div class="field">
@@ -37,7 +37,7 @@
                <!--Store -->
                <div class="field is-horizontal">
                   <div class="field-label is-normal">
-                     <label for="unit_id" class="label">Store</label>
+                     <label for="unit_id" class="label">Store <sup>*</sup></label>
                   </div>
                   <div class="field-body">
                      <div class="field">
@@ -70,7 +70,7 @@
                <!-- Invoice Date -->
                <div class="field is-horizontal">
                   <div class="field-label is-normal">
-                     <label for="invoice_date" class="label">Invoice Date</label>
+                     <label for="invoice_date" class="label">Invoice Date <sup>*</sup></label>
                   </div>
                   <div class="field-body">
                      <div class="field">

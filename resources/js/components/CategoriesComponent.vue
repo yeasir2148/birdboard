@@ -197,6 +197,7 @@
          fetchCategory: function() {
              axios(httpConfig.get)
             .then(({ data }) => {
+               // console.log(data);
                if(data.length) {
                   EventBus.$emit('update-data','category',data);
                }

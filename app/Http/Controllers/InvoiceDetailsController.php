@@ -15,7 +15,7 @@ class InvoiceDetailsController extends Controller
     */
    public function index()
    {
-      $invoiceDetails = InvoiceDetail::all();
+      $invoiceDetails = InvoiceDetail::all()->sortBy('name')->values();
       $data = [
          'invoice_details' => $invoiceDetails,
       ];

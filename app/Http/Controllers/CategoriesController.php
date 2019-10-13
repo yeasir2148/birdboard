@@ -18,7 +18,8 @@ class CategoriesController extends Controller
     */
    public function index()
    {
-      $categories = Category::all();
+      $categories = Category::all()->sortBy('name')->values();
+      // dd($categories);
       if(request()->ajax() || App()->runningUnitTests()) {
          return response()->json($categories);
       }

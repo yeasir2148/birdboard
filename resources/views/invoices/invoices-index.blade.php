@@ -41,7 +41,7 @@
                      <!-- This is left empty -->
                   </div>
 
-                  <div class="column is-two-fifths">
+                  <div class="column is-two-fifths" :class="{ hidden: shared.selectedInvoiceId === null}" id="invoice_details_on_summary_page">
                      <invoice-detail-list @invoice-detail-removed="refreshInvoice">
                      @auth
                         <template v-slot:delete-btn="{ invoiceDetail, confirmDelete }">

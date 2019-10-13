@@ -27,6 +27,7 @@ class InvoiceSummary extends Model
       ->join('units AS u', 'u.id', '=', 'inD.unit_id')
       ->select('i.item_name','u.unit_name','inD.*')
       ->where('inD.invoice_id','=', $this->id)
+      ->orderBy('i.item_name','asc')
       ->get();
    }
 

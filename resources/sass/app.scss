@@ -24,6 +24,10 @@
    display: none;
  }
 
+.hidden {
+   display: none;
+}
+
 .tab-content {
    padding-top: 20px;
 }
@@ -50,5 +54,12 @@
       ~ .dropdown-menu {
          background-color: #FAEBD7;
       }
+   }
+}
+
+#invoice_details_on_summary_page {
+   > .invoice-detail-list {
+      position: sticky;
+      top: 50px;
    }
 }

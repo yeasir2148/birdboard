@@ -16,9 +16,9 @@ class ItemsController extends Controller
     */
    public function index()
    {
-      $items = Item::with('subcategory.category')->get();
-      $subcategories = Subcategory::with('category')->get();
-      $categories = Category::all();
+      $items = Item::with('subcategory.category')->get()->sortBy('item_name')->values();
+      $subcategories = Subcategory::with('category')->get()->sortBy('subcat_name')->values();
+      $categories = Category::all()->sortBy('name')->values();
 
       if(isRequestAjaxOrTesting()) {
          return response()->json(

@@ -18,7 +18,7 @@ class StoresController extends Controller
     */
    public function index()
    {
-      $stores = Store::all();
+      $stores = Store::orderBy('store_name')->get();
       if(isRequestAjaxOrTesting()) {
          return response()->json($stores);
       }

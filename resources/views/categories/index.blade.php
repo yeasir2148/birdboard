@@ -83,7 +83,11 @@
                </div>
             </div>
 			</div>
-		</div>
+      </div>
+      
+      <div class="column is-two-fifths">
+         
+      </div>
 	</div>
 </div>
 

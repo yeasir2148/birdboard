@@ -30,7 +30,7 @@
                <tbody>
                   <tr v-for="invoice in invoices" :key="invoice.id">
                      <td class="has-text-centered">
-                        <a href="#" @click="showInvoiceDetails(invoice.id)">{{ invoice.invoice_no }}</a>
+                        <a href="#" @click.prevent="showInvoiceDetails(invoice.id)">{{ invoice.invoice_no }}</a>
                      </td>
                      <td class="has-text-centered">{{ invoice.value }}</td>
                      <td class="has-text-centered">{{ invoice.invoice_date }}</td>

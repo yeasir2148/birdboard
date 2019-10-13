@@ -1,5 +1,5 @@
 <template>
-   <div>
+   <div class="invoice-detail-list">
       <div class="alert alert-success" v-if="form.successMsg && form.successMsg.length">{{form.successMsg}}</div>
       <div class="alert alert-danger" v-if="form.errorMsg && form.errorMsg.length">{{form.errorMsg}}</div>
 

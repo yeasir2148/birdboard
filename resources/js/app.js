@@ -18,6 +18,7 @@ import InvoiceSummaryList from './components/InvoiceSummaryListComponent.vue';
 import InvoiceDetailForm from './components/InvoiceDetailFormComponent.vue';
 import InvoiceDetailList from './components/InvoiceDetailListComponent.vue';
 import DatePickerComponent from './components/Utility/DatePickerComponent.vue';
+import { invoiceDetailStore } from './Shared_State/invoice_detail_store.js';
 import Axios from 'axios';
 /**
  * The following block of code may be used to automatically register your
@@ -58,6 +59,7 @@ const app = new Vue({
       stores: [],
       units: [],
       invoices: [],
+      shared: invoiceDetailStore.state
       // activeNav: {
       //    inventory: null,
       //    purchases: 'invoices_tab'

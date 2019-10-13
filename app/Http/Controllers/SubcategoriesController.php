@@ -19,8 +19,8 @@ class SubcategoriesController extends Controller
     */
    public function index()
    {
-      $subCategories = Subcategory::with('category')->get();
-      $categories = Category::all();
+      $subCategories = Subcategory::with('category')->get()->sortBy('subcat_name')->values();
+      $categories = Category::all()->sortBy('name')->values();
       if(request()->ajax() || App()->runningUnitTests()) {
          $data = [
             'subcategories' => $subCategories,

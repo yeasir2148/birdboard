@@ -14,8 +14,9 @@ $factory->define(Item::class, function (Faker $faker) {
    }
    
    $existingSubcategories = Subcategory::all('id')->pluck('id')->toArray();
-
+   
    if(empty($existingSubcategories) || count($existingSubcategories) == 1) {
+      // dd(empty($existingSubcategories));
       $subcategoryId = factory(Subcategory::class)->create()->id;
    } else {
       $index = rand(0, count($existingSubcategories) - 1);

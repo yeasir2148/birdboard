@@ -37,9 +37,9 @@
                      </div>
                   </div>
                </div>
-               <br>
+               <!--<br>-->
                <!-- Item Id -->
-               <div class="field is-horizontal">
+               <!--<div class="field is-horizontal">
                   <div class="field-label is-normal">
                      <label for="item_id" class="label">Item <sup>*</sup></label>
                   </div>
@@ -69,6 +69,39 @@
                         </div>
                      </div>
                   </div>
+               </div>-->
+
+               <div class="field is-horizontal">
+                  <div class="field-label is-normal">
+                     <label for="search_item" class="label">Item <sup>*</sup></label>
+                  </div>
+                  <div class="field-body">
+                     <div class="field">
+                        <div class="control">
+                           <input type="text"
+                              class="input" name="search-item" id="search_item"
+                              placeholder="search item name..." v-model="form.searchedItem">
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               
+               <br>
+
+               <div class="field is-horizontal">
+                  <div class="field-label is-normal"></div>
+                     <div class="field-body">
+                        <div class="field">
+                           <div class="control item-suggestion">
+                           <validation-provider :rules="{ required: { allowFalse: false } }">
+                              <label class="radio" v-for="item in filteredItems" :key="item.id">
+                                 <input type="radio" name="item-id" :value="item.id" v-model="form.itemId">
+                                 {{item.item_name}}
+                              </label>
+                           </validation-provider>
+                           </div>
+                        </div>
+                     </div>                     
                </div>
                <br>
                <!-- quantity -->
@@ -230,6 +263,7 @@
                unitId: null,               
                price: null,
                invoiceDate: null,
+               searchedItem: null,
                successMsg: null,
                errorMsg: null
             },
@@ -242,7 +276,6 @@
          if(!this.items) {
             this.fetchInvoices();
          }
-         // this.fetchItems();
       },
 
       computed: {
@@ -256,9 +289,20 @@
                // _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
             };
          },
+
          removeModal: function() {
             return '#remove_item_modal';
          },
+
+         filteredItems: function() {
+            if(this.items.length && this.form.searchedItem) {
+               let filtered = this.items.filter(item => {
+                  return item.item_name.toLowerCase().includes(this.form.searchedItem.toLowerCase());
+               });
+               return filtered;
+            }
+            return [];
+         }
       },
       methods: {
          fetchInvoices: function() {
@@ -307,3 +351,8 @@
       }
    };
 </script>
+<style>
+   .item-suggestion .radio:first-of-type {
+      margin-left: 8px;
+   }
+</style>

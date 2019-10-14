@@ -24,13 +24,13 @@
                                  name="item_name"
                                  autocomplete="off"
                                  v-model="form.itemName"
-                                 @keydown="form.itemNameSuggestion = true">
-                              <div class="field-suggest" v-if="showItemNameSuggestion">
+                                 @keyup="filterItems">
+                              <!--<div class="field-suggest" v-if="showItemNameSuggestion">
                                  <ul>
                                     <li>Available items....</li>
                                     <li v-for="item of filteredItems" :key="item.id">{{item.item_name}}</li>
                                  </ul>
-                              </div>
+                              </div>-->
                               <span
                                  class="has-text-danger"
                                  v-show="form.itemName && form.itemName.length">
@@ -148,7 +148,7 @@
                </thead>
 
                <tbody>
-                  <tr v-for="item in items" :key="item.id">
+                  <tr v-for="item in filteredItems" :key="item.id">
                      <td class="has-text-centered">{{ item.item_name }}</td>
                      <td class="has-text-centered">{{ item.item_code }}</td>
                      <td class="has-text-centered" v-if="item.subcategory">{{ item.subcategory.subcat_name }}</td>
@@ -220,7 +220,8 @@
             },
             serverResponseData: {},
             itemIdToDelete: null,
-            isAuthenticated: this.isLoggedIn
+            isAuthenticated: this.isLoggedIn,
+            filteredItems: null
          };
       },
 
@@ -242,11 +243,11 @@
             return '#remove_item_modal';
          },
 
-         filteredItems: function() {
-            return this.items.filter(item => {
-               return this.form.itemName && item.item_name.toLowerCase().startsWith(this.form.itemName.toLowerCase());
-            });
-         },
+         // filteredItems: function() {
+         //    return this.items.filter(item => {
+         //       return this.form.itemName && item.item_name.toLowerCase().startsWith(this.form.itemName.toLowerCase());
+         //    });
+         // },
 
          showItemNameSuggestion: {
             get() {
@@ -257,13 +258,43 @@
             }
          }
       },
+
+      watch: {
+         items(newValue) {
+            this.filteredItems = newValue;
+         },
+
+         'form.subCategoryId'(newValue) {
+            this.form.itemName = null;
+            this.filteredItems = this.items.filter(item => {
+               return item.subcat_id == newValue;
+            });
+         }
+      },
       methods: {
          fetchItems: function() {
             axios(httpConfig.getAll)
             .then(({ data }) => {
                if(data !== null && data !== 'undefined') {
                   EventBus.$emit('update-data', 'item', data.items);
+                  if(this.form.itemName) {
+                     this.filterItems();
+                  }
+
+                  if(this.form.subCategoryId) {
+                     let subcatId = this.form.subCategoryId;
+                     this.form.subCategoryId = null;
+                     this.form.subCategoryId = subcatId;
+                  }
                }
+            });
+         },
+
+         filterItems: function() {
+            // console.log('here');
+            this.filteredItems = this.items.filter((item) => {
+               return item.item_name.toLowerCase().includes(this.form.itemName.toLowerCase());
+               // this.form.itemNameSuggestion = true;   // will call the computed setter
             });
          },
          createItem: function() {

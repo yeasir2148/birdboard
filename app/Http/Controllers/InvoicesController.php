@@ -19,8 +19,8 @@ class InvoicesController extends Controller
    public function index()
    {
       $invoices = InvoiceSummary::with('store')->get();
-      $stores = Store::all();
-      $items = Item::all();
+      $stores = Store::orderBy('store_name')->get();
+      $items = Item::orderBy('item_name')->get();
       $units = Unit::all();
 
       $data = [

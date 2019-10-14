@@ -73,13 +73,16 @@ class ItemsTest extends TestCase
    {
       $items = factory(Item::class, 3)->create();  // creating items also creates subcategories in the factory
       $subcategories = Subcategory::all();
-      $subcategories = $subcategories ?? factory(Subcategory::class, 2)->create();
-      $categories = factory(Category::class, 2)->create();
 
+      if(!count($subcategories)) {
+         factory(Subcategory::class, 2)->create();
+      }
+
+      $categories = $this->get('/categories')->decodeResponseJson();
       $data = $this->get('items')->decodeResponseJson();
 
       $this->assertEquals(count($subcategories), count($data['subcategories']));
-      $this->assertEquals(count($items), count($data['categories']));
+      $this->assertEquals(count($categories), count($data['categories']));
    }
 
    /** @test */

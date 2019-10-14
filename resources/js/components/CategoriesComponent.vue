@@ -23,6 +23,8 @@
                                  :class="{ 'is-danger': form.name && errors.length}"
                                  name="name"
                                  v-model="form.name"
+                                 @keyup="filterCategories"
+                                 autocomplete="off"
                               >
                               <span
                                  class="has-text-danger"
@@ -34,7 +36,7 @@
                   </div>
                </div>
 
-               <div class="field is-horizontal" v-if="false">
+               <!--<div class="field is-horizontal" v-if="false">
                   <div class="field-label is-normal">
                      <label for="category_code" class="label">Category Code</label>
                   </div>
@@ -62,7 +64,7 @@
                         </div>
                      </div>
                   </div>
-               </div>
+               </div>-->
 
                <div class="field is-horizontal">
                   <div class="field-label"></div>
@@ -107,7 +109,7 @@
                </thead>
 
                <tbody>
-                  <tr v-for="category in categories" :key="category.id">
+                  <tr v-for="category in filteredCategories" :key="category.id">
                      <td class="has-text-centered">{{ category.name }}</td>
                      <td class="has-text-centered">{{ category.category_code }}</td>
                      <td class="has-text-centered" v-if="isAuthenticated">
@@ -173,7 +175,8 @@
             },
             serverResponseData: {},
             categoryIdToDelete: null,
-            isAuthenticated: this.isLoggedIn
+            isAuthenticated: this.isLoggedIn,
+            filteredCategories: null
          };
       },
 
@@ -193,6 +196,12 @@
             return '#remove_category_modal';
          },
       },
+
+      watch: {
+         categories(newValue) {
+            this.filteredCategories = newValue;
+         }
+      },
       methods: {
          fetchCategory: function() {
              axios(httpConfig.get)
@@ -203,6 +212,13 @@
                }
             });            
          },
+
+         filterCategories: function() {
+            this.filteredCategories = this.categories.filter((category) => {
+               return category.name.toLowerCase().includes(this.form.name.toLowerCase());
+            });
+         },
+
          createCategory: function() {
             httpConfig.create.data = this.postData;
             var vm = this;

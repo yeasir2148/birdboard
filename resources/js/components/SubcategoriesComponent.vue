@@ -21,7 +21,9 @@
                                  class="input"
                                  :class="{ 'is-danger': form.subcategoryName && errors.length}"
                                  name="name"
-                                 v-model="form.subcategoryName">
+                                 v-model="form.subcategoryName"
+                                 @keyup="filterSubcategories"
+                                 autocomplete="off">
                               <span
                                  class="has-text-danger"
                                  v-show="form.subcategoryName && form.subcategoryName.length">
@@ -78,7 +80,8 @@
                                     :class="{'is-danger': form.category && errors.length}"
                                     id="category"
                                     name="category"
-                                    v-model="form.categoryId">
+                                    v-model="form.categoryId"
+                                    @change="showFilteredSubcategoriesByCategory">
                                        <option value="" disabled>Please select category</option>
                                        <option v-for="category in categories" :key="category.id" :value="category.id">
                                           {{ category.name }}
@@ -139,7 +142,7 @@
                </thead>
 
                <tbody>
-                  <tr v-for="subcat in subcategories" :key="subcat.id">
+                  <tr v-for="subcat in filteredSubcategories" :key="subcat.id">
                      <td class="has-text-centered">{{ subcat.subcat_name }}</td>
                      <td class="has-text-centered">{{ subcat.subcat_code }}</td>
                      <td class="has-text-centered">{{ subcat.category.name }}</td>
@@ -208,7 +211,8 @@
             },
             serverResponseData: {},
             subcategoryIdToDelete: null,
-            isAuthenticated: this.isLoggedIn
+            isAuthenticated: this.isLoggedIn,
+            filteredSubcategories: null
          };
       },
 
@@ -229,6 +233,11 @@
             return '#remove_subcategory_modal';
          },
       },
+      watch: {
+         subcategories(newValue) {
+            this.filteredSubcategories = newValue;
+         }
+      },
       methods: {
          fetchSubcategory: function() {
             axios(httpConfig.getAll)
@@ -236,6 +245,12 @@
                if(data !== null && data !== 'undefined') {
                   EventBus.$emit('update-data','subcategory',data.subcategories);
                }
+            });
+         },
+         filterSubcategories: function() {
+            this.form.categoryId = null;
+            this.filteredSubcategories = this.subcategories.filter(subcategory => {
+               return subcategory.subcat_name.toLowerCase().includes(this.form.subcategoryName.toLowerCase());
             });
          },
          createSubcategory: function() {
@@ -282,7 +297,16 @@
                setTimeout(() => this.resetForm(), 1000);
             });
          },
+         showFilteredSubcategoriesByCategory: function() {
+            console.log('here');
+            // reset the subcategory name before filtering by category ID, as subcat name also filters the list that is displayed
+            this.form.subcategoryName = null;
 
+            // now filter the subcategories by selected category id
+            this.filteredSubcategories = this.subcategories.filter(subcategory => {
+               return subcategory.category_id === this.form.categoryId;
+            });
+         },
          resetForm: function() {
             for (var key in this.form) {
                this.form[key] = null;

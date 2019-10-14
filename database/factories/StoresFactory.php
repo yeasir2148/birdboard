@@ -9,6 +9,7 @@ $factory->define(Store::class, function (Faker $faker) {
    $name = $faker->word;
    return [
       'store_name' => $name,
-      'store_code' => strtolower($name)
+      'store_code' => strtolower($name),
+      'suburb' => $faker->word
    ];
 });

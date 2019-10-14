@@ -24,14 +24,14 @@
                                  id="store_name"
                                  v-model="form.storeName"
                                  autocomplete="off"
-                                 @keyup="form.storeSuggestion = true"
+                                 @keyup="filterStores"
                               >
-                              <div class="field-suggest" v-if="showStoreSuggestion">
+                              <!--<div class="field-suggest" v-if="showStoreSuggestion">
                                  <ul>
                                     <li>Available stores....</li>
                                     <li v-for="store of filteredStores" :key="store.id">{{store.store_name}}</li>
                                  </ul>
-                              </div>
+                              </div>-->
                               <span
                                  class="has-text-danger"
                                  v-show="form.storeName && form.storeName.length"
@@ -108,7 +108,7 @@
                         <div class="control">
                            <validation-provider
                               name="store-suburb"
-                              rules="max:20"
+                              rules="required|max:20"
                               v-slot="{ errors, classes }">
                               <input
                                  class="input"
@@ -225,7 +225,7 @@
                </thead>
 
                <tbody>
-                  <tr v-for="store in stores" :key="store.id">
+                  <tr v-for="store in filteredStores" :key="store.id">
                      <td class="has-text-centered">{{ store.store_name }}</td>
                      <td class="has-text-centered">{{ store.store_code }}</td>
                      <td class="has-text-centered">{{ store.abn }}</td>
@@ -298,7 +298,8 @@
             },
             serverResponseData: {},
             storeIdToDelete: null,
-            isAuthenticated: this.isLoggedIn
+            isAuthenticated: this.isLoggedIn,
+            filteredStores: null,
          };
       },
 
@@ -322,11 +323,11 @@
          removeModal: function() {
             return '#remove_store_modal';
          },
-         filteredStores: function() {
-            return this.stores.filter(store => {
-               return this.form.storeName && store.store_name.toLowerCase().startsWith(this.form.storeName.toLowerCase());
-            });
-         },
+         // filteredStores: function() {
+         //    return this.stores.filter(store => {
+         //       return this.form.storeName && store.store_name.toLowerCase().startsWith(this.form.storeName.toLowerCase());
+         //    });
+         // },
          showStoreSuggestion: {
             get() {
                return this.form.storeSuggestion && this.form.status == 'pending' 
@@ -337,6 +338,11 @@
             }            
          }
       },
+      watch: {
+         stores(newValue) {
+            this.filteredStores = newValue;
+         }
+      },
       methods: {
          fetchStores: function() {
              axios(httpConfig.get)
@@ -345,6 +351,12 @@
                   EventBus.$emit('update-data','store',data);
                }
             });            
+         },
+         filterStores: function() {
+            this.filteredStores = this.stores.filter(store => {
+               return store.store_name.toLowerCase().includes(this.form.storeName.toLowerCase());
+            });
+            // this.form.storeSuggestion = true;   // will call the computed setter
          },
          createStore: function() {
             this.form.status = 'submitting';

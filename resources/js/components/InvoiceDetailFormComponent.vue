@@ -6,7 +6,7 @@
          <ValidationObserver v-slot="observerSlotProp" @submit.prevent="createInvoiceDetail">
             <form id="createInvoiceForm">
                <!--Invoice Id -->
-               <div class="field is-horizontal">
+               <!--<div class="field is-horizontal">
                   <div class="field-label is-normal">
                      <label for="invoice_detail_id" class="label">Invoice No <sup>*</sup></label>
                   </div>
@@ -36,7 +36,7 @@
                         </div>
                      </div>
                   </div>
-               </div>
+               </div> -->
                <!--<br>-->
                <!-- Item Id -->
                <!--<div class="field is-horizontal">
@@ -70,7 +70,40 @@
                      </div>
                   </div>
                </div>-->
+               <!-- Search invoice no -->
+               <div class="field is-horizontal">
+                  <div class="field-label is-normal">
+                     <label for="search_invoice_no" class="label">Invoice No <sup>*</sup></label>
+                  </div>
+                  <div class="field-body">
+                     <div class="field">
+                        <div class="control">
+                           <input type="text"
+                              class="input" name="search-item" id="search_invoice_no"
+                              placeholder="search invoice no..." v-model="form.searchedInvoiceNo">
+                        </div>
+                     </div>
+                  </div>
+               </div>
 
+               <div class="field is-horizontal">
+                  <div class="field-label is-normal"></div>
+                     <div class="field-body">
+                        <div class="field">
+                           <div class="control invoice-suggestion">
+                              <validation-provider 
+                                 name="invoice" :rules="{ required: { allowFalse: false } }">
+                                 <label class="radio" v-for="invoice in filteredInvoices" :key="invoice.id">
+                                    <input type="radio" name="invoice_id" :value="invoice.id" v-model="form.invoiceId">
+                                    {{invoice.invoice_no}}
+                                 </label>
+                              </validation-provider>
+                           </div>
+                        </div>
+                     </div>                     
+               </div>
+
+               <!-- Search Item -->
                <div class="field is-horizontal">
                   <div class="field-label is-normal">
                      <label for="search_item" class="label">Item <sup>*</sup></label>
@@ -93,11 +126,16 @@
                      <div class="field-body">
                         <div class="field">
                            <div class="control item-suggestion">
-                           <validation-provider :rules="{ required: { allowFalse: false } }">
+                           <validation-provider :rules="{ required: { allowFalse: false } }"
+                              name="item" v-slot="{ errors, classes }">
                               <label class="radio" v-for="item in filteredItems" :key="item.id">
-                                 <input type="radio" name="item-id" :value="item.id" v-model="form.itemId">
+                                 <input type="radio" name="item_id" :value="item.id" v-model="form.itemId">
                                  {{item.item_name}}
                               </label>
+                              <span
+                                 class="has-text-danger" v-show="errors.length">
+                                 {{ errors[0] }}
+                              </span>
                            </validation-provider>
                            </div>
                         </div>
@@ -114,7 +152,7 @@
                         <div class="control">
                            <validation-provider
                               name="quantity"
-                              :rules="{ regex:/^[0-9\.]+$/ }"
+                              :rules="{ required: true, regex:/^[0-9\.]+$/ }"
                               v-slot="{ errors, classes }">
                               <input
                                  type="text"
@@ -145,7 +183,15 @@
                               name="Unit"
                               rules="required|numeric"
                               v-slot="{ errors }">
-                              <div class="select">
+                              <label class="radio" v-for="unit in units" :key="unit.id">
+                                 <input type="radio" name="unit_id" :value="unit.id" v-model="form.unitId">
+                                 {{unit.unit_name}}
+                              </label>
+                              <span
+                                 class="has-text-danger" v-show="errors.length">
+                                 {{ errors[0] }}
+                              </span>
+                              <!--<div class="select">
                                  <select
                                     :class="{'is-danger': form.unitId && errors.length}"
                                     id="unit_id"
@@ -156,10 +202,10 @@
                                           {{ unit.unit_name }}
                                        </option>
                                  </select>
-                                 <span class="has-text-danger" v-show="form.unitId && errors.length">
+                                 <span class="has-text-danger" v-show="errors.length">
                                     {{ errors[0] }}
                                  </span>
-                              </div>
+                              </div>-->
                            </validation-provider>
                         </div>
                      </div>
@@ -264,6 +310,7 @@
                price: null,
                invoiceDate: null,
                searchedItem: null,
+               searchedInvoiceNo: null,
                successMsg: null,
                errorMsg: null
             },
@@ -298,6 +345,15 @@
             if(this.items.length && this.form.searchedItem) {
                let filtered = this.items.filter(item => {
                   return item.item_name.toLowerCase().includes(this.form.searchedItem.toLowerCase());
+               });
+               return filtered;
+            }
+            return [];
+         },
+         filteredInvoices: function() {
+            if(this.invoices.length && this.form.searchedInvoiceNo) {
+               let filtered = this.invoices.filter(invoice => {
+                  return invoice.invoice_no.toString().toLowerCase().includes(this.form.searchedInvoiceNo.toLowerCase());
                });
                return filtered;
             }
@@ -352,7 +408,7 @@
    };
 </script>
 <style>
-   .item-suggestion .radio:first-of-type {
+   [class*='suggestion'] .radio:first-of-type {
       margin-left: 8px;
    }
 </style>

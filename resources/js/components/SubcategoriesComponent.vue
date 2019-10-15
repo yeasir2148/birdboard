@@ -256,7 +256,7 @@
             });
          },
          filterSubcategories: function() {
-            this.form.categoryId = null;
+            // this.form.categoryId = null;
             this.filteredSubcategories = this.subcategories.filter(subcategory => {
                return subcategory.subcat_name.toLowerCase().includes(this.form.subcategoryName.toLowerCase());
             });
@@ -278,6 +278,7 @@
                })
                .finally(() => {
                   setTimeout(() => this.resetForm(), 1000);
+                  this.filteredSubcategories = this.subcategories;
                });
          },
 
@@ -308,7 +309,7 @@
          showFilteredSubcategoriesByCategory: function() {
             // console.log('here');
             // reset the subcategory name before filtering by category ID, as subcat name also filters the list that is displayed
-            this.form.subcategoryName = null;
+            // this.form.subcategoryName = null;
 
             // now filter the subcategories by selected category id
             this.filteredSubcategories = this.subcategories.filter(subcategory => {

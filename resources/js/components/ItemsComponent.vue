@@ -243,12 +243,6 @@
             return '#remove_item_modal';
          },
 
-         // filteredItems: function() {
-         //    return this.items.filter(item => {
-         //       return this.form.itemName && item.item_name.toLowerCase().startsWith(this.form.itemName.toLowerCase());
-         //    });
-         // },
-
          showItemNameSuggestion: {
             get() {
                return this.form.itemNameSuggestion && this.form.status == "pending" && this.filteredItems.length;
@@ -274,7 +268,7 @@
          },
 
          'form.subCategoryId'(newValue) {
-            this.form.itemName = null;
+            // this.form.itemName = null;
             this.filteredItems = this.items.filter(item => {
                return item.subcat_id == newValue;
             });
@@ -291,7 +285,7 @@
          },
 
          filterItems: function() {
-            // console.log('here');
+            console.log('here');
             this.filteredItems = this.items.filter((item) => {
                return item.item_name.toLowerCase().includes(this.form.itemName.toLowerCase());
                // this.form.itemNameSuggestion = true;   // will call the computed setter
@@ -317,7 +311,13 @@
                })
                .finally(() => {
                   this.form.status = 'pending';
-                  setTimeout(() => this.resetForm(), 1000);
+                  var vm = this;
+                  setTimeout(() => {
+                     this.resetForm();
+                     console.log(this.items);
+                     vm.filteredItems = vm.items;
+                  }, 1000);
+                  
                });
          },
 

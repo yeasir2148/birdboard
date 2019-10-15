@@ -340,7 +340,20 @@
       },
       watch: {
          stores(newValue) {
+            if(this.form.storeName) {
+               this.filteredStores();
+            } else if(this.form.suburb) {
+               suburb = this.form.suburb;
+               this.form.suburb = null;
+               this.form.suburb = suburb;
+            }
             this.filteredStores = newValue;
+         },
+         'form.suburb'(newValue) {
+            this.form.storeName = null;                        // Clear filtering from storeName
+            this.filteredStores = this.stores.filter(store => {
+               return store.suburb.toLowerCase().includes(this.form.suburb.toLowerCase());
+            });
          }
       },
       methods: {

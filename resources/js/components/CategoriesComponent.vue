@@ -199,7 +199,11 @@
 
       watch: {
          categories(newValue) {
-            this.filteredCategories = newValue;
+            if(this.form.name) {
+               this.filterCategories();
+            } else {
+               this.filteredCategories = newValue;
+            }
          }
       },
       methods: {

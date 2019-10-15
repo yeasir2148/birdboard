@@ -235,7 +235,15 @@
       },
       watch: {
          subcategories(newValue) {
-            this.filteredSubcategories = newValue;
+            if(this.form.subcategoryName) {
+               this.filterSubcategories();
+            } else if(this.form.categoryId) {         // If already subcategory is selected then filter according to that
+               let catId = this.form.categoryId;
+               this.form.categoryId = null;
+               this.form.categoryId = catId;
+            } else {
+               this.filteredSubcategories = newValue;
+            }
          }
       },
       methods: {
@@ -298,7 +306,7 @@
             });
          },
          showFilteredSubcategoriesByCategory: function() {
-            console.log('here');
+            // console.log('here');
             // reset the subcategory name before filtering by category ID, as subcat name also filters the list that is displayed
             this.form.subcategoryName = null;
 

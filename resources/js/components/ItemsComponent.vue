@@ -261,7 +261,16 @@
 
       watch: {
          items(newValue) {
-            this.filteredItems = newValue;
+            // If already some text in item name box then filter according to that
+            if(this.form.itemName) {
+               this.filterItems();
+            } else if(this.form.subCategoryId) {         // If already subcategory is selected then filter according to that
+               let subcatId = this.form.subCategoryId;
+               this.form.subCategoryId = null;
+               this.form.subCategoryId = subcatId;
+            } else {
+               this.filteredItems = newValue;
+            }               
          },
 
          'form.subCategoryId'(newValue) {
@@ -277,15 +286,6 @@
             .then(({ data }) => {
                if(data !== null && data !== 'undefined') {
                   EventBus.$emit('update-data', 'item', data.items);
-                  if(this.form.itemName) {
-                     this.filterItems();
-                  }
-
-                  if(this.form.subCategoryId) {
-                     let subcatId = this.form.subCategoryId;
-                     this.form.subCategoryId = null;
-                     this.form.subCategoryId = subcatId;
-                  }
                }
             });
          },

@@ -23,7 +23,6 @@
                                  :class="{ 'is-danger': form.name && errors.length}"
                                  name="name"
                                  v-model="form.name"
-                                 @keyup="filterCategories"
                                  autocomplete="off"
                               >
                               <span
@@ -109,6 +108,15 @@
                </thead>
 
                <tbody>
+                  <tr>
+                     <td class="has-text-centered">
+                        <input class="input" type="text" 
+                           v-model="search.categoryName" @keyup="filterCategories"
+                        />
+                     </td>
+                     <td></td>
+                     <td v-if="isAuthenticated"></td>
+                  </tr>
                   <tr v-for="category in filteredCategories" :key="category.id">
                      <td class="has-text-centered">{{ category.name }}</td>
                      <td class="has-text-centered">{{ category.category_code }}</td>
@@ -137,6 +145,7 @@
    import { required, max, alpha_dash } from "vee-validate/dist/rules";
    import { alpha_space_dash } from '../__custom_validation_rules.js';
    import { EventBus } from '../__vue_event-bus.js';
+   import _ from 'lodash';
 
    extend("required", required);
    extend("max", max);
@@ -172,6 +181,9 @@
                categoryCode: null,
                successMsg: null,
                errorMsg: null
+            },
+            search: {
+               categoryName: null,
             },
             serverResponseData: {},
             categoryIdToDelete: null,
@@ -217,11 +229,22 @@
             });            
          },
 
-         filterCategories: function() {
-            this.filteredCategories = this.categories.filter((category) => {
-               return category.name.toLowerCase().includes(this.form.name.toLowerCase());
-            });
-         },
+         filterCategories: _.debounce(function() {
+            let tmp = this.categories;
+
+            for(let field in this.search) {
+               if(this.search[field] && this.search.hasOwnProperty(field)) {
+                  tmp = tmp.filter(category => {
+                     switch(field) {
+                        case 'categoryName':
+                           return category.name.toLowerCase().includes(this.search[field].toLowerCase());
+                           break;
+                     }                     
+                  });
+               }
+               this.filteredCategories = tmp;
+            }
+         }, 500),
 
          createCategory: function() {
             httpConfig.create.data = this.postData;

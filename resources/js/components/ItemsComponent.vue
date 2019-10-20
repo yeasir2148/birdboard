@@ -14,7 +14,7 @@
                         <div class="control">
                            <validation-provider
                               name="Item-Name"
-                              rules="required|max:30|alpha_space_dash"
+                              rules="required|max:50|alpha_space_dash"
                               v-slot="{ errors, classes }">
                               <input
                                  type="text"
@@ -23,8 +23,7 @@
                                  id="item_name"
                                  name="item_name"
                                  autocomplete="off"
-                                 v-model="form.itemName"
-                                 @keyup="filterItems">
+                                 v-model="form.itemName">
                               <!--<div class="field-suggest" v-if="showItemNameSuggestion">
                                  <ul>
                                     <li>Available items....</li>
@@ -148,6 +147,20 @@
                </thead>
 
                <tbody>
+                  <tr>
+                     <td class="has-text-centered">
+                        <input class="input" type="text" name="search-item-name" 
+                           v-model="search.itemName" data-filter="itemName" @keyup="filterItems"
+                        />
+                     </td>
+                     <td class="has-text-centered"></td>
+                     <td class="has-text-centered">
+                        <input class="input" type="text" name="search-item-subcategory" 
+                           v-model="search.subcategoryName" data-filter="subcategoryId" @keyup="filterItems"
+                        />                     
+                     </td>
+                     <td v-if="isAuthenticated" class="has-text-centered"></td>
+                  </tr>
                   <tr v-for="item in filteredItems" :key="item.id">
                      <td class="has-text-centered">{{ item.item_name }}</td>
                      <td class="has-text-centered">{{ item.item_code }}</td>
@@ -179,6 +192,7 @@
    import { alpha_space_dash } from '../__custom_validation_rules.js';
    import { EventBus } from '../__vue_event-bus.js';
    import { setTimeout } from 'timers';
+   import _ from 'lodash';
   
    extend("required", required);
    extend("max", max);
@@ -204,6 +218,13 @@
          }         
       }
    };
+
+   // this should be key => value object where key is the v-model of search field and value is corresponding table
+   // column name of the object(i.e.; Item)
+   const allowedFilterMapping = {
+      itemName: 'item_name',
+      subcategoryName: 'subcategory.subcat_name'
+   };
    export default {
       components: { ValidationObserver, ValidationProvider, ConfirmDelete },
       props: ['categories','subcategories','items','isLoggedIn'],
@@ -217,6 +238,10 @@
                itemNameSuggestion: null,
                successMsg: null,
                errorMsg: null
+            },
+            search: {
+               itemName: null,
+               subcategoryName: null
             },
             serverResponseData: {},
             itemIdToDelete: null,
@@ -267,12 +292,12 @@
             }               
          },
 
-         'form.subCategoryId'(newValue) {
-            // this.form.itemName = null;
-            this.filteredItems = this.items.filter(item => {
-               return item.subcat_id == newValue;
-            });
-         }
+         // 'form.subCategoryId'(newValue) {
+         //    // this.form.itemName = null;
+         //    this.filteredItems = this.items.filter(item => {
+         //       return item.subcat_id == newValue;
+         //    });
+         // }
       },
       methods: {
          fetchItems: function() {
@@ -284,13 +309,30 @@
             });
          },
 
-         filterItems: function() {
-            console.log('here');
-            this.filteredItems = this.items.filter((item) => {
-               return item.item_name.toLowerCase().includes(this.form.itemName.toLowerCase());
-               // this.form.itemNameSuggestion = true;   // will call the computed setter
-            });
+         filterItems: _.debounce(function(event) {
+            let tmp = this.items;
+
+            for(let field in this.search) {
+               if(this.search[field] && this.search.hasOwnProperty(field)) {
+                  tmp = tmp.filter(item => {
+                     switch(field) {
+                        case 'itemName':
+                           return item.item_name.toLowerCase().includes(this.search[field].toLowerCase());
+                           break;
+                        case 'subcategoryName':
+                           return item.subcategory.subcat_name.toLowerCase().includes(this.search[field].toLowerCase());
+                           break;
+                     }                     
+                  });
+               }
+               this.filteredItems = tmp;
+            }
+         }, 500),
+
+         filter: function(e) {
+            console.log(e.target.attributes);
          },
+
          createItem: function() {
             this.form.status = 'submitting';
             httpConfig.create.data = this.postData;

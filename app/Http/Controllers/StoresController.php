@@ -48,6 +48,14 @@ class StoresController extends Controller
          'suburb' => 'required | max:100',
       ]);
 
+      $optionalAttributes = [
+         'phone' => $request->phone,
+         'abn' => $request->abn,
+         'suburb' => $request->suburb
+      ];
+
+      $validatedAttr = array_merge($validatedAttr, $optionalAttributes);
+
       $storeCode = explode(" ", $validatedAttr['store_name']);
       $storeCode = array_map(function($str){
          return strtolower($str);

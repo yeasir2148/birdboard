@@ -24,7 +24,6 @@
                                  id="store_name"
                                  v-model="form.storeName"
                                  autocomplete="off"
-                                 @keyup="filterStores"
                               >
                               <!--<div class="field-suggest" v-if="showStoreSuggestion">
                                  <ul>
@@ -220,6 +219,7 @@
                      <th class="has-text-centered">Store code</th>
                      <th class="has-text-centered">ABN</th>
                      <th class="has-text-centered">Phone</th>
+                     <th class="has-text-centered">Suburb</th>
                      <th class="has-text-centered" v-if="isAuthenticated">Action</th>
                   </tr>
                </thead>
@@ -230,6 +230,7 @@
                      <td class="has-text-centered">{{ store.store_code }}</td>
                      <td class="has-text-centered">{{ store.abn }}</td>
                      <td class="has-text-centered">{{ store.phone }}</td>
+                     <td class="has-text-centered">{{ store.suburb }}</td>
                      <td class="has-text-centered" v-if="isAuthenticated">
                         <button class="btn btn-primary" @click="confirmDelete(store.id)">Delete</button>
                      </td>
@@ -340,21 +341,21 @@
       },
       watch: {
          stores(newValue) {
-            if(this.form.storeName) {
-               this.filteredStores();
-            } else if(this.form.suburb) {
-               suburb = this.form.suburb;
-               this.form.suburb = null;
-               this.form.suburb = suburb;
-            }
+            // if(this.form.storeName) {
+            //    this.filteredStores();
+            // } else if(this.form.suburb) {
+            //    suburb = this.form.suburb;
+            //    this.form.suburb = null;
+            //    this.form.suburb = suburb;
+            // }
             this.filteredStores = newValue;
          },
-         'form.suburb'(newValue) {
-            this.form.storeName = null;                        // Clear filtering from storeName
-            this.filteredStores = this.stores.filter(store => {
-               return store.suburb.toLowerCase().includes(this.form.suburb.toLowerCase());
-            });
-         }
+         // 'form.suburb'(newValue) {
+         //    this.form.storeName = null;                        // Clear filtering from storeName
+         //    this.filteredStores = this.stores.filter(store => {
+         //       return store.suburb.toLowerCase().includes(this.form.suburb.toLowerCase());
+         //    });
+         // }
       },
       methods: {
          fetchStores: function() {

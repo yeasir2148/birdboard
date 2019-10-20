@@ -119,7 +119,7 @@ class InvoiceDetailsController extends Controller
    {
       $price = $invoiceDetail->price;
       $invoiceSummary = $invoiceDetail->invoice;
-      // dd($invoiceSummary);
+      dd($invoiceSummary);
 
       $success = $invoiceDetail->delete();
       if($success) {
@@ -135,7 +135,7 @@ class InvoiceDetailsController extends Controller
       }
    }
 
-   protected function updateInvoiceSummaryValue(InvoiceDetail $invoiceDetail) {
+   protected function updateInvoiceSummaryValue(InvoiceDetail $invoiceDetail, $action = 'added') {
       $invoiceSummary = $invoiceDetail->invoice;
 
       $invoiceSummary->value += $invoiceDetail->price;

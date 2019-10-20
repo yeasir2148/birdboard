@@ -22,7 +22,6 @@
                                  :class="{ 'is-danger': form.subcategoryName && errors.length}"
                                  name="name"
                                  v-model="form.subcategoryName"
-                                 @keyup="filterSubcategories"
                                  autocomplete="off">
                               <span
                                  class="has-text-danger"
@@ -80,8 +79,7 @@
                                     :class="{'is-danger': form.category && errors.length}"
                                     id="category"
                                     name="category"
-                                    v-model="form.categoryId"
-                                    @change="showFilteredSubcategoriesByCategory">
+                                    v-model="form.categoryId">
                                        <option value="" disabled>Please select category</option>
                                        <option v-for="category in categories" :key="category.id" :value="category.id">
                                           {{ category.name }}
@@ -140,8 +138,21 @@
                      <th class="has-text-centered" v-if="isAuthenticated">Action</th>
                   </tr>
                </thead>
-
                <tbody>
+                  <tr>
+                     <td class="has-text-centered">
+                        <input class="input" type="text" 
+                           v-model="search.subcategoryName" @keyup="filterSubcategories"
+                        />
+                     </td>
+                     <td></td>
+                     <td class="has-text-centered">
+                        <input class="input" type="text" 
+                           v-model="search.categoryName" @keyup="filterSubcategories"
+                        />
+                     </td>
+                     <td v-if="isAuthenticated"></td>
+                  </tr>
                   <tr v-for="subcat in filteredSubcategories" :key="subcat.id">
                      <td class="has-text-centered">{{ subcat.subcat_name }}</td>
                      <td class="has-text-centered">{{ subcat.subcat_code }}</td>
@@ -172,6 +183,7 @@
    import { alpha_space_dash } from '../__custom_validation_rules.js';
    import { EventBus } from '../__vue_event-bus.js';
    import { setTimeout } from 'timers';
+   import _ from 'lodash';
   
    extend("required", required);
    extend("max", max);
@@ -208,6 +220,10 @@
                categoryId: null,
                successMsg: null,
                errorMsg: null
+            },
+            search: {
+               subcategoryName: null,
+               categoryName: null
             },
             serverResponseData: {},
             subcategoryIdToDelete: null,
@@ -255,12 +271,26 @@
                }
             });
          },
-         filterSubcategories: function() {
-            // this.form.categoryId = null;
-            this.filteredSubcategories = this.subcategories.filter(subcategory => {
-               return subcategory.subcat_name.toLowerCase().includes(this.form.subcategoryName.toLowerCase());
-            });
-         },
+
+         filterSubcategories: _.debounce(function() {
+            let tmp = this.subcategories;
+
+            for(let field in this.search) {
+               if(this.search[field] && this.search.hasOwnProperty(field)) {
+                  tmp = tmp.filter(subcategory => {
+                     switch(field) {
+                        case 'subcategoryName':
+                           return subcategory.subcat_name.toLowerCase().includes(this.search[field].toLowerCase());
+                           break;
+                        case 'categoryName':
+                           return subcategory.category.name.toLowerCase().includes(this.search[field].toLowerCase());
+                           break;
+                     }                     
+                  });
+               }
+               this.filteredSubcategories = tmp;
+            }
+         }, 500),
          createSubcategory: function() {
             httpConfig.create.data = this.postData;
             var vm = this;

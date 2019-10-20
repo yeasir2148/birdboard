@@ -20,7 +20,7 @@
 
 LOCK TABLES `units` WRITE;
 /*!40000 ALTER TABLE `units` DISABLE KEYS */;
-INSERT INTO `units` VALUES (1,'Gram','gm',NULL,NULL),(2,'Kg','kg',NULL,NULL),(3,'Liter','liter',NULL,NULL),(4,'Each','ea',NULL,NULL),(5,'Bunch','bunch',NULL,NULL),(6,'ML','ml',NULL,NULL),(7,'Dozen','',NULL,NULL);
+INSERT INTO `units` VALUES (1,'Gram','gm',NULL,NULL),(2,'Kg','kg',NULL,NULL),(3,'Liter','liter',NULL,NULL),(4,'Each','ea',NULL,NULL),(5,'Bunch','bunch',NULL,NULL),(6,'ML','ml',NULL,NULL),(7,'Dozen','',NULL,NULL),(8,'Pair','pair',NULL,NULL);
 /*!40000 ALTER TABLE `units` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -32,4 +32,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-10-20 10:12:43
+-- Dump completed on 2019-10-20 22:37:07

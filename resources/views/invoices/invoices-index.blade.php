@@ -47,6 +47,7 @@
                         <template v-slot:delete-btn="{ invoiceDetail, confirmDelete }">
                            <button class="btn btn-danger" @click="confirmDelete(invoiceDetail.id)">Delete</button>
                         </template>
+
                      @endauth
                      </invoice-detail-list>
                   </div>
@@ -70,17 +71,22 @@
                         <br>
 
                         <invoice-detail-list @invoice-detail-removed="refreshInvoice">
-                        </invoice-detail-list>
-                
+                           <template v-slot:confirm-delete-modal="{ invoiceDetailIdToDelete, entityType }">
+                              <div class="columns">
+                                 <confirm-delete :entity-id="invoiceDetailIdToDelete" :entity-type="entityType">
+                                    <template v-slot:body>
+                                       Confirm Delete of invoice item?
+                                    </template>
+                                 </confirm-delete>
+                              </div>
+                           </template>
+                        </invoice-detail-list>                
                      </div>
                   </div>
                </div>
             </div>
-
 			</div>
       </div>
-      
-
 	</div>
 </div>
 

@@ -43,13 +43,7 @@
          </div>
       </div>
 
-      <div class="columns">
-         <confirm-delete :entityId="invoiceDetailIdToDelete" :entityType="entityType">
-            <template v-slot:body>
-               Confirm Delete?
-            </template>
-         </confirm-delete>
-      </div>
+      <slot name="confirm-delete-modal" :invoiceDetailIdToDelete="invoiceDetailIdToDelete" :entityType="entityType"></slot>
    </div>
 </template>
 
@@ -133,10 +127,10 @@
             console.log(invoiceId);
          },
          confirmDelete: function(invoiceDetailId) {
-            console.log(invoiceDetailId);
+            console.log(this.removeModal);
             this.invoiceDetailIdToDelete = invoiceDetailId;
             $(this.removeModal).modal({
-               backdrop: 'static'
+               backdrop: false
             });
          },
 

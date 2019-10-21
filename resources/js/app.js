@@ -19,6 +19,8 @@ import InvoiceDetailForm from './components/InvoiceDetailFormComponent.vue';
 import InvoiceDetailList from './components/InvoiceDetailListComponent.vue';
 import DatePickerComponent from './components/Utility/DatePickerComponent.vue';
 import { invoiceDetailStore } from './Shared_State/invoice_detail_store.js';
+import ConfirmDelete from './components/Utility/ConfirmDeleteComponent.vue';
+
 import Axios from 'axios';
 /**
  * The following block of code may be used to automatically register your
@@ -46,7 +48,7 @@ const app = new Vue({
    components: {
       Categories, Subcategories, Items, Stores, 
       InvoiceSummaryForm, InvoiceSummaryList, InvoiceDetailForm,
-      InvoiceDetailList
+      InvoiceDetailList, ConfirmDelete
    },
    data: {
       form: {

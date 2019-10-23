@@ -17,8 +17,8 @@
 			<div class="tab-content" id="invoices_page_content">
             <div class="tab-pane fade show active" id="invoice_summary_content" role="tabpanel"
                aria-labelledby="invoices_tab">
-                <div class="columns">
-                  <div class="column is-two-fifths">
+               <div class="columns">
+                  <div class="column is-three-fifths">
                      <div>
                         @auth
                         <invoice-summary-form :stores="stores" @new-invoice-added="invoices.push($event)"></invoice-summary-form>
@@ -29,27 +29,33 @@
 
                         <invoice-summary-list :invoices="invoices" :items="items" :stores="stores" :units="units"
                            @invoice-summary-deleted="invoiceSummaryDeleted">
-                        @auth
-                           <template v-slot:delete-btn="{ invoice, confirmDelete }">
-                              <button class="btn btn-danger" @click="confirmDelete(invoice.id)">Delete</button>
-                           </template>
-                        @endauth
+                           @auth
+                              <template v-slot:delete-btn="{ invoice, confirmDelete }">
+                                 <button class="btn btn-danger" @click="confirmDelete(invoice.id)">Delete</button>
+                              </template>
+                           @endauth
                         </invoice-summary-list>
                      </div>
-                  </div>
-                  <div class="column is-one-fifth">
-                     <!-- This is left empty -->
                   </div>
 
                   <div class="column is-two-fifths" :class="{ hidden: shared.selectedInvoiceId === null}" id="invoice_details_on_summary_page">
                      <invoice-detail-list @invoice-detail-removed="refreshInvoice">
-                     @auth
+                        @auth
                         <template v-slot:delete-btn="{ invoiceDetail, confirmDelete }">
-                           <button class="btn btn-danger" @click="confirmDelete(invoiceDetail.id)">Delete</button>
+                           <button class="btn btn-danger" @click="confirmDelete(invoiceDetail.id, 1)">Delete</button>
                         </template>
-
-                     @endauth
-                     </invoice-detail-list>
+                        
+                        <template v-slot:confirm-delete-modal="{ invoiceDetailIdToDelete, entityType }">
+                           <div class="columns">
+                              <confirm-delete :entity-id="invoiceDetailIdToDelete" :entity-type="entityType" :modal-no="1">
+                                 <template v-slot:body>
+                                    Confirm Delete of invoice item?
+                                 </template>
+                              </confirm-delete>
+                           </div>
+                        </template>
+                        @endauth-->
+                     </invoice-detail-list>                     
                   </div>
                </div>
             </div>
@@ -71,20 +77,27 @@
                         <br>
 
                         <invoice-detail-list @invoice-detail-removed="refreshInvoice">
+                           @auth
+                           <template v-slot:delete-btn="{ invoiceDetail, confirmDelete }">
+                              <button class="btn btn-danger" @click="confirmDelete(invoiceDetail.id, 2)">Delete</button>
+                           </template>
                            <template v-slot:confirm-delete-modal="{ invoiceDetailIdToDelete, entityType }">
                               <div class="columns">
-                                 <confirm-delete :entity-id="invoiceDetailIdToDelete" :entity-type="entityType">
+                                 <confirm-delete :entity-id="invoiceDetailIdToDelete" :entity-type="entityType" :modal-no="2">
                                     <template v-slot:body>
                                        Confirm Delete of invoice item?
                                     </template>
                                  </confirm-delete>
                               </div>
                            </template>
-                        </invoice-detail-list>                
+                           @endauth
+                        </invoice-detail-list>          
                      </div>
                   </div>
                </div>
             </div>
+
+
 			</div>
       </div>
 	</div>

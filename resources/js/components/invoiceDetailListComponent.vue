@@ -35,16 +35,17 @@
                      <td class="has-text-centered">{{ invoiceDetail.unit_name }}</td>
                      <td class="has-text-centered">{{ invoiceDetail.price }}</td>
                      <td class="has-text-centered">
-                        <slot name="delete-btn" v-bind:invoiceDetail="invoiceDetail" v-bind:confirmDelete="confirmDelete">Delete</slot>
+                        <slot v-if="$scopedSlots['delete-btn']" name="delete-btn" v-bind:invoiceDetail="invoiceDetail" v-bind:confirmDelete="confirmDelete">Delete</slot>
                      </td>
                   </tr>
                </tbody>
             </table>
          </div>
       </div>
-
-      <slot name="confirm-delete-modal" :invoiceDetailIdToDelete="invoiceDetailIdToDelete" :entityType="entityType"></slot>
+      <slot v-if="$scopedSlots['confirm-delete-modal']" name="confirm-delete-modal" :invoiceDetailIdToDelete="invoiceDetailIdToDelete" :entityType="entityType"></slot>
    </div>
+   
+
 </template>
 
 
@@ -126,11 +127,11 @@
          fetchInvoiceDetails: function(invoiceId) {
             console.log(invoiceId);
          },
-         confirmDelete: function(invoiceDetailId) {
-            console.log(this.removeModal);
+         confirmDelete: function(invoiceDetailId, modalNo) {
+            console.log(`${this.removeModal}_${modalNo}`);
             this.invoiceDetailIdToDelete = invoiceDetailId;
-            $(this.removeModal).modal({
-               backdrop: false
+            $(`${this.removeModal}_${modalNo}`).modal({
+               // backdrop: 'static'
             });
          },
 

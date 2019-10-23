@@ -58,8 +58,9 @@
 }
 
 #invoice_details_on_summary_page {
-   > .invoice-detail-list {
+   .invoice-detail-list {
       position: sticky;
-      top: 50px;
+      top: 150px;
    }
 }
+

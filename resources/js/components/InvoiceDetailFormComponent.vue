@@ -80,7 +80,7 @@
                         <div class="control">
                            <input type="text"
                               class="input" name="search-item" id="search_invoice_no"
-                              placeholder="search invoice no..." v-model="form.searchedInvoiceNo">
+                              placeholder="search invoice no..." v-model="form.searchedInvoiceNo" autocomplete="off">
                         </div>
                      </div>
                   </div>
@@ -113,7 +113,7 @@
                         <div class="control">
                            <input type="text"
                               class="input" name="search-item" id="search_item"
-                              placeholder="search item name..." v-model="form.searchedItem">
+                              placeholder="search item name..." v-model="form.searchedItem" autocomplete="off">
                         </div>
                      </div>
                   </div>
@@ -160,7 +160,7 @@
                                  :class="{ 'is-danger': errors.length}"
                                  id="quantity"
                                  name="quantity"
-                                 v-model="form.quantity">
+                                 v-model="form.quantity" autocomplete="off">
                               <span
                                  class="has-text-danger" v-show="errors.length">
                                  {{ errors[0] }}
@@ -230,7 +230,7 @@
                                  :class="{'is-danger': form.price && errors.length}"
                                  id="price"
                                  name="price"
-                                 v-model="form.price">
+                                 v-model="form.price" autocomplete="off">
                               <span
                                  class="has-text-danger" v-show="form.price && errors.length">
                                     {{ errors[0] }}
@@ -408,7 +408,7 @@
    };
 </script>
 <style>
-   [class*='suggestion'] .radio:first-of-type {
+   .radio:first-of-type {
       margin-left: 8px;
    }
 </style>

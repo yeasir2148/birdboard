@@ -1,9 +1,9 @@
 <template>
-   <div class="modal remove-object-modal" tabindex="-1" role="dialog" :id="objectRemoveModalId">
+   <div class="modal remove-object-modal" tabindex="-1" role="dialog" :id="objectRemoveModalId" data-backdrop="false">
       <div class="modal-dialog modal-dialog-centered modal-sm">
          <div class="modal-content">
             <div class="modal-header">
-               <h5 class="modal-title">Modal title</h5>
+               <h5 class="modal-title has-text-weight-bold">Modal title</h5>
                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
                </button>
@@ -22,14 +22,14 @@
 
 <script>
    export default {
-      props: ['entityId', 'entityType'],
+      props: ['entityId', 'entityType','modalNo'],
       data() {
          return {
          }
       },
       computed: {
          objectRemoveModalId: function() {
-            return 'remove_' + this.entityType + '_modal';
+            return 'remove_' + this.entityType + '_modal' + (this.modalNo !== null && this.modalNo !== undefined ? `_${this.modalNo}` : '');
          }
       },
       methods: {
@@ -64,6 +64,16 @@
 
 <style>
    .remove-object-modal {
-      z-index: 9999
+      z-index: 9999;
+   }
+   .modal-header {
+      background-color: #BDB76B;
+      font-weight: bold;
+   }
+   .modal-body {
+      background-color: #DCDCDC;
+   }
+   .modal-footer {
+      background-color: #DCDCDC;
    }
 </style>

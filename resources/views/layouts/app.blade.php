@@ -23,7 +23,7 @@
 
    <body>
       <div id="app" v-cloak>
-         <nav class="navbar navbar-expand-md navbar-dark bg-primary shadow-sm" id="site_navbar">
+         <nav class="navbar navbar-expand-md navbar-dark shadow-sm" id="site_navbar">
             <div class="container">
                <a class="navbar-brand " href="{{ url('/') }}">
                   {{ config('app.name', 'Laravel') }}

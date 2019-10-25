@@ -98,19 +98,19 @@
 
       <div class="columns">
          <div class="column">
-            <table class="table is-bordered is-hoverable">
+            <table class="table is-bordered is-hoverable custom-color">
                <thead>
                   <tr>
-                     <th class="has-text-centered">Name</th>
-                     <th class="has-text-centered">Category code</th>
-                     <th class="has-text-centered" v-if="isAuthenticated">Action</th>
+                     <th class="has-text-centered green">Name</th>
+                     <th class="has-text-centered green">Category code</th>
+                     <th class="has-text-centered green" v-if="isAuthenticated">Action</th>
                   </tr>
                </thead>
 
                <tbody>
                   <tr>
                      <td class="has-text-centered">
-                        <input class="input" type="text" 
+                        <input class="input" type="text" placeholder="search category..."
                            v-model="search.categoryName" @keyup="filterCategories"
                         />
                      </td>
@@ -121,7 +121,7 @@
                      <td class="has-text-centered">{{ category.name }}</td>
                      <td class="has-text-centered">{{ category.category_code }}</td>
                      <td class="has-text-centered" v-if="isAuthenticated">
-                        <button class="btn btn-primary" @click="confirmDelete(category.id)">Delete</button>
+                        <button class="fas fa-trash-alt remove" @click="confirmDelete(category.id)"></button>
                      </td>
                   </tr>
                </tbody>

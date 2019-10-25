@@ -136,13 +136,13 @@
 
       <div class="columns">
          <div class="column">
-            <table class="table is-bordered is-hoverable">
+            <table class="table is-bordered is-hoverable custom-color">
                <thead>
                   <tr>
-                     <th class="has-text-centered">Item Name</th>
-                     <th class="has-text-centered">Item Code</th>
-                     <th class="has-text-centered">Subcategory</th>
-                     <th class="has-text-centered" v-if="isAuthenticated">Action</th>
+                     <th class="has-text-centered green">Item Name</th>
+                     <th class="has-text-centered green">Item Code</th>
+                     <th class="has-text-centered green">Subcategory</th>
+                     <th class="has-text-centered green" v-if="isAuthenticated">Action</th>
                   </tr>
                </thead>
 

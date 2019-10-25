@@ -29,11 +29,23 @@
 }
 
 main {
-   background-color: #F0FFF0;
+   background-color: #FFF8DD;
 }
 
 .tab-content {
    padding-top: 20px;
+}
+
+.table.custom-color {
+   background-color: #ffffcc;
+}
+
+.table thead tr th.green {
+   color: green;
+}
+
+input {
+   background-color: #F0F8FF
 }
 
 .icon.fa-sync {
@@ -42,6 +54,7 @@ main {
 }
 
 #site_navbar {
+   background-color: #FB733E;
    .nav-item.btn {
       background-color: #F0E68C; 
       border: 1px solid gray;
@@ -66,5 +79,9 @@ main {
       position: sticky;
       top: 100px;
    }
+}
+
+.fas.fa-trash-alt {
+   color: #ff5050;
 }
 

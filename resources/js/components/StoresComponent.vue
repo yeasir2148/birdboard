@@ -212,15 +212,15 @@
 
       <div class="columns">
          <div class="column">
-            <table class="table is-bordered is-hoverable">
+            <table class="table is-bordered is-hoverable custom-color">
                <thead>
                   <tr>
-                     <th class="has-text-centered">Store Name</th>
-                     <th class="has-text-centered">Store code</th>
-                     <th class="has-text-centered">ABN</th>
-                     <th class="has-text-centered">Phone</th>
-                     <th class="has-text-centered">Suburb</th>
-                     <th class="has-text-centered" v-if="isAuthenticated">Action</th>
+                     <th class="has-text-centered green">Store Name</th>
+                     <th class="has-text-centered green">Store code</th>
+                     <th class="has-text-centered green">ABN</th>
+                     <th class="has-text-centered green">Phone</th>
+                     <th class="has-text-centered green">Suburb</th>
+                     <th class="has-text-centered green" v-if="isAuthenticated">Action</th>
                   </tr>
                </thead>
 

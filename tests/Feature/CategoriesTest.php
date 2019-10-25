@@ -85,8 +85,7 @@ class CategoriesTest extends TestCase
       // modify the category relation of the subcategory
       $subCategory->category()->associate($category);
       $subCategory->save();
-      // dd($subCategory->category);
-      // dd($category->subcategories);
+
       $this->assertInstanceOf(Subcategory::class, $category->subcategories->first());
    }
    

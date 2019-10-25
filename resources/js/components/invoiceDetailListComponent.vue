@@ -16,15 +16,15 @@
 
       <div class="columns">
          <div class="column">
-            <table class="table is-bordered is-hoverable">
+            <table class="table is-bordered is-hoverable custom-color">
                <thead>
                   <tr>
                      <!--th-- class="has-text-centered">Invoice No</!--th-->
-                     <th class="has-text-centered">Item</th>
-                     <th class="has-text-centered">Quantity</th>
-                     <th class="has-text-centered">Unit</th>
-                     <th class="has-text-centered">Price</th>
-                     <th class="has-text-centered">Action</th>
+                     <th class="has-text-centered green">Item</th>
+                     <th class="has-text-centered green">Quantity</th>
+                     <th class="has-text-centered green">Unit</th>
+                     <th class="has-text-centered green">Price</th>
+                     <th class="has-text-centered green">Action</th>
                   </tr>
                </thead>
 

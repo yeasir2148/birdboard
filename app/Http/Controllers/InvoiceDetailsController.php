@@ -119,7 +119,7 @@ class InvoiceDetailsController extends Controller
    {
       $price = $invoiceDetail->price;
       $invoiceSummary = $invoiceDetail->invoice;
-      dd($invoiceSummary);
+      // dd($invoiceSummary);
 
       $success = $invoiceDetail->delete();
       if($success) {

@@ -88,6 +88,7 @@
             invoiceDetailIdToDelete: null,
             shared: invoiceDetailStore.state,
             selectedInvoice: {},
+            removeModalId: null
          };
       },
 
@@ -128,9 +129,10 @@
             console.log(invoiceId);
          },
          confirmDelete: function(invoiceDetailId, modalNo) {
-            console.log(`${this.removeModal}_${modalNo}`);
+            this.removeModalId = `${this.removeModal}_${modalNo}`;
+            console.log(this.removeModalId);
             this.invoiceDetailIdToDelete = invoiceDetailId;
-            $(`${this.removeModal}_${modalNo}`).modal({
+            $(this.removeModalId).modal({
                // backdrop: 'static'
             });
          },
@@ -149,7 +151,8 @@
                this.form.errorMsg = errorResponse.message;
             })
             .finally(() => {
-               $(this.removeModal).modal('hide');
+               $(this.removeModalId).modal('hide');
+               this.removeModalId = null;
                setTimeout(() => this.resetForm(), 1000);
             });
          },

@@ -28,6 +28,10 @@
    display: none;
 }
 
+main {
+   background-color: #F0FFF0;
+}
+
 .tab-content {
    padding-top: 20px;
 }
@@ -60,7 +64,7 @@
 #invoice_details_on_summary_page {
    .invoice-detail-list {
       position: sticky;
-      top: 150px;
+      top: 100px;
    }
 }
 

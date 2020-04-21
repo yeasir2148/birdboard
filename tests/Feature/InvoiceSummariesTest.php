@@ -31,15 +31,15 @@ class InvoiceSummariesTest extends TestCase
    public function authenticated_user_can_create_an_invoice()
    {
       // There must be some items in the table
-      factory(Item::class, 5)->create();
-      factory(Unit::class, 3)->create();
-      factory(Store::class, 3)->create();
+      factory(Item::class)->create();
+      factory(Unit::class)->create();
+      factory(Store::class)->create();
       $invoice = factory(InvoiceSummary::class)->raw();
 
       $user = factory(User::class)->make();
       $this->actingAs($user);
       $response = $this->post('/invoice', $invoice);
-   //    dd($response);
+      // $this->assertInstanceOf(InvoiceSummary::class, InvoiceSummary::find(1));
       $this->assertDatabaseHas('invoice_summaries', $invoice);
    }
 

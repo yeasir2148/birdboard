@@ -56,7 +56,7 @@ class InvoicesController extends Controller
    {
       $validatedAttributes = $request->validate([
          'invoice_no' => 'required',
-         // 'value' => 'required | numeric',
+         'value' => 'required | numeric',
          'invoice_date' => 'required | date',
          'store_id' => 'required | exists:stores,id'
       ]);

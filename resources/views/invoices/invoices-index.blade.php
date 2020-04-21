@@ -31,7 +31,7 @@
                            @invoice-summary-deleted="invoiceSummaryDeleted">
                            @auth
                               <template v-slot:delete-btn="{ invoice, confirmDelete }">
-                                 <button class="btn btn-danger" @click="confirmDelete(invoice.id)">Delete</button>
+                                 <button class="fas fa-trash-alt" @click="confirmDelete(invoice.id)"></button>
                               </template>
                            @endauth
                         </invoice-summary-list>
@@ -42,7 +42,7 @@
                      <invoice-detail-list @invoice-detail-removed="refreshInvoice">
                         @auth
                         <template v-slot:delete-btn="{ invoiceDetail, confirmDelete }">
-                           <button class="btn btn-danger" @click="confirmDelete(invoiceDetail.id, 1)">Delete</button>
+                           <button class="fas fa-trash-alt" @click="confirmDelete(invoiceDetail.id, 1)"></button>
                         </template>
                         
                         <template v-slot:confirm-delete-modal="{ invoiceDetailIdToDelete, entityType }">
@@ -79,7 +79,7 @@
                         <invoice-detail-list @invoice-detail-removed="refreshInvoice">
                            @auth
                            <template v-slot:delete-btn="{ invoiceDetail, confirmDelete }">
-                              <button class="btn btn-danger" @click="confirmDelete(invoiceDetail.id, 2)">Delete</button>
+                              <button class="fas fa-trash-alt" @click="confirmDelete(invoiceDetail.id, 2)"></button>
                            </template>
                            <template v-slot:confirm-delete-modal="{ invoiceDetailIdToDelete, entityType }">
                               <div class="columns">

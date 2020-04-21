@@ -12,7 +12,8 @@ $factory->define(InvoiceDetail::class, function (Faker $faker) {
    $invoice = factory(InvoiceSummary::class)->create();
 
    $itemId = factory(Item::class)->create();
-   $unitId = factory(Unit::class)->create();
+   $unit = Unit::find(1);
+   $unitId = $unit ? $unit->id : factory(Unit::class)->create();
    $price = $faker->randomFloat(2, 1, 20);
 
    // Updating the InvoiceSummary value as the InvoiceSummary factory defaults to 0 for 'value' column

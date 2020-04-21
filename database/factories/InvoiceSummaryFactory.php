@@ -7,8 +7,8 @@ use App\Store;
 use Faker\Generator as Faker;
 
 $factory->define(InvoiceSummary::class, function (Faker $faker) {
-
-   $storeId = factory(Store::class)->create();
+   $store = Store::find(1);
+   $storeId = $store ? $store->id : factory(Store::class)->create();
 
    return [
       'invoice_no' => $faker->randomNumber(6),

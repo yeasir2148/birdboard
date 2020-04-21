@@ -142,13 +142,17 @@
                   <tr>
                      <td class="has-text-centered">
                         <input class="input" type="text" 
-                           v-model="search.subcategoryName" @keyup="filterSubcategories"
+                           v-model="search.subcategoryName"
+                           placeholder="search sub-cat"
+                           @keyup="filterSubcategories"
                         />
                      </td>
                      <td></td>
                      <td class="has-text-centered">
                         <input class="input" type="text" 
-                           v-model="search.categoryName" @keyup="filterSubcategories"
+                           v-model="search.categoryName"
+                           placeholder="search category"
+                           @keyup="filterSubcategories"
                         />
                      </td>
                      <td v-if="isAuthenticated"></td>
@@ -158,7 +162,7 @@
                      <td class="has-text-centered">{{ subcat.subcat_code }}</td>
                      <td class="has-text-centered">{{ subcat.category.name }}</td>
                      <td class="has-text-centered" v-if="isAuthenticated">
-                        <button class="btn btn-primary" @click="confirmDelete(subcat.id)">Delete</button>
+                        <button class="fas fa-trash-alt" @click="confirmDelete(subcat.id)"></button>
                      </td>
                   </tr>
                </tbody>

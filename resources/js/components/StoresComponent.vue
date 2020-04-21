@@ -232,7 +232,7 @@
                      <td class="has-text-centered">{{ store.phone }}</td>
                      <td class="has-text-centered">{{ store.suburb }}</td>
                      <td class="has-text-centered" v-if="isAuthenticated">
-                        <button class="btn btn-primary" @click="confirmDelete(store.id)">Delete</button>
+                        <button class="fas fa-trash-alt" @click="confirmDelete(store.id)"></button>
                      </td>
                   </tr>
                </tbody>

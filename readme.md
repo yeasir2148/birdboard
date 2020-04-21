@@ -1,72 +1,121 @@
-<p align="center"><img src="https://laravel.com/assets/img/components/logo-laravel.svg"></p>
+## Authors
+- Yeasir Majumder <yeasir2148@yhotmail.com>
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/d/total.svg" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/v/stable.svg" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
-</p>
+## Setup
+Make sure you have `node`, `npm`, `php`, `composer` and `MySQL` is available in your computer. 
+Clone the repo, checkout `master` branch. Run the installation.
 
-## About Laravel
+```bash
+cd [project directory]
+git checkout master
+cp .env.example .env
+composer install
+npm install
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+# Add encryption key
+php artisan key:generate
+```
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Create a **fresh** database name `ydt-local` in mysql (or any db name you want). Then __supply__ your own db credentials in your `.env` file. Example:
+```
+DB_DATABASE=[database name]
+DB_USERNAME=your-awesome-mysql-username
+DB_PASSWORD=your-awesome-mysql-password
+```
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Run migrations
+```
+php artisan migrate
+```
 
-## Learning Laravel
+_**Open another terminal/cmd window**_ and compile assets using `npm`
+```
+npm run watch
+```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Go back to the previous terminal and serve the project on port __5000__ (_usually defaults to port 8000, but it might already been used_)
+```bash
+php artisan serve --port=5000 # or you can use php -S 0.0.0.0:5000 -t ./public
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1400 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Setup auto-refresh
+If you **hate** clicking the refresh button after you made some changes (esp. in `resources` folder) you can setup BrowserSync to autoreload the page
+Since we are using laravel-mix, we have support of browser-sync out of the box, if you are using latest version of laravel.
+otherwise install browser-sync npm package.
 
-## Laravel Sponsors
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+```bash
+# Open another terminal then..
+npm install -g browser-sync
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[British Software Development](https://www.britishsoftware.co)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- [UserInsights](https://userinsights.com)
-- [Fragrantica](https://www.fragrantica.com)
-- [SOFTonSOFA](https://softonsofa.com/)
-- [User10](https://user10.com)
-- [Soumettre.fr](https://soumettre.fr/)
-- [CodeBrisk](https://codebrisk.com)
-- [1Forge](https://1forge.com)
-- [TECPRESSO](https://tecpresso.co.jp/)
-- [Runtime Converter](http://runtimeconverter.com/)
-- [WebL'Agence](https://weblagence.com/)
-- [Invoice Ninja](https://www.invoiceninja.com)
-- [iMi digital](https://www.imi-digital.de/)
-- [Earthlink](https://www.earthlink.ro/)
-- [Steadfast Collective](https://steadfastcollective.com/)
-- [We Are The Robots Inc.](https://watr.mx/)
-- [Understand.io](https://www.understand.io/)
-- [Abdel Elrafa](https://abdelelrafa.com)
-- [Hyper Host](https://hyper.host)
+# Make sure you have artisan serve running on port 5000
+browser-sync start --port=5001 --proxy=localhost:5000 --files "./resources/**/*"
+```
 
-## Contributing
+To make things work with browsersync:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+open your .env file and add a constant named MIX_APP_URL and set it's value to your local url, like below:
 
-## Security Vulnerabilities
+```
+MIX_APP_URL=[your local app url]
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```
+now in your webpack.mix.js file, make the following changes:
 
-## License
+```
+const hostname = process.env.MIX_APP_URL;
+```
+And append the below snippet in your mix configuration/definition:
 
-The Laravel framework is open-source software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```
+.browserSync({
+        open: 'external',
+        port: 80,
+        host: hostname,
+        proxy: hostname,
+        files: ['resources/views/**/*.php', 'app/**/*.php', 'routes/**/*.php', 'public/js/*.js', 'public/css/*.css']
+    })
+```
+
+browserSync is set up to work on port 80, so make sure you are running the project on port 80
+
+Now whenever you make some changes under `resources` folder browser-sync will detect it, auto-compile and reload your project.
+
+## VSCode and XDebug (optional)
+If you want a step debugging, Install `vscode-php-debug` extension. You can use these `.vscode/launch.json` setup.
+```json
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Listen for XDebug",
+            "type": "php",
+            "request": "launch",
+            "port": 9000,
+            "ignore": [
+                "**/vendor/**/*.php"
+            ]
+        },
+        {
+            "name": "Launch currently open script",
+            "type": "php",
+            "request": "launch",
+            "program": "${file}",
+            "cwd": "${fileDirname}",
+            "port": 9000
+        }
+    ]
+}
+```
+
+## Tests
+... coming soon ..
+
+
+## Docker setup
+...coming soon...
+
+
+## Deployment
+...coming soon...
+

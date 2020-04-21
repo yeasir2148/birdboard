@@ -1,5 +1,5 @@
 const mix = require('laravel-mix');
-
+const hostname = process.env.MIX_APP_URL;
 /*
  |--------------------------------------------------------------------------
  | Mix Asset Management
@@ -12,4 +12,11 @@ const mix = require('laravel-mix');
  */
 
 mix.js('resources/js/app.js', 'public/js')
-    .sass('resources/sass/app.scss', 'public/css');
+    .sass('resources/sass/app.scss', 'public/css')
+    .browserSync({
+        open: 'external',
+        port: 80,
+        host: hostname,
+        proxy: hostname,
+        files: ['resources/views/**/*.php', 'app/**/*.php', 'routes/**/*.php', 'public/js/*.js', 'public/css/*.css']
+    });

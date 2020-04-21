@@ -24,7 +24,8 @@
                                  :class="{ 'is-danger': form.invoiceNo && errors.length}"
                                  id="invoice_no"
                                  name="invoice_no"
-                                 v-model="form.invoiceNo">
+                                 v-model="form.invoiceNo"
+                                 autocomplete="off">
                               <span class="has-text-danger" v-show="form.invoiceNo && errors.length">
                                  {{ errors[0] }}
                               </span>

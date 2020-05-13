@@ -32,9 +32,7 @@
                </div>
                <div class="columns">
                   <div class="column">
-                     <categories :categories="categories" @new-category-added="categories.push($event)"
-                        @category-deleted="categoryDeleted"
-                        :is-logged-in="<?= json_encode(Auth::check()) ?>">
+                     <categories>
                      </categories>
                   </div>
                </div>
@@ -46,10 +44,7 @@
                </div>
                <div class="columns">
                   <div class="column">
-                     <subcategories :categories="categories" :subcategories="subcategories"
-                        @new-subcategory-added="subcategories.push($event)"
-                        @subcategory-deleted="subcategoryDeleted"
-                        :is-logged-in="<?= json_encode(Auth::check()) ?>">
+                     <subcategories>
                      </subcategories>
                   </div>
                </div>
@@ -61,9 +56,7 @@
                </div>
                <div class="columns">
                   <div class="column">
-                     <Items :items="items" :categories="categories" :subcategories="subcategories"
-                        @new-item-added="items.push($event)" @item-deleted="itemDeleted"
-                        :is-logged-in="<?= json_encode(Auth::check()) ?>">
+                     <Items>
                      </Items>
                   </div>
                </div>
@@ -75,9 +68,7 @@
                </div>
                <div class="columns">
                   <div class="column">
-                     <Stores :stores="stores"
-                        @new-store-added="stores.push($event)" @store-deleted="storeDeleted"
-                        :is-logged-in="<?= json_encode(Auth::check()) ?>">
+                     <Stores>
                      </Stores>
                   </div>
                </div>
@@ -85,9 +76,9 @@
 			</div>
       </div>
       
-      <div class="column is-two-fifths">
+      <!-- <div class="column is-two-fifths">
          
-      </div>
+      </div> -->
 	</div>
 </div>
 

@@ -4,7 +4,7 @@
       <div class="alert alert-danger" v-if="form.errorMsg && form.errorMsg.length">{{form.errorMsg}}</div>
       
       <div class="form">
-         <validation-observer v-slot="observerSlotProp" @submit.prevent="createInvoiceSummary">
+         <validation-observer v-slot="observerSlotProp" @submit.prevent="addInvoice(postData)">
             <form id="createInvoiceForm">
                <!-- Invoice No -->
                <div class="field is-horizontal">
@@ -117,28 +117,15 @@
    import { EventBus } from '../__vue_event-bus.js';
    import { required, alpha_dash, numeric } from "vee-validate/dist/rules";
    import DatePickerComponent from './Utility/DatePickerComponent.vue';
-
+   import { mapState, mapActions } from 'vuex';
+   import Fetch from "@js/components/Fetch.vue";
   
    extend("required", required);
    extend("alpha_dash", alpha_dash);
    extend("numeric", numeric);
 
-   const httpConfig = {
-      getAll: {
-         method: "get",
-         url: "/invoices",
-         responseType: "json"
-      },
-      create: {
-         method: "post",
-         url: "/invoice",
-         responseType: "json"
-      },
-   };
-
    export default {
       components: { ValidationObserver, ValidationProvider, DatePickerComponent },
-      props: ['stores'],
       data() {
          return {
             form: {
@@ -158,6 +145,11 @@
       },
 
       computed: {
+         ...mapState({
+            stores: state => state.shopStore.stores,
+            invoices: state => state.invoiceSummaryStore.invoices
+
+         }),
          postData: function() {
             return {
                invoice_no: this.form.invoiceNo,
@@ -168,34 +160,17 @@
          },
       },
       methods: {
-         fetchInvoices: function() {
-            axios(httpConfig.getAll)
-            .then(({ data }) => {
-               if(data !== null && data !== 'undefined') {
-                  EventBus.$emit('update-data', 'invoiceSummary', data);
-               }
+         ...mapActions('invoiceSummaryStore', ['fetchInvoices','createInvoiceSummary']),
+         addInvoice: function(postData) {
+            this.createInvoiceSummary(postData)
+            .then(() => {
+               this.$toasted.show('Invoice added successfully');
+               setTimeout(() => this.resetForm(), 1000);
+            })
+            .catch(errorResponse => {
+               this.$toasted.show(errorResponse.message);
             });
          },
-         createInvoiceSummary: function() {
-            httpConfig.create.data = this.postData;
-            var vm = this;
-
-            axios(httpConfig.create)
-               .then((response) => {
-                  this.serverResponseData = response.data;
-                  if(this.serverResponseData.success === true) {
-                     this.$emit('new-invoice-added', this.serverResponseData.data);
-                     this.form.successMsg = 'Invoice added successfully';
-                  }
-               })
-               .catch(response => {
-                  this.form.errorMsg = response.data.msg;
-               })
-               .finally(() => {
-                  setTimeout(() => this.resetForm(), 1000);
-               });
-         },
-
          resetForm: function() {
             for (var key in this.form) {
                this.form[key] = null;

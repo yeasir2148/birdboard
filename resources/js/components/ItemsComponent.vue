@@ -1,9 +1,7 @@
 <template>
    <div>
-      <div class="alert alert-success" v-if="form.successMsg && form.successMsg.length">{{form.successMsg}}</div>
-      <div class="alert alert-danger" v-if="form.errorMsg && form.errorMsg.length">{{form.errorMsg}}</div>
       <div class="form" v-if="isAuthenticated">
-         <ValidationObserver v-slot="observerSlotProp" @submit.prevent="createItem">
+         <ValidationObserver v-slot="observerSlotProp" @submit.prevent="addItem(postData)">
             <form id="createItemForm">
                <div class="field is-horizontal">
                   <div class="field-label is-normal">
@@ -123,15 +121,11 @@
 
       <br>
       
-      <div class="columns">
+      <div class="columns is-vcentered">
          <div class="column has-text-centered">
             <h4 class="title is-4">Items</h4>
          </div>
-         <div class="column is-2 has-text-centered">
-            <div class="toolbar has-text-centered">
-               <span @click="fetchItems" class="icon fas fa-sync"></span>
-            </div>            
-         </div>
+         <Fetch class="column is-2 has-text-centered" objectToFetch="items"></Fetch>
       </div>      
 
       <div class="columns">
@@ -181,7 +175,13 @@
       </div>
 
       <div class="columns">
-         <confirm-delete :entityId="itemIdToDelete" entityType="item">
+         <confirm-delete
+            :entityId="itemIdToDelete"
+            entityType="item"
+            v-if="showDeleteModal"
+            @deleted="afterDeleteItem"
+            @delete-modal-closed="afterHideModal()"
+         >
             <template v-slot:body>
                Confirm Delete?
             </template>
@@ -199,31 +199,13 @@
    import { EventBus } from '../__vue_event-bus.js';
    import { setTimeout } from 'timers';
    import _ from 'lodash';
-  
+   import { mapState, mapActions } from 'vuex';
+   import Fetch from "@js/components/Fetch.vue";
+   import { commonMethods } from "@js/mixins/commonMethodMixin.js";
+   
    extend("required", required);
    extend("max", max);
    extend("alpha_dash", alpha_dash);
-
-   const httpConfig = {
-      create: {
-         method: "post",
-         url: "/item",
-         responseType: "json"
-      },
-      getAll: {
-         method: "get",
-         url: "/items",
-         responseType: "json"
-      },
-      delete: {
-         url: "/item/{item_id}",
-         params: {
-            data: {
-               _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
-            }
-         }         
-      }
-   };
 
    // this should be key => value object where key is the v-model of search field and value is corresponding table
    // column name of the object(i.e.; Item)
@@ -231,9 +213,10 @@
       itemName: 'item_name',
       subcategoryName: 'subcategory.subcat_name'
    };
+
    export default {
-      components: { ValidationObserver, ValidationProvider, ConfirmDelete },
-      props: ['categories','subcategories','items','isLoggedIn'],
+      mixins: [ commonMethods ], 
+      components: { ValidationObserver, ValidationProvider, ConfirmDelete, Fetch },
       data() {
          return {
             form: {
@@ -242,16 +225,13 @@
                itemCode: null,
                subCategoryId: null,
                itemNameSuggestion: null,
-               successMsg: null,
-               errorMsg: null
             },
             search: {
                itemName: null,
                subcategoryName: null
             },
-            serverResponseData: {},
             itemIdToDelete: null,
-            isAuthenticated: this.isLoggedIn,
+            showDeleteModal: false,
             filteredItems: null
          };
       },
@@ -261,19 +241,21 @@
       },
 
       computed: {
+         ...mapState({
+            categories: state => state.categoryStore.categories,
+            subcategories: state => state.subcategoryStore.subcategories,
+            items: state => state.itemStore.items,
+            isAuthenticated: state => state.auth.isLoggedIn
+         }),
          postData: function() {
             return {
                item_name: this.form.itemName,
-               // item_code: this.form.itemCode.toLowerCase(),
                subcat_id: this.form.subCategoryId,
-               // _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
             };
          },
-
          removeModal: function() {
             return '#remove_item_modal';
          },
-
          showItemNameSuggestion: {
             get() {
                return this.form.itemNameSuggestion && this.form.status == "pending" && this.filteredItems.length;
@@ -297,24 +279,9 @@
                this.filteredItems = newValue;
             }               
          },
-
-         // 'form.subCategoryId'(newValue) {
-         //    // this.form.itemName = null;
-         //    this.filteredItems = this.items.filter(item => {
-         //       return item.subcat_id == newValue;
-         //    });
-         // }
       },
       methods: {
-         fetchItems: function() {
-            axios(httpConfig.getAll)
-            .then(({ data }) => {
-               if(data !== null && data !== 'undefined') {
-                  EventBus.$emit('update-data', 'item', data.items);
-               }
-            });
-         },
-
+         ...mapActions('itemStore', ['fetchItems','createItem']),
          filterItems: _.debounce(function(event) {
             let tmp = this.items;
 
@@ -334,66 +301,36 @@
                this.filteredItems = tmp;
             }
          }, 500),
-
+         addItem: function(postData) {
+            this.createItem(postData)
+            .then(() => {
+               this.$toasted.show('Item added successfully');
+               setTimeout(() => this.resetForm(), 1000);
+            })
+            .catch(errorResponse => {
+               this.$toasted.show(errorResponse.message);
+            });
+         },
          filter: function(e) {
             console.log(e.target.attributes);
          },
-
-         createItem: function() {
-            this.form.status = 'submitting';
-            httpConfig.create.data = this.postData;
-            var vm = this;
-
-            axios(httpConfig.create)
-               .then((response) => {
-                  this.serverResponseData = response.data;
-                  if(this.serverResponseData.success === true) {
-                     this.$emit('new-item-added', this.serverResponseData.data);
-                     this.form.successMsg = 'Item added successfully';
-                  } else {
-                     this.form.errorMsg = this.serverResponseData.message;
-                  }
-               })
-               .catch(response => {
-                  this.form.errorMsg = response.data.msg;
-               })
-               .finally(() => {
-                  this.form.status = 'pending';
-                  var vm = this;
-                  setTimeout(() => {
-                     this.resetForm();
-                     console.log(this.items);
-                     vm.filteredItems = vm.items;
-                  }, 1000);
-                  
-               });
-         },
-
          confirmDelete: function(itemId) {
             this.itemIdToDelete = itemId;
-            $(this.removeModal).modal({
-               backdrop: 'static'
+            this.showDeleteModal = true;
+            this.$nextTick(() => {
+               $(this.removeModal).modal({
+                  backdrop: 'static'
+               });
             });
          },
+         afterDeleteItem: function() {
+            this.$toasted.show('Item deleted');
 
-         deleteItem: function(itemId) {
-            axios.delete(httpConfig.delete.url.replace('{item_id}', itemId), httpConfig.delete.params)
-            .then( response => {
-               this.serverResponseData = response.data;
-               if(response.data.success === true) {
-                  this.$emit('item-deleted', itemId);
-                  this.form.successMsg = 'Item removed successfully.';
-               }
-            })
-            .catch(errorResponse => {
-               this.form.errorMsg = response.data.msg;
-            })
-            .finally(() => {
-               $(this.removeModal).modal('hide');
-               setTimeout(() => this.resetForm(), 1000);
+            $(this.removeModal).modal('hide');            
+            this.$nextTick(() => {
+               this.showDeleteModal = false;
             });
          },
-
          resetForm: function() {
             for (var key in this.form) {
                this.form.status = 'pending';

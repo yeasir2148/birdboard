@@ -3,7 +3,7 @@
       <div class="alert alert-success" v-if="form.successMsg && form.successMsg.length">{{form.successMsg}}</div>
       <div class="alert alert-danger" v-if="form.errorMsg && form.errorMsg.length">{{form.errorMsg}}</div>
       <div class="form" v-if="isAuthenticated">
-         <ValidationObserver v-slot="observerSlotProp" @submit.prevent="createCategory">
+         <ValidationObserver v-slot="observerSlotProp" @submit.prevent="addCategory(postData)">
             <form method="post" action="/categories" id="createCategoryForm">
                <div class="field is-horizontal">
                   <div class="field-label is-normal">
@@ -35,36 +35,6 @@
                   </div>
                </div>
 
-               <!--<div class="field is-horizontal" v-if="false">
-                  <div class="field-label is-normal">
-                     <label for="category_code" class="label">Category Code</label>
-                  </div>
-                  <div class="field-body">
-                     <div class="field">
-                        <div class="control">
-                           <validation-provider
-                              name="category-code"
-                              rules="required|max:30|alpha_dash"
-                              v-slot="{ errors }"
-                           >
-                              <input
-                                 type="text"
-                                 class="input"
-                                 :class="{'is-danger': form.categoryCode && errors.length}"
-                                 id="category_code"
-                                 name="category_code"
-                                 v-model="form.categoryCode"
-                              >
-                              <span
-                                 class="has-text-danger"
-                                 v-show="form.categoryCode && form.categoryCode.length"
-                              >{{ errors[0] }}</span>
-                           </validation-provider>
-                        </div>
-                     </div>
-                  </div>
-               </div>-->
-
                <div class="field is-horizontal">
                   <div class="field-label"></div>
                   <div class="field-body">
@@ -89,11 +59,7 @@
          <div class="column has-text-centered">
             <h4 class="title is-4">All Categories</h4>
          </div>
-         <div class="column is-2 has-text-centered">
-            <div class="toolbar has-text-centered">
-               <span @click="fetchCategory" class="icon fas fa-sync"></span>
-            </div>            
-         </div>
+         <Fetch class="column is-2 has-text-centered" objectToFetch="categories"></Fetch>
       </div>
 
       <div class="columns">
@@ -129,7 +95,13 @@
          </div>
       </div>
       <div class="columns">
-         <confirm-delete :entityId="categoryIdToDelete" entityType="category">
+         <confirm-delete 
+            :entityId="categoryIdToDelete"
+            entityType="category"
+            v-if="showDeleteModal"
+            @deleted="afterDeleteCategory"
+            @delete-modal-closed="afterHideModal()"
+         >
             <template v-slot:body>
                Confirm Delete? All related subcategories and items will also be deleted!!
             </template>
@@ -144,36 +116,18 @@
    import ConfirmDelete from './Utility/ConfirmDeleteComponent.vue';
    import { required, max, alpha_dash } from "vee-validate/dist/rules";
    import { alpha_space_dash } from '../__custom_validation_rules.js';
-   import { EventBus } from '../__vue_event-bus.js';
    import _ from 'lodash';
+   import { mapState, mapActions } from 'vuex';
+   import Fetch from "@js/components/Fetch.vue";
+   import { commonMethods } from "@js/mixins/commonMethodMixin.js";
 
    extend("required", required);
    extend("max", max);
    extend("alpha_dash", alpha_dash);
 
-   const httpConfig = {
-      create: {
-         method: "post",
-         url: "/categories",
-         responseType: "json"
-      },
-      get: {
-         method: "get",
-         url: "/categories",
-         responseType: "json"
-      },
-      delete: {
-         url: "/categories/{category_id}",
-         params: {
-            data: {
-               // _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
-            }
-         }         
-      }
-   };
    export default {
-      components: { ValidationObserver, ValidationProvider, ConfirmDelete },
-      props: ['categories', 'isLoggedIn'],
+      mixins: [ commonMethods ],
+      components: { ValidationObserver, ValidationProvider, ConfirmDelete, Fetch },
       data() {
          return {
             form: {
@@ -186,22 +140,24 @@
                categoryName: null,
             },
             serverResponseData: {},
+            showDeleteModal: false,
             categoryIdToDelete: null,
-            isAuthenticated: this.isLoggedIn,
             filteredCategories: null
          };
       },
 
       mounted: function() {
-         this.fetchCategory();
+         this.fetchCategories();
       },
 
       computed: {
+         ...mapState({
+            categories: state => state.categoryStore.categories,
+            isAuthenticated: state => state.auth.isLoggedIn
+         }),
          postData: function() {
             return {
                name: this.form.name,
-               // category_code: this.form.categoryCode.toLowerCase(),
-               // _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
             };
          },
          removeModal: function() {
@@ -218,17 +174,19 @@
             }
          }
       },
-      methods: {
-         fetchCategory: function() {
-             axios(httpConfig.get)
-            .then(({ data }) => {
-               // console.log(data);
-               if(data.length) {
-                  EventBus.$emit('update-data','category',data);
-               }
-            });            
-         },
 
+      methods: {
+         ...mapActions('categoryStore',['fetchCategories','createCategory']),
+         addCategory: function(postData) {
+            this.createCategory(postData)
+            .then(() => {
+               this.$toasted.show('Category added successfully');
+               setTimeout(() => this.resetForm(), 1000);
+            })
+            .catch(errorResponse => {
+               this.$toasted.show(errorResponse.message);
+            });
+         },
          filterCategories: _.debounce(function() {
             let tmp = this.categories;
 
@@ -245,54 +203,23 @@
                this.filteredCategories = tmp;
             }
          }, 500),
-
-         createCategory: function() {
-            httpConfig.create.data = this.postData;
-            var vm = this;
-
-            axios(httpConfig.create)
-            .then((response) => {
-               this.serverResponseData = response.data;
-               if(this.serverResponseData.success === true) {
-                  this.form.successMsg = 'Category added successfully';
-                  this.$emit('new-category-added', this.serverResponseData.data);
-               } else {
-                  this.form.errorMsg = this.serverResponseData.message;
-               }
-            })
-            .catch(errorResponse => {
-               this.form.errorMsg = errorResponse.message;
-            })
-            .finally(() => {
-               setTimeout(() => this.resetForm(), 1000);
-            });         
-         },
-
          confirmDelete: function(categoryId) {
             this.categoryIdToDelete = categoryId;
-            $(this.removeModal).modal({
-               backdrop: 'static'
+            this.showDeleteModal = true;
+            this.$nextTick(() => {
+               $(this.removeModal).modal({
+                  backdrop: 'static'
+               });
             });
          },
+         afterDeleteCategory: function() {
+            this.$toasted.show('category deleted');
 
-         deleteCategory: function(categoryId) {
-            axios.delete(httpConfig.delete.url.replace('{category_id}', categoryId), httpConfig.delete.params)
-            .then( response => {
-               this.serverResponseData = response.data;
-               if(response.data.success === true) {
-                  this.form.successMsg = "Category removed successfully";
-                  this.$emit('category-deleted', categoryId);
-               }
-            })
-            .catch(errorResponse => {
-               this.form.errorMsg = errorResponse.message;
-            })
-            .finally(() => {
-               $(this.removeModal).modal('hide');
-               setTimeout(() => this.resetForm(), 1000);
+            $(this.removeModal).modal('hide');            
+            this.$nextTick(() => {
+               this.showDeleteModal = false;
             });
          },
-
          resetForm: function() {
             for (var key in this.form) {
                this.form[key] = null;
@@ -303,12 +230,4 @@
 </script>
 
 <style lang="scss">
-   .fas.icon {
-      line-height: inherit;
-      cursor: pointer;
-      &:hover {
-         background-color: #EDE7E6;
-      }
-   }
-
 </style>

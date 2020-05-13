@@ -16,8 +16,8 @@ Route::get('/', function () {
 });
 
 Route::get('/is-authenticated', function() {
-   $resposne = ['data' => []];
-   return response()->json($response['data']['is_authenticated'] = Auth::check());
+   $response = ['is_authenticated' => Auth::check()];
+   return response()->json($response);
 });
 Route::post('/projects', 'ProjectsController@store');
 

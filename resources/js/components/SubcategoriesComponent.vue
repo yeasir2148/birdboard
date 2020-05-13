@@ -3,7 +3,7 @@
       <div class="alert alert-success" v-if="form.successMsg && form.successMsg.length">{{form.successMsg}}</div>
       <div class="alert alert-danger" v-if="form.errorMsg && form.errorMsg.length">{{form.errorMsg}}</div>
       <div class="form" v-if="isAuthenticated">
-         <ValidationObserver v-slot="observerSlotProp" @submit.prevent="createSubcategory">
+         <ValidationObserver v-slot="observerSlotProp" @submit.prevent="addSubcategory(postData)">
             <form id="createSubCategoryForm">
                <div class="field is-horizontal">
                   <div class="field-label is-normal">
@@ -33,35 +33,6 @@
                      </div>
                   </div>
                </div>
-
-               <!--<div class="field is-horizontal" v-if="false">
-                  <div class="field-label is-normal">
-                     <label for="subcategory_code" class="label">Subcategory Code</label>
-                  </div>
-                  <div class="field-body">
-                     <div class="field">
-                        <div class="control">
-                           <validation-provider
-                              name="subcategory-code"
-                              rules="required|max:30|alpha_dash"
-                              v-slot="{ errors }">
-                              <input
-                                 type="text"
-                                 class="input"
-                                 :class="{'is-danger': form.subcategoryCode && errors.length}"
-                                 id="category_code"
-                                 name="category_code"
-                                 v-model="form.subcategoryCode">
-                              <span
-                                 class="has-text-danger"
-                                 v-show="form.subcategoryCode && form.subcategoryCode.length">
-                                    {{ errors[0] }}
-                              </span>
-                           </validation-provider>
-                        </div>
-                     </div>
-                  </div>
-               </div>-->
 
                <div class="field is-horizontal">
                   <div class="field-label is-normal">
@@ -116,15 +87,11 @@
 
       <br>
       
-      <div class="columns">
+      <div class="columns is-vcentered">
          <div class="column has-text-centered">
             <h4 class="title is-4">Subcategories</h4>
          </div>
-         <div class="column is-2 has-text-centered">
-            <div class="toolbar has-text-centered">
-               <span @click="fetchSubcategory" class="icon fas fa-sync"></span>
-            </div>            
-         </div>
+         <Fetch class="column is-2 has-text-centered" objectToFetch="subcategories"></Fetch>
       </div>      
 
       <div class="columns">
@@ -170,7 +137,13 @@
          </div>
       </div>
       <div class="columns">
-         <confirm-delete :entityId="subcategoryIdToDelete" entityType="subcategory">
+         <confirm-delete
+            :entityId="subcategoryIdToDelete"
+            entityType="subcategory"
+            v-if="showDeleteModal"
+            @deleted="afterDeleteSubcategory"
+            @delete-modal-closed="afterHideModal()"
+         >
             <template v-slot:body>
                Confirm Delete? All related Items will also be deleted!!
             </template>
@@ -188,34 +161,17 @@
    import { EventBus } from '../__vue_event-bus.js';
    import { setTimeout } from 'timers';
    import _ from 'lodash';
+   import { mapState, mapActions } from 'vuex';
+   import Fetch from "@js/components/Fetch.vue";
+   import { commonMethods } from "@js/mixins/commonMethodMixin.js";
   
    extend("required", required);
    extend("max", max);
    extend("alpha_dash", alpha_dash);
 
-   const httpConfig = {
-      create: {
-         method: "post",
-         url: "/subcategory",
-         responseType: "json"
-      },
-      getAll: {
-         method: "get",
-         url: "/subcategories",
-         responseType: "json"
-      },
-      delete: {
-         url: "/subcategory/{subcat_id}",
-         params: {
-            data: {
-               _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
-            }
-         }         
-      }
-   };
    export default {
-      components: { ValidationObserver, ValidationProvider, ConfirmDelete },
-      props: ['categories', 'subcategories','isLoggedIn'],
+      mixins: [ commonMethods ],
+      components: { ValidationObserver, ValidationProvider, ConfirmDelete, Fetch },
       data() {
          return {
             form: {
@@ -231,28 +187,32 @@
             },
             serverResponseData: {},
             subcategoryIdToDelete: null,
-            isAuthenticated: this.isLoggedIn,
+            showDeleteModal: false,
             filteredSubcategories: null
          };
       },
 
       mounted: function() {
-         this.fetchSubcategory();
+         this.fetchSubcategories();
       },
 
       computed: {
+            ...mapState({
+            categories: state => state.categoryStore.categories,
+            subcategories: state => state.subcategoryStore.subcategories,
+            isAuthenticated: state => state.auth.isLoggedIn
+         }),
          postData: function() {
             return {
                subcat_name: this.form.subcategoryName,
-               // subcat_code: this.form.subcategoryCode.toLowerCase(),
                category_id: this.form.categoryId,
-               // _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
             };
          },
          removeModal: function() {
             return '#remove_subcategory_modal';
          },
       },
+
       watch: {
          subcategories(newValue) {
             if(this.form.subcategoryName) {
@@ -266,16 +226,9 @@
             }
          }
       },
-      methods: {
-         fetchSubcategory: function() {
-            axios(httpConfig.getAll)
-            .then(({ data }) => {
-               if(data !== null && data !== 'undefined') {
-                  EventBus.$emit('update-data','subcategory',data.subcategories);
-               }
-            });
-         },
 
+      methods: {
+         ...mapActions('subcategoryStore', ['fetchSubcategories','createSubcategory']),
          filterSubcategories: _.debounce(function() {
             let tmp = this.subcategories;
 
@@ -295,53 +248,34 @@
                this.filteredSubcategories = tmp;
             }
          }, 500),
-         createSubcategory: function() {
-            httpConfig.create.data = this.postData;
-            var vm = this;
-
-            axios(httpConfig.create)
-               .then((response) => {
-                  this.serverResponseData = response.data;
-                  if(this.serverResponseData.success === true) {
-                     this.$emit('new-subcategory-added', this.serverResponseData.data);
-                     this.form.successMsg = 'subcategory added successfully';
-                  }
-               })
-               .catch(response => {
-                  this.form.errorMsg = response.data.msg;
-               })
-               .finally(() => {
-                  setTimeout(() => this.resetForm(), 1000);
-                  this.filteredSubcategories = this.subcategories;
-               });
-         },
-
-         confirmDelete: function(subcategoryId) {
-            this.subcategoryIdToDelete = subcategoryId;
-            $(this.removeModal).modal({
-               backdrop: 'static'
-            });
-         },
-
-         deleteSubcategory: function(subcategoryId) {
-            axios.delete(httpConfig.delete.url.replace('{subcat_id}', subcategoryId), httpConfig.delete.params)
-            .then( response => {
-               this.serverResponseData = response.data;
-               if(response.data.success === true) {
-                  this.$emit('subcategory-deleted',subcategoryId);
-                  this.form.successMsg = 'Subcategory removed successfully.';
-               }
+         addSubcategory: function(postData) {
+            this.createSubcategory(postData)
+            .then(() => {
+               this.$toasted.show('Subcategory added successfully');
+               setTimeout(() => this.resetForm(), 1000);
             })
             .catch(errorResponse => {
-               this.form.errorMsg = response.data.msg;
-            })
-            .finally(() => {
-               $(this.removeModal).modal('hide');
-               setTimeout(() => this.resetForm(), 1000);
+               this.$toasted.show(errorResponse.message);
+            });
+         },
+         confirmDelete: function(subcategoryId) {
+            this.subcategoryIdToDelete = subcategoryId;
+            this.showDeleteModal = true;
+            this.$nextTick(() => {
+               $(this.removeModal).modal({
+                  backdrop: 'static'
+               });
+            });
+         },
+         afterDeleteSubcategory: function() {
+            this.$toasted.show('subcategory deleted');
+
+            $(this.removeModal).modal('hide');            
+            this.$nextTick(() => {
+               this.showDeleteModal = false;
             });
          },
          showFilteredSubcategoriesByCategory: function() {
-            // console.log('here');
             // reset the subcategory name before filtering by category ID, as subcat name also filters the list that is displayed
             // this.form.subcategoryName = null;
 

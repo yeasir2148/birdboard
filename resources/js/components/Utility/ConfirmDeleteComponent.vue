@@ -1,10 +1,10 @@
 <template>
-   <div class="modal remove-object-modal" tabindex="-1" role="dialog" :id="objectRemoveModalId" data-backdrop="false">
+   <div class="modal remove-object-modal modal-active show" tabindex="-1" role="dialog" :id="objectRemoveModalId" data-backdrop="static">
       <div class="modal-dialog modal-dialog-centered modal-sm">
          <div class="modal-content">
             <div class="modal-header">
                <h5 class="modal-title has-text-weight-bold">Modal title</h5>
-               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+               <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="onModalClose">
                   <span aria-hidden="true">&times;</span>
                </button>
             </div>
@@ -13,7 +13,7 @@
             </div>
             <div class="modal-footer">
                <button type="button" class="btn btn-primary" @click.prevent="deleteEntity(entityId, entityType)">Confirm</button>
-               <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+               <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="onModalClose">Cancel</button>
             </div>
          </div>
       </div>
@@ -21,6 +21,8 @@
 </template>
 
 <script>
+   import { mapActions } from 'vuex';
+
    export default {
       props: ['entityId', 'entityType','modalNo'],
       data() {
@@ -33,30 +35,53 @@
          }
       },
       methods: {
+         ...mapActions('categoryStore', ['deleteCategory']),
+         ...mapActions('subcategoryStore', ['deleteSubcategory']),
+         ...mapActions('itemStore', ['deleteItem']),
+         ...mapActions('shopStore', ['deleteStore']),
+         ...mapActions('invoiceSummaryStore',['deleteInvoiceSummary']),
+         ...mapActions('invoiceDetailStore', ['deleteInvoiceDetail']),
          deleteEntity: function(objectId, objectType) {
             switch (objectType) {
                case 'category':
-                  this.$parent.deleteCategory(objectId);
+                  this.deleteCategory(objectId)
+                  .then(() => {
+                     this.$emit('deleted');
+                  });
                   break;
                case 'subcategory': 
-                  this.$parent.deleteSubcategory(objectId);
+                  this.deleteSubcategory(objectId)
+                  .then(() => {
+                     this.$emit('deleted');
+                  });
                   break;
                case 'item':
-                  this.$parent.deleteItem(objectId);
+                  this.deleteItem(objectId)
+                  .then(() => {
+                     this.$emit('deleted');
+                  });
                   break;
                case 'store':
-                  this.$parent.deleteStore(objectId);
+                  this.deleteStore(objectId)
+                  .then(() => {
+                     this.$emit('deleted');
+                  });
                   break;
                case 'invoiceSummary':
-                  this.$parent.deleteInvoiceSummary(objectId);
+                  this.deleteInvoiceSummary(objectId)
+                  .then(() => {
+                     this.$emit('deleted');
+                  });
                   break;
                case 'invoiceDetail':
-                  this.$parent.deleteInvoiceDetail(objectId);
-                  break;
-               default:
+                  this.deleteInvoiceDetail(objectId);
+                  this.$emit('deleted');
                   break;
             }
             
+         },
+         onModalClose: function() {
+            this.$emit('delete-modal-closed', this.entityType);
          }
       },
    }

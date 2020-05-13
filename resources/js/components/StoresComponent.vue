@@ -3,14 +3,14 @@
       <div class="alert alert-success" v-if="form.successMsg && form.successMsg.length">{{form.successMsg}}</div>
       <div class="alert alert-danger" v-if="form.errorMsg && form.errorMsg.length">{{form.errorMsg}}</div>
       <div class="form" v-if="isAuthenticated">
-         <ValidationObserver v-slot="observerSlotProp" @submit.prevent="createStore">
+         <ValidationObserver v-slot="observerSlotProp" @submit.prevent="addStore(postData)">
             <form id="createStoreForm">
                <div class="field is-horizontal">
                   <div class="field-label is-normal">
                      <label for="store_name" class="label">Store Name <sup>*</sup></label>
                   </div>
                   <div class="field-body">
-                     <div class="field" @focusout="showStoreSuggestion = false">
+                     <div class="field" @focusout="showStoreSuggestion = false" @keyup="filterStores">
                         <div class="control">
                            <validation-provider
                               name="store-name"
@@ -25,12 +25,18 @@
                                  v-model="form.storeName"
                                  autocomplete="off"
                               >
-                              <!--<div class="field-suggest" v-if="showStoreSuggestion">
+                              <div class="field-suggest" v-if="showStoreSuggestion">
                                  <ul>
                                     <li>Available stores....</li>
-                                    <li v-for="store of filteredStores" :key="store.id">{{store.store_name}}</li>
+                                    <li 
+                                       v-for="store of filteredStores"
+                                       :key="store.id"
+                                       class="store-suggestion"
+                                    >
+                                       {{store.store_name}}
+                                    </li>
                                  </ul>
-                              </div>-->
+                              </div>
                               <span
                                  class="has-text-danger"
                                  v-show="form.storeName && form.storeName.length"
@@ -203,11 +209,8 @@
          <div class="column has-text-centered">
             <h4 class="title is-4">Stores</h4>
          </div>
-         <div class="column is-2 has-text-centered">
-            <div class="toolbar has-text-centered">
-               <span @click="fetchStores" class="icon fas fa-sync"></span>
-            </div>            
-         </div>
+         <Fetch class="column is-2 has-text-centered" objectToFetch="stores"></Fetch>
+
       </div>
 
       <div class="columns">
@@ -225,7 +228,7 @@
                </thead>
 
                <tbody>
-                  <tr v-for="store in filteredStores" :key="store.id">
+                  <tr v-for="store in stores" :key="store.id">
                      <td class="has-text-centered">{{ store.store_name }}</td>
                      <td class="has-text-centered">{{ store.store_code }}</td>
                      <td class="has-text-centered">{{ store.abn }}</td>
@@ -240,7 +243,13 @@
          </div>
       </div>
       <div class="columns">
-         <confirm-delete :entityId="storeIdToDelete" entityType="store">
+         <confirm-delete
+            :entityId="storeIdToDelete"
+            entityType="store"
+            v-if="showDeleteModal"
+            @deleted="afterDeleteStore"
+            @delete-modal-closed="afterHideModal()"
+         >
             <template v-slot:body>
                Confirm Delete?
             </template>
@@ -255,34 +264,17 @@
    import ConfirmDelete from './Utility/ConfirmDeleteComponent.vue';
    import { required, max, alpha_dash } from "vee-validate/dist/rules";
    import { alpha_space_dash } from '../__custom_validation_rules.js';
-   import { EventBus } from '../__vue_event-bus.js';
+   import _ from 'lodash';
+   import { mapState, mapActions } from 'vuex';
+   import Fetch from "@js/components/Fetch.vue";
+   import { commonMethods } from "@js/mixins/commonMethodMixin.js";
 
    extend("required", required);
    extend("max", max);
 
-   const httpConfig = {
-      create: {
-         method: "post",
-         url: "/store",
-         responseType: "json"
-      },
-      get: {
-         method: "get",
-         url: "/stores",
-         responseType: "json"
-      },
-      delete: {
-         url: "/store/{store_id}",
-         params: {
-            data: {
-               // _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
-            }
-         }         
-      }
-   };
    export default {
-      components: { ValidationObserver, ValidationProvider, ConfirmDelete },
-      props: ['stores', 'isLoggedIn'],
+      mixins: [ commonMethods ],
+      components: { ValidationObserver, ValidationProvider, ConfirmDelete, Fetch },
       data() {
          return {
             form: {
@@ -297,10 +289,10 @@
                errorMsg: null,
                storeSuggestion: null
             },
-            serverResponseData: {},
             storeIdToDelete: null,
-            isAuthenticated: this.isLoggedIn,
+            showDeleteModal: false,
             filteredStores: null,
+            
          };
       },
 
@@ -309,6 +301,13 @@
       },
 
       computed: {
+         ...mapState({
+            categories: state => state.categoryStore.categories,
+            subcategories: state => state.subcategoryStore.subcategories,
+            items: state => state.itemStore.items,
+            stores: state => state.shopStore.stores,
+            isAuthenticated: state => state.auth.isLoggedIn
+         }),
          formStatus: function() {
             return this.form.status == 'pending' && this.form.storeName && this.filteredStores.length;
          },
@@ -324,104 +323,60 @@
          removeModal: function() {
             return '#remove_store_modal';
          },
-         // filteredStores: function() {
-         //    return this.stores.filter(store => {
-         //       return this.form.storeName && store.store_name.toLowerCase().startsWith(this.form.storeName.toLowerCase());
-         //    });
-         // },
          showStoreSuggestion: {
             get() {
                return this.form.storeSuggestion && this.form.status == 'pending' 
-                  && this.filteredStores.length;
+                  && this.filteredStores.length > 0;
             },
             set(newValue) {
-               this.form.storeSuggestion = false;
+               this.form.storeSuggestion = newValue;
             }            
          }
       },
       watch: {
-         stores(newValue) {
-            // if(this.form.storeName) {
-            //    this.filteredStores();
-            // } else if(this.form.suburb) {
-            //    suburb = this.form.suburb;
-            //    this.form.suburb = null;
-            //    this.form.suburb = suburb;
-            // }
+         stores: function(newValue) {
             this.filteredStores = newValue;
          },
-         // 'form.suburb'(newValue) {
-         //    this.form.storeName = null;                        // Clear filtering from storeName
-         //    this.filteredStores = this.stores.filter(store => {
-         //       return store.suburb.toLowerCase().includes(this.form.suburb.toLowerCase());
-         //    });
-         // }
+         'form.storeName': function(newVal, oldVal) {
+
+         }
       },
       methods: {
-         fetchStores: function() {
-             axios(httpConfig.get)
-            .then(({ data }) => {
-               if(data.length) {
-                  EventBus.$emit('update-data','store',data);
-               }
-            });            
-         },
-         filterStores: function() {
+         ...mapActions('shopStore', ['fetchStores','createStore']),
+         filterStores: _.debounce(function() {
+            this.showStoreSuggestion = true;
             this.filteredStores = this.stores.filter(store => {
                return store.store_name.toLowerCase().includes(this.form.storeName.toLowerCase());
             });
-            // this.form.storeSuggestion = true;   // will call the computed setter
-         },
-         createStore: function() {
-            this.form.status = 'submitting';
-            httpConfig.create.data = this.postData;
-            this.form.storeName = null;
-            var vm = this;
-
-            axios(httpConfig.create)
-            .then((response) => {
-               this.serverResponseData = response.data;
-               if(this.serverResponseData.success === true) {
-                  this.form.successMsg = 'Store added successfully';
-                  this.$emit('new-store-added', this.serverResponseData.data);
-               } else {
-                  this.form.errorMsg = this.serverResponseData.message;
-               }
+         }, 500),
+         addStore: function(postData) {
+            this.createStore(postData)
+            .then(() => {
+               this.$toasted.show('Store added successfully');
+               setTimeout(() => this.resetForm(), 1000);
             })
             .catch(errorResponse => {
-               this.form.errorMsg = errorResponse.message;
-            })
-            .finally(() => {
-               setTimeout(() => this.resetForm(), 500);
-               this.form.status = 'pending';
-            });         
+               this.$toasted.show(errorResponse.message);
+            });
          },
-
          confirmDelete: function(storeId) {
             this.storeIdToDelete = storeId;
-            $(this.removeModal).modal({
-               backdrop: 'static'
+            this.showDeleteModal = true;
+
+            this.$nextTick(() => {
+               $(this.removeModal).modal({
+                  backdrop: 'static'
+               });
             });
          },
+         afterDeleteStore: function() {
+            this.$toasted.show('Store deleted');
 
-         deleteStore: function(storeId) {
-            axios.delete(httpConfig.delete.url.replace('{store_id}', storeId), httpConfig.delete.params)
-            .then( response => {
-               this.serverResponseData = response.data;
-               if(response.data.success === true) {
-                  this.form.successMsg = "Store removed successfully";
-                  this.$emit('store-deleted', storeId);
-               }
-            })
-            .catch(errorResponse => {
-               this.form.errorMsg = errorResponse.message;
-            })
-            .finally(() => {
-               $(this.removeModal).modal('hide');
-               setTimeout(() => this.resetForm(), 1000);
+            $(this.removeModal).modal('hide');            
+            this.$nextTick(() => {
+               this.showDeleteModal = false;
             });
          },
-
          resetForm: function() {
             for (var key in this.form) {
                this.form.status = 'pending';
@@ -442,7 +397,6 @@
          background-color: #EDE7E6;
       }
    }
-
    .field-suggest {
       position: absolute;
       background-color: white;
@@ -451,5 +405,11 @@
       padding: 5px;
       width: 200px;
       border-radius: 5px;
+   }
+   li.store-suggestion {
+      cursor: pointer;
+      &:hover {
+         background: #FFF8DD;
+      }
    }
 </style>

@@ -9,6 +9,9 @@ window.Vue = require('vue');
 import 'jquery-ui/ui/widgets/datepicker.js';
 import { EventBus } from './__vue_event-bus.js';
 import { ValidationObserver, ValidationProvider } from "vee-validate";
+import Toasted from 'vue-toasted';
+import AutoCloseToasted from 'vue-toasted';
+
 import Categories from './components/CategoriesComponent.vue';
 import Subcategories from './components/SubcategoriesComponent.vue';
 import Stores from './components/StoresComponent.vue';
@@ -20,6 +23,8 @@ import InvoiceDetailList from './components/InvoiceDetailListComponent.vue';
 import DatePickerComponent from './components/Utility/DatePickerComponent.vue';
 import { invoiceDetailStore } from './Shared_State/invoice_detail_store.js';
 import ConfirmDelete from './components/Utility/ConfirmDeleteComponent.vue';
+import store from './store';
+import { mapActions, mapState } from 'vuex';
 
 import Axios from 'axios';
 /**
@@ -43,8 +48,13 @@ Vue.component('date-picker', DatePickerComponent);
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
+Vue.use(AutoCloseToasted, {
+   duration: 2000
+})
+
 const app = new Vue({
    el: '#app',
+   store,
    components: {
       Categories, Subcategories, Items, Stores, 
       InvoiceSummaryForm, InvoiceSummaryList, InvoiceDetailForm,
@@ -55,107 +65,25 @@ const app = new Vue({
          successMsg: null,
          errorMsg: null
       },
-      categories: [],
-      subcategories: [],
-      items: [],
-      stores: [],
       units: [],
       invoices: [],
-      shared: invoiceDetailStore.state
-      // activeNav: {
-      //    inventory: null,
-      //    purchases: 'invoices_tab'
-      // }
+      shared: {}
    },
 
    mounted: function () {
-      // this.fetchInvoices();
-      // $('#invoice_date').datepicker();
+      this.checkLoginStatus();
 
-      EventBus.$on('update-data', (entityName, data) => {
-         switch (entityName) {
-            case 'category':
-               this.categories = data;
-               break;
-            case 'subcategory':
-               this.subcategories = data;
-               break;
-            case 'item':
-               this.items = data;
-               break;
-            case 'store':
-               this.stores = data;
-               break;
-            case 'invoiceSummary':
-               this.invoices = data.invoices;
-               this.stores = data.stores;
-               this.items = data.items;
-               this.units = data.units;
-               break;
-         }
-      });
-
-      EventBus.$on('new-category-added', newCategory => {
-         this.categories.push(newCategory);
-      });
+      // EventBus.$on('new-category-added', newCategory => {
+      //    this.categories.push(newCategory);
+      // });
    },
-
+   computed: {
+      ...mapState({
+         selectedInvoice: state => state.invoiceSummaryStore.selectedInvoice
+      })
+   },
    methods: {
-      fetchInvoices: function() {
-         axios.get('/invoices')
-         .then(({ data }) => {
-            // console.log(response);
-            if(data !== null && data !== undefined) {
-               this.invoices = data.invoices;
-               this.units = data.units;
-               this.items = data.items;
-               this.stores = data.stores;
-            }
-         });
-      },
-
-      categoryDeleted: function(deletedCategoryId) {
-         this.categories = this.categories.filter(category => {
-            return category.id != deletedCategoryId;
-         });
-
-         this.subcategories = this.subcategories.filter(subcat => {
-            return subcat.category.id != deletedCategoryId;
-         });
-
-         this.items = this.items.filter(item => {
-            return item.subcategory.category.id != deletedCategoryId;
-         });
-      },
-
-      subcategoryDeleted: function(deletedSubcatId) {
-         this.subcategories = this.subcategories.filter(subcat => {
-            return subcat.id != deletedSubcatId;
-         });
-
-         this.items = this.items.filter(item => {
-            return item.subcategory.id != deletedSubcatId;
-         });
-      },
-
-      itemDeleted: function(deletedItemId) {
-         this.items = this.items.filter(item => {
-            return item.id != deletedItemId;
-         });
-      },
-
-      storeDeleted: function(deletedStoreId) {
-         this.stores = this.stores.filter(store => {
-            return store.id != deletedStoreId;
-         });
-      },
-
-      invoiceSummaryDeleted: function(deletedInvoiceSummaryId) {
-         this.invoices = this.invoices.filter(invoice => {
-            return invoice.id != deletedInvoiceSummaryId;
-         });
-      },
-
+      ...mapActions(['checkLoginStatus']),
       refreshInvoice: function(invoiceSummaryForWhichDetailWasAdded) {
          let targetObjIndex = this.invoices.findIndex(invoice => {
             return invoice.id === invoiceSummaryForWhichDetailWasAdded.id;
@@ -165,9 +93,5 @@ const app = new Vue({
          // this.invoices.splice(targetObjIndex, 1);        // remove the old item
          // this.invoices.splice(targetObjIndex, 0, invoiceSummaryForWhichDetailWasAdded);   // add the fresh item
       },
-      setActiveNav: function() {
-         // $(event.target).parents('ul.navbar-nav').find('li.nav-item').removeClass('active');
-         // event.target.parentNode.classList.add('active');
-      }
    }
 });

@@ -52,7 +52,13 @@ input {
    background-color: #00CED1;
    border-radius: 5px;
 }
-
+.fas.icon {
+   line-height: inherit;
+   cursor: pointer;
+   &:hover {
+      background-color: #EDE7E6;
+   }
+}
 #site_navbar {
    background-color: #FB733E;
    .nav-item.btn {
@@ -74,12 +80,12 @@ input {
    }
 }
 
-#invoice_details_on_summary_page {
-   .invoice-detail-list {
-      position: sticky;
-      top: 100px;
-   }
-}
+// #invoice_details_on_summary_page {
+//    .invoice-detail-list {
+//       position: sticky;
+//       top: 100px;
+//    }
+// }
 
 .fas.fa-trash-alt {
    color: #ff5050;

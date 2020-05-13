@@ -1,9 +1,7 @@
 <template>
    <div>
-      <div class="alert alert-success" v-if="form.successMsg && form.successMsg.length">{{form.successMsg}}</div>
-      <div class="alert alert-danger" v-if="form.errorMsg && form.errorMsg.length">{{form.errorMsg}}</div>
       <div class="form">
-         <ValidationObserver v-slot="observerSlotProp" @submit.prevent="createInvoiceDetail">
+         <ValidationObserver v-slot="observerSlotProp" @submit.prevent="addInvoiceDetail(postData)">
             <form id="createInvoiceForm">
                <!--Invoice Id -->
                <!--<div class="field is-horizontal">
@@ -268,10 +266,10 @@
    import ConfirmDelete from './Utility/ConfirmDeleteComponent.vue';
    import { required, max, alpha_dash, alpha, numeric, regex } from "vee-validate/dist/rules";
    import { alpha_space_dash } from '../__custom_validation_rules.js';
-   import { EventBus } from '../__vue_event-bus.js';
    import { setTimeout } from 'timers';
    import { invoiceDetailStore } from '../Shared_State/invoice_detail_store.js';
-  
+   import { mapState, mapActions } from "vuex";
+
    extend("required", required);
    extend("max", max);
    extend("alpha_dash", alpha_dash);
@@ -279,27 +277,8 @@
    extend("numeric", numeric);
    extend("regex", regex);
    
-   const httpConfig = {
-      get: {
-         method: "get",
-         url: "/invoice-detail/{invoice_detial_id}",
-         responseType: "json"
-      },
-      getAll: {
-         method: "get",
-         url: "/invoices",
-         responseType: "json"
-      },
-      create: {
-         method: "post",
-         url: "/invoice-detail",
-         responseType: "json"
-      },
-   };
-
    export default {
       components: { ValidationObserver, ValidationProvider, ConfirmDelete },
-      props: ['items', 'units', 'invoices','active-nav'],
       data() {
          return {
             form: {
@@ -311,8 +290,6 @@
                invoiceDate: null,
                searchedItem: null,
                searchedInvoiceNo: null,
-               successMsg: null,
-               errorMsg: null
             },
             serverResponseData: {},
             invoiceIdToDelete: null,
@@ -320,12 +297,14 @@
       },
 
       mounted: function() {
-         if(!this.items) {
-            this.fetchInvoices();
-         }
+
       },
 
       computed: {
+         ...mapState('itemStore', ['items']),
+         ...mapState('invoiceSummaryStore', ['invoices']),
+         ...mapState(['units']),
+
          postData: function() {
             return {
                invoice_id: this.form.invoiceId,
@@ -333,7 +312,6 @@
                quantity: this.form.quantity,
                unit_id: this.form.unitId,
                price: this.form.price
-               // _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
             };
          },
 
@@ -361,37 +339,17 @@
          }
       },
       methods: {
-         fetchInvoices: function() {
-            axios(httpConfig.getAll)
-            .then(({ data }) => {
-               if(data !== null && data !== 'undefined') {
-                  EventBus.$emit('update-data', 'invoiceSummary', data);
-               }
+         ...mapActions('invoiceDetailStore', ['createInvoiceDetail']),
+         addInvoiceDetail: function(postData) {
+            this.createInvoiceDetail(postData)
+            .then(() => {
+               this.$toasted.show('Invoice detail added successfully');
+               setTimeout(() => this.resetForm(), 1000);
+            })
+            .catch(errorResponse => {
+               this.$toasted.show(errorResponse.message);
             });
          },
-         createInvoiceDetail: function() {
-            httpConfig.create.data = this.postData;
-            var vm = this;
-
-            axios(httpConfig.create)
-               .then((response) => {
-                  this.serverResponseData = response.data;
-                  if(this.serverResponseData.success === true) {
-                     this.form.successMsg = 'Item added to invoice successfully';
-                     let relatedInvoice = this.serverResponseData.data.model.invoice;
-                     invoiceDetailStore.setSelectedInvoiceId(this.serverResponseData.data.model.invoice_id, 'invoice-detail-form');
-                     invoiceDetailStore.addSelectedInvoiceDetail(this.serverResponseData.data.withDetails, 'invoice-detail-form');
-                     this.$emit('new-invoice-detail-added', relatedInvoice);
-                  }
-               })
-               .catch(errorResponse => {
-                  this.form.errorMsg = errorResponse.message;
-               })
-               .finally(() => {
-                  setTimeout(() => this.resetForm(), 1000);
-               });
-         },
-
          confirmDelete: function(itemId) {
             this.itemIdToDelete = itemId;
             $(this.removeModal).modal({

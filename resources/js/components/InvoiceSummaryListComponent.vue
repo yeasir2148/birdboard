@@ -1,17 +1,10 @@
 <template>
    <div>
-      <div class="alert alert-success" v-if="form.successMsg && form.successMsg.length">{{form.successMsg}}</div>
-      <div class="alert alert-danger" v-if="form.errorMsg && form.errorMsg.length">{{form.errorMsg}}</div>
-
       <div class="columns">
          <div class="column has-text-centered">
             <h4 class="title is-4">Invoices</h4>
          </div>
-         <div class="column is-2 has-text-centered">
-            <div class="toolbar has-text-centered">
-               <span @click="fetchInvoices" class="icon fas fa-sync" id="sync_invoices"></span>
-            </div>            
-         </div>
+         <Fetch class="column is-2 has-text-centered" objectToFetch="invoiceSummaries"></Fetch>
       </div>                    
 
       <div class="columns">
@@ -30,7 +23,7 @@
                <tbody>
                   <tr v-for="invoice in invoices" :key="invoice.id">
                      <td class="has-text-centered">
-                        <a href="#" class="has-text-black" @click.prevent="showInvoiceDetails(invoice.id)">{{ invoice.invoice_no }}</a>
+                        <a href="#" class="has-text-black" @click.prevent="showInvoiceDetails(invoice)">{{ invoice.invoice_no }}</a>
                      </td>
                      <td class="has-text-centered">{{ invoice.value }}</td>
                      <td class="has-text-centered">{{ invoice.invoice_date }}</td>
@@ -45,7 +38,13 @@
       </div>
 
       <div class="columns">
-         <confirm-delete :entityId="invoiceSummaryIdToDelete" :entityType="entityType">
+         <confirm-delete ref="removeModal"
+            :entityId="invoiceSummaryIdToDelete" 
+            :entityType="entityType"
+            v-if="showDeleteModal"
+            @deleted="afterDeleteInvoice"
+            @delete-modal-closed="afterHideModal()"
+         >
             <template v-slot:body>
                Confirm Delete?
             </template>
@@ -62,126 +61,78 @@
    import { alpha_space_dash } from '../__custom_validation_rules.js';
    import { EventBus } from '../__vue_event-bus.js';
    import { setTimeout } from 'timers';
-   import { invoiceDetailStore } from '../Shared_State/invoice_detail_store.js';
-  
+   import { mapState, mapActions, mapMutations } from 'vuex';
+   import Fetch from "@js/components/Fetch.vue";
+   import store from "@js/store";
+   import { commonMethods } from "@js/mixins/commonMethodMixin.js";
+
    extend("required", required);
    extend("max", max);
    extend("alpha_dash", alpha_dash);
    extend("numeric", numeric);
 
-   const httpConfig = {
-      getAll: {
-         method: "get",
-         url: "/invoices",
-         responseType: "json"
-      },
-      get: {
-         method: "get",
-         url: "/invoice/{invoice_id}",
-         responseType: "json"
-      },
-      delete: {
-         url: "/invoice/{invoice_id}",
-         params: {
-            data: {
-               _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
-            }
-         }         
-      }
-   };
-
    export default {
-      components: { ValidationObserver, ValidationProvider, ConfirmDelete },
-      props: ['items','units','invoices','stores'],
+      mixins: [commonMethods],
+      components: { ValidationObserver, ValidationProvider, ConfirmDelete, Fetch },
       data() {
          return {
-            // items: [],
-            // units: [],
-            form: {
-               successMsg: null,
-               errorMsg: null
-            },
             serverResponseData: {},
             invoiceSummaryIdToDelete: null,
             entityType: 'invoiceSummary',
-            shared: invoiceDetailStore.state
+            showDeleteModal: false,
          };
       },
 
       mounted: function() {
          this.fetchInvoices();
       },
-
       computed: {
+         ...mapState({
+            invoices: state => state.invoiceSummaryStore.invoices,
+            items: state => state.itemStore.items,
+            stores: state => state.shopStore.stores,
+            units: state => state.units,
+            selectedInvoiceId: state => state.invoiceSummaryStore.selectedInvoiceId
+         }),
          removeModal: function() {
             return '#remove_invoiceSummary_modal';
          },
-
-         selectedInvoiceDetails: function() {
-            return this.shared.selectedInvoiceDetails;
-         }
       },
-
       watch: {
-         selectedInvoiceDetails: function(newVal) {
-            // Since new detail/item was added/removed to an invoice, we need to fetch that invoice again from server
-            
-            // httpConfig.get.url = httpConfig.get.url.replace('{invoice_id}', this.shared.selectedInvoiceId);
+         selectedInvoiceId: function(newValue, oldValue) {
 
-            // axios(httpConfig.get)
-            // .then(successResponse => {
-
-            // })
-            // .finally(() => {
-            //    httpConfig.get.url = "/invoice/{invoice_id}";
-            // });
-         }
-      },
-
-      methods: {
-         showInvoiceDetails: function(invoiceId) {
-            invoiceDetailStore.setSelectedInvoiceId(invoiceId, 'invoiceSummaryList');
-            // $('#invoice_detail_tab').trigger('click');                                 // Switch view to the invoice details tab 
-         },
-         fetchInvoices: function() {
-            axios(httpConfig.getAll)
-            .then(({ data }) => {
-               if(data !== null && data !== 'undefined') {
-                  EventBus.$emit('update-data', 'invoiceSummary', data);
-               }
-            });
-         },
-
-         confirmDelete: function(invoiceSummaryId) {
-            this.invoiceSummaryIdToDelete = invoiceSummaryId;
-            $(this.removeModal).modal({
-               backdrop: 'static'
-            });
-         },
-
-         deleteInvoiceSummary: function(invoiceSummaryId) {
-            axios.delete(httpConfig.delete.url.replace('{invoice_id}', invoiceSummaryId), httpConfig.delete.params)
-            .then( response => {
-               this.serverResponseData = response.data;
-               if(response.data.success === true) {
-                  this.$emit('invoice-summary-deleted', invoiceSummaryId);
-                  this.form.successMsg = 'Invoice removed successfully.';
-               }
-            })
-            .catch(errorResponse => {
-               this.form.errorMsg = response.data.msg;
-            })
-            .finally(() => {
-               $(this.removeModal).modal('hide');
-               setTimeout(() => this.resetForm(), 1000);
-            });
-         },
-
-         resetForm: function() {
-            for (var key in this.form) {
-               this.form[key] = null;
+            if(newValue && newValue !== oldValue) {
+               const selectedInvoice = this.invoices.find(invoice => invoice.id == newValue);
+               this.setSelectedInvoice(selectedInvoice);
             }
          }
+      },
+      methods: {
+         ...mapActions('invoiceSummaryStore', ['fetchInvoices']),
+         ...mapMutations({
+            setSelectedInvoiceId: 'invoiceSummaryStore/SET_SELECTED_INVOICE_ID',
+            setSelectedInvoice: 'invoiceSummaryStore/SET_SELECTED_INVOICE'
+         }),
+         showInvoiceDetails: function(invoice) {
+            this.setSelectedInvoiceId(invoice.id);
+         },
+         confirmDelete: function(invoiceSummaryId) {
+            this.invoiceSummaryIdToDelete = invoiceSummaryId;
+            this.showDeleteModal = true;
+            this.$nextTick(() => {
+               $(this.removeModal).modal({
+                  backdrop: 'static'
+               });
+            });
+         },
+         afterDeleteInvoice: function() {
+            this.$toasted.show('Invoice deleted');
+
+            $(this.removeModal).modal('hide');            
+            this.$nextTick(() => {
+               this.afterHideModal();
+            });
+         },
       }
    };
 </script>

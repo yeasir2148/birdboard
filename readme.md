@@ -1,27 +1,24 @@
 ## Authors
-- Yeasir Majumder <yeasir2148@yhotmail.com>
+- Yeasir Majumder <majumder2148@gmail.com>
 
 ## Setup
-Make sure you have `node`, `npm`, `php`, `composer` and `MySQL` is available in your computer. 
-Clone the repo, checkout `master` branch. Run the installation.
+Make sure you have `node`, `npm`, `php`, `composer` and `MySQL` installed on your computer. 
+Clone the repo. Then:
 
 ```bash
 cd [project directory]
-git checkout master
 cp .env.example .env
 composer install
 npm install
+```
 
+Set database configurations in the .env file according to your local setting.
+
+````
 # Add encryption key
 php artisan key:generate
-```
+````
 
-Create a **fresh** database name `ydt-local` in mysql (or any db name you want). Then __supply__ your own db credentials in your `.env` file. Example:
-```
-DB_DATABASE=[database name]
-DB_USERNAME=your-awesome-mysql-username
-DB_PASSWORD=your-awesome-mysql-password
-```
 
 Run migrations
 ```
@@ -31,11 +28,6 @@ php artisan migrate
 _**Open another terminal/cmd window**_ and compile assets using `npm`
 ```
 npm run watch
-```
-
-Go back to the previous terminal and serve the project on port __5000__ (_usually defaults to port 8000, but it might already been used_)
-```bash
-php artisan serve --port=5000 # or you can use php -S 0.0.0.0:5000 -t ./public
 ```
 
 ## Setup auto-refresh
@@ -81,41 +73,5 @@ browserSync is set up to work on port 80, so make sure you are running the proje
 
 Now whenever you make some changes under `resources` folder browser-sync will detect it, auto-compile and reload your project.
 
-## VSCode and XDebug (optional)
-If you want a step debugging, Install `vscode-php-debug` extension. You can use these `.vscode/launch.json` setup.
-```json
-{
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "Listen for XDebug",
-            "type": "php",
-            "request": "launch",
-            "port": 9000,
-            "ignore": [
-                "**/vendor/**/*.php"
-            ]
-        },
-        {
-            "name": "Launch currently open script",
-            "type": "php",
-            "request": "launch",
-            "program": "${file}",
-            "cwd": "${fileDirname}",
-            "port": 9000
-        }
-    ]
-}
-```
 
-## Tests
-... coming soon ..
-
-
-## Docker setup
-...coming soon...
-
-
-## Deployment
-...coming soon...
 

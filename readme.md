@@ -1,3 +1,5 @@
+A basic crud app implemented with Laravel, vue.js and vuex. You can use it to electronically store your receipts that you got from purchasing at different stores(grocery, fuel etc etc). More features to come, such as scanning and uploading receipts, google maps integration and more.
+
 ## Authors
 - Yeasir Majumder <majumder2148@gmail.com>
 

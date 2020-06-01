@@ -36,7 +36,7 @@ export const httpConfig = {
          url: "/subcategory/{subcat_id}",
          params: {
             data: {
-               _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+               // _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
             }
          }         
       }
@@ -56,7 +56,7 @@ export const httpConfig = {
          url: "/item/{item_id}",
          params: {
             data: {
-               _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+               // _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
             }
          }         
       }
@@ -101,7 +101,7 @@ export const httpConfig = {
          url: "/invoice/{invoice_id}",
          params: {
             data: {
-               _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+               // _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
             }
          }         
       }
@@ -126,7 +126,7 @@ export const httpConfig = {
          url: "/invoice-detail/{invoice_detail_id}",
          params: {
             data: {
-               _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+               // _token: document.querySelector('meta[name="csrf-token"]').getAttribute("content")
             }
          }         
       },

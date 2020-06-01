@@ -1,7 +1,7 @@
 <template>
    <div>
-      <div class="alert alert-success" v-if="form.successMsg && form.successMsg.length">{{form.successMsg}}</div>
-      <div class="alert alert-danger" v-if="form.errorMsg && form.errorMsg.length">{{form.errorMsg}}</div>
+      <!-- <div class="alert alert-success" v-if="form.successMsg && form.successMsg.length">{{form.successMsg}}</div>
+      <div class="alert alert-danger" v-if="form.errorMsg && form.errorMsg.length">{{form.errorMsg}}</div> -->
       <div class="form" v-if="isAuthenticated">
          <ValidationObserver v-slot="observerSlotProp" @submit.prevent="addCategory(postData)">
             <form method="post" action="/categories" id="createCategoryForm">
@@ -15,7 +15,7 @@
                            <validation-provider
                               name="category-name"
                               rules="required|max:30|alpha_space_dash"
-                              v-slot="{ errors, classes }"
+                              v-slot="{ errors, classes, valid }"
                            >
                               <input
                                  type="text"
@@ -27,7 +27,7 @@
                               >
                               <span
                                  class="has-text-danger"
-                                 v-show="form.name && form.name.length"
+                                 v-show="!valid"
                               >{{ errors[0] }}</span>
                            </validation-provider>
                         </div>
@@ -41,7 +41,7 @@
                      <div class="field">
                         <div class="control">
                            <button
-                              class="button is-link"
+                              class="button is-link create-category"
                               type="submit"
                               :disabled="!observerSlotProp.valid || observerSlotProp.pristine"
                            >Create</button>
@@ -114,7 +114,7 @@
 <script>
    import { ValidationObserver, ValidationProvider, extend } from "vee-validate";
    import ConfirmDelete from './Utility/ConfirmDeleteComponent.vue';
-   import { required, max, alpha_dash } from "vee-validate/dist/rules";
+   import { required, max, alpha_dash } from "vee-validate/dist/rules.umd.js";
    import { alpha_space_dash } from '../__custom_validation_rules.js';
    import _ from 'lodash';
    import { mapState, mapActions } from 'vuex';
@@ -132,9 +132,7 @@
          return {
             form: {
                name: null,
-               categoryCode: null,
-               successMsg: null,
-               errorMsg: null
+               // categoryCode: null,
             },
             search: {
                categoryName: null,

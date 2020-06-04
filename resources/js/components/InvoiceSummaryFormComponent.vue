@@ -3,7 +3,7 @@
       <div class="alert alert-success" v-if="form.successMsg && form.successMsg.length">{{form.successMsg}}</div>
       <div class="alert alert-danger" v-if="form.errorMsg && form.errorMsg.length">{{form.errorMsg}}</div>
       
-      <div class="form">
+      <div class="form" v-if="isAuthenticated">
          <validation-observer v-slot="observerSlotProp" @submit.prevent="addInvoice(postData)">
             <form id="createInvoiceForm">
                <!-- Invoice No -->
@@ -140,15 +140,15 @@
          };
       },
 
-      mounted: function() {
-         this.fetchInvoices();
-      },
+      // mounted: function() {
+      //    // this.fetchInvoices();
+      // },
 
       computed: {
          ...mapState({
             stores: state => state.shopStore.stores,
-            invoices: state => state.invoiceSummaryStore.invoices
-
+            invoices: state => state.invoiceSummaryStore.invoices,
+            isAuthenticated: state => state.auth.isLoggedIn
          }),
          postData: function() {
             return {

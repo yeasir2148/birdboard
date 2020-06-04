@@ -9,9 +9,12 @@ use App\Unit;
 use Faker\Generator as Faker;
 
 $factory->define(InvoiceDetail::class, function (Faker $faker) {
-   $invoice = factory(InvoiceSummary::class)->create();
+   $invoice = factory(InvoiceSummary::class)->create(
+      [
+         'user_id' => auth()->user()->id ?? factory('App\User')->create()->id
+      ]);
 
-   $itemId = factory(Item::class)->create();
+   $itemId = factory(Item::class)->create()->id;
    $unit = Unit::find(1);
    $unitId = $unit ? $unit->id : factory(Unit::class)->create();
    $price = $faker->randomFloat(2, 1, 20);

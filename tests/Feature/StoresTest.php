@@ -54,10 +54,9 @@ class StoresTest extends TestCase
    /** @test */
    public function it_fetches_all_stores()
    {
-      $stores = factory(Store::class, 3)->create();
+      $stores = factory(Store::class, 2)->create();
       $response = $this->get('/stores');
       $data = $response->decodeResponseJson();
-      // var_dump($data);
       $this->assertEquals(count($stores), count($data));
    }
 

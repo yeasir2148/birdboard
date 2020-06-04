@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use App\Store;
 use App\InvoiceDetail;
+use App\User;
 use DB;
 
 class InvoiceSummary extends Model
@@ -14,6 +15,10 @@ class InvoiceSummary extends Model
 
    public function store() {
       return $this->belongsTo(Store::class);
+   }
+
+   public function user() {
+      return $this->belongsTo(User::class);
    }
 
    public function invoiceDetails() {
@@ -39,5 +44,10 @@ class InvoiceSummary extends Model
       ->select('i.item_name','u.unit_name','inD.*')
       ->where('inD.id','=', $invoiceDetailId)
       ->get();
+   }
+
+   public function updateTotal(InvoiceDetail $invoiceDetail) {
+      $this->value += $invoiceDetail->price;
+      $this->save();
    }
 }

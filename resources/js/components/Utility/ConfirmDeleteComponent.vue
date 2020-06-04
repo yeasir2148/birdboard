@@ -12,7 +12,7 @@
                <slot name="body"></slot>
             </div>
             <div class="modal-footer">
-               <button type="button" class="btn btn-primary" @click.prevent="deleteEntity(entityId, entityType)">Confirm</button>
+               <button type="button" class="btn btn-primary delete-entity" @click.prevent="deleteEntity(entityId, entityType)">Confirm</button>
                <button type="button" class="btn btn-secondary" data-dismiss="modal" @click="onModalClose">Cancel</button>
             </div>
          </div>

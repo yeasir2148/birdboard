@@ -34,30 +34,48 @@ class InvoiceSummariesTest extends TestCase
       factory(Item::class)->create();
       factory(Unit::class)->create();
       factory(Store::class)->create();
+      $user = factory(User::class)->create();
+      $this->actingAs($user);
+
       $invoice = factory(InvoiceSummary::class)->raw();
 
-      $user = factory(User::class)->make();
-      $this->actingAs($user);
       $response = $this->post('/invoice', $invoice);
       // $this->assertInstanceOf(InvoiceSummary::class, InvoiceSummary::find(1));
       $this->assertDatabaseHas('invoice_summaries', $invoice);
    }
 
    /** @test */
-   public function an_invoice_belongs_to_a_store()
+   public function unauthenticated_user_cannot_see_invoices()
    {
-      factory(Store::class, 3)->create();
-      $invoice = factory(InvoiceSummary::class)->create();
-      $this->assertInstanceOf(Store::class, $invoice->store);
+      $this->withExceptionHandling();
+      // given a user
+      $user = factory(User::class)->create();
+      // given some invoices
+      $invoices = \factory(InvoiceSummary::class, 2)->create(['user_id' => $user->id]);
+      // when someone who is not logged in makes a get request
+      $response = $this->get('/invoices');
+      // gets a 403 error
+      $response->assertUnauthorized();
    }
    
    /** @test */
-   public function an_invoice_has_invoice_details()
+   public function authenticated_user_can_see_invoices_created_by_himself_only()
    {
-      $invoice = factory(InvoiceSummary::class)->create();
-      $invoiceDetail = factory(InvoiceDetail::class)->create(['invoice_id' => $invoice->id]);
+      // given a user
+      $user = factory(User::class)->create();
+      $this->actingAs($user);
 
-      $this->assertInstanceOf(InvoiceDetail::class, $invoice->invoiceDetails->first());
+      // given some invoices created by that user
+      $invoicesOwn = \factory(InvoiceSummary::class, 2)->create(['user_id' => $user->id]);
+
+      // And some inovoices created by other user
+      $invoicesOthers = \factory(InvoiceSummary::class, 2)->create(['user_id' => 10]);
+
+      // when logged in user makes a get request to fetch invoices
+      $response = $this->get('/invoices');
+      // dd($response->json());
+
+      // He gets only his invoices
+      $this->assertCount(2, $response->json()['invoices']);
    }
-   
 }

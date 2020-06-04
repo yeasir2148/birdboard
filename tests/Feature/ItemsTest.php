@@ -61,7 +61,7 @@ class ItemsTest extends TestCase
    /** @test */
    public function it_fetches_all_items()
    {
-      $items = factory(Item::class, 3)->create();
+      $items = factory(Item::class, 2)->create();
       $response = $this->get('/items');
       $data = $response->decodeResponseJson();
       // var_dump($data);

@@ -9,7 +9,13 @@ use App\Category;
 
 class CategoryTest extends TestCase
 {
-    use RefreshDatabase;
-    /** @test */
-    
+   use RefreshDatabase;
+   /** @test */
+   
+   /** @test */
+   public function test_function()
+   {
+      $this->assertTrue(true);
+   }
+   
 }

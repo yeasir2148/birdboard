@@ -20,7 +20,7 @@
                   </tr>
                </thead>
 
-               <tbody>
+               <tbody  v-if="isAuthenticated">
                   <tr v-for="invoice in invoices" :key="invoice.id">
                      <td class="has-text-centered">
                         <a href="#" class="has-text-black" @click.prevent="showInvoiceDetails(invoice)">{{ invoice.invoice_no }}</a>
@@ -34,6 +34,9 @@
                   </tr>
                </tbody>
             </table>
+            <div v-if="!isAuthenticated">
+               Please login to view your invoices
+            </div>
          </div>
       </div>
 
@@ -55,25 +58,25 @@
 
 
 <script>
-   import { ValidationObserver, ValidationProvider, extend } from "vee-validate";
+   // import { ValidationObserver, ValidationProvider, extend } from "vee-validate";
    import ConfirmDelete from './Utility/ConfirmDeleteComponent.vue';
-   import { required, max, alpha_dash, numeric } from "vee-validate/dist/rules";
-   import { alpha_space_dash } from '../__custom_validation_rules.js';
-   import { EventBus } from '../__vue_event-bus.js';
-   import { setTimeout } from 'timers';
+   // import { required, max, alpha_dash, numeric } from "vee-validate/dist/rules";
+   // import { alpha_space_dash } from '../__custom_validation_rules.js';
+   // import { EventBus } from '../__vue_event-bus.js';
+   // import { setTimeout } from 'timers';
    import { mapState, mapActions, mapMutations } from 'vuex';
    import Fetch from "@js/components/Fetch.vue";
    import store from "@js/store";
    import { commonMethods } from "@js/mixins/commonMethodMixin.js";
 
-   extend("required", required);
-   extend("max", max);
-   extend("alpha_dash", alpha_dash);
-   extend("numeric", numeric);
+   // extend("required", required);
+   // extend("max", max);
+   // extend("alpha_dash", alpha_dash);
+   // extend("numeric", numeric);
 
    export default {
       mixins: [commonMethods],
-      components: { ValidationObserver, ValidationProvider, ConfirmDelete, Fetch },
+      components: { ConfirmDelete, Fetch },  //ValidationObserver, ValidationProvider, 
       data() {
          return {
             serverResponseData: {},
@@ -83,8 +86,12 @@
          };
       },
 
-      mounted: function() {
-         this.fetchInvoices();
+      mounted: async function() {
+         try {
+            await this.fetchInvoices();
+         } catch (error) {
+            console.log(error.message);
+         }
       },
       computed: {
          ...mapState({
@@ -92,7 +99,8 @@
             items: state => state.itemStore.items,
             stores: state => state.shopStore.stores,
             units: state => state.units,
-            selectedInvoiceId: state => state.invoiceSummaryStore.selectedInvoiceId
+            selectedInvoiceId: state => state.invoiceSummaryStore.selectedInvoiceId,
+            isAuthenticated: state => state.auth.isLoggedIn
          }),
          removeModal: function() {
             return '#remove_invoiceSummary_modal';

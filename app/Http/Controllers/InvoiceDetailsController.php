@@ -55,13 +55,14 @@ class InvoiceDetailsController extends Controller
 
       $newInvoiceDetail = InvoiceDetail::create($validatedAttributes);
       $newInvoiceDetail->load('invoice.store');
+      
       if($newInvoiceDetail->wasRecentlyCreated !== true) {
          $response['success'] = false;
          $response['message'] = 'Record already exists';
       } else {
-         $this->updateInvoiceSummaryValue($newInvoiceDetail);
+         InvoiceSummary::find($request->invoice_id)->updateTotal($newInvoiceDetail);
          $result = [
-            'model' => $newInvoiceDetail,
+            'model' => $newInvoiceDetail->refresh(),
             'withDetails' => $newInvoiceDetail->withRelatedInformation()
          ];
          $response['success'] = true;
@@ -132,12 +133,5 @@ class InvoiceDetailsController extends Controller
             'invoice' => $invoiceSummary->refresh()
          ]);
       }
-   }
-
-   protected function updateInvoiceSummaryValue(InvoiceDetail $invoiceDetail, $action = 'added') {
-      $invoiceSummary = $invoiceDetail->invoice;
-
-      $invoiceSummary->value += $invoiceDetail->price;
-      $invoiceSummary->save();
    }
 }

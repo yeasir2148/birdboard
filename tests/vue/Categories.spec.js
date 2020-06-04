@@ -145,26 +145,26 @@ describe('Categories', () => {
       });
    });
 
-   it('makes an api call to server when refresh button is clicked', () => {
-      store.dispatch = jest.fn();
+   // it('makes an api call to server when refresh button is clicked', () => {
+   //    store.dispatch = jest.fn();
 
-      const wrapper = mount(Categories, {
-         sync: false,
-         store,
-         computed: {
-            isAuthenticated: () => { return true }
-         },
-         localVue
-      });
+   //    const wrapper = mount(Categories, {
+   //       sync: false,
+   //       store,
+   //       computed: {
+   //          isAuthenticated: () => { return true }
+   //       },
+   //       localVue
+   //    });
 
-      const refreshButton = wrapper.find('span.fa-sync');
-      refreshButton.trigger('click');
-      expect(store.dispatch).toHaveBeenNthCalledWith(1, 'categoryStore/fetchCategories', undefined);
-      expect(store.dispatch).toHaveBeenNthCalledWith(2, 'categoryStore/fetchCategories', undefined);
-   });
+   //    const refreshButton = wrapper.find('span.fa-sync');
+   //    refreshButton.trigger('click');
+   //    expect(store.dispatch).toHaveBeenNthCalledWith(1, 'categoryStore/fetchCategories', undefined);
+   //    expect(store.dispatch).toHaveBeenNthCalledWith(2, 'categoryStore/fetchCategories', undefined);
+   // });
 
-   // The below test can be writeen as below
-   it('makes an api call when refresh button is clicked', () => {
+   // The above test can be writeen as below
+   it('makes an api call to fetch categories when refresh button is clicked', () => {
       store.dispatch = jest.fn();
       const spy = jest.spyOn(store, 'dispatch');
       const wrapper = mount(Categories, {
@@ -185,111 +185,3 @@ describe('Categories', () => {
       expect(spy.mock.calls[0][0]).toEqual(expect.stringContaining(spy.mock.calls[1][0]));
    })
 });
-
-// import moxios from 'moxios';
-// import expect from 'expect';
-// import Categories from '../../resources/js/components/CategoriesComponent.vue';
-// import VeeValidate from 'vee-validate';
-
-// describe('Categories', () => {
-
-//    let wrapper;
-//    beforeEach(() => {
-//       // console.log('callling before each');
-//       moxios.install(axios);
-//       // wrapper = shallowMount(Categories);
-//    });
-
-//    afterEach(() => {
-//       moxios.uninstall(axios);
-//    });
-
-//    it('renders All Categories', () => {
-//       wrapper = shallowMount(Categories, { sync: false });
-//       const vm = wrapper.vm
-//       expect(wrapper.html()).toContain('Category');
-//       wrapper.destroy();
-//    });
-
-//    it('has a name data property that defaults to null', () => {
-//       wrapper = shallowMount(Categories, { sync: false });
-//       expect(wrapper.vm.form.name).toBe(null);
-//       wrapper.destroy();
-//    });
-
-//    it('has a categoryCode data property that defaults to null', () => {
-//       wrapper = shallowMount(Categories, { sync: false });
-//       expect(wrapper.vm.form.categoryCode).toBe(null);
-//       wrapper.destroy();
-//    });
-
-//    it('it fetches categogies upon being mounted', function (done) {
-
-//       moxios.stubRequest('/categories', {
-//          status: 200,
-//          response: [
-//             {
-//                name: 'Fish',
-//                category_code: 1,
-//                id: 5
-//             }
-//          ],
-//       }, 2000);
-
-//       wrapper = shallowMount(Categories, { sync: false });
-
-
-
-//       moxios.wait(() => {
-//          expect(wrapper.vm.categories.length).toBe(1);
-//          expect(wrapper.html()).toContain('Fish');
-//          done();
-//       });
-//    });
-
-//    it.only('calls a post api on create button click', function (done) {
-//       const wrapper1 = mount(Categories);
-
-//       // moxios.stubRequest('/categories', {
-//       //    status: 200,
-//       //    response: {
-//       //       success: true,
-//       //       data: {
-//       //          name: 'Meat',
-//       //          category_code: 'meat',
-//       //          id: 5
-//       //       }
-//       //    }
-//       // });
-
-//       wrapper1.find('input[name="name"]').setValue('Meat');
-//       wrapper1.find('input[name="category_code"]').setValue('meat');
-//       wrapper1.find('#createCategoryForm').trigger('submit.prevent');
-
-//       expect(wrapper1.vm.form.name).toBe('Meat');
-//       expect(wrapper1.vm.form.categoryCode).toBe('meat');
-
-//       moxios.wait(() => {
-//          // console.log((moxios.requests.mostRecent().config));
-//          const request = moxios.requests.mostRecent();
-//          if (request.config.method === 'post') {
-//             console.log('here');
-//             request.respondWith({
-//                status: 200,
-//                response: {
-//                   success: true,
-//                   data: {
-//                      name: 'Meat',
-//                      category_code: 'meat',
-//                      id: 5
-//                   }
-//                }
-//             });
-//          }
-
-//          expect(moxios.requests.mostRecent().config.method).toEqual('post');
-
-//          done();
-//       });
-//    });
-// });

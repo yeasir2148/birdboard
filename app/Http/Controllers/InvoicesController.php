@@ -18,20 +18,34 @@ class InvoicesController extends Controller
     */
    public function index()
    {
-      $invoices = InvoiceSummary::with('store')->get();
-      $stores = Store::orderBy('store_name')->get();
-      $items = Item::orderBy('item_name')->get();
-      $units = Unit::all();
+      $authorizedUser = auth()->user();
+      $data = [];
 
-      $data = [
-         'invoices' => $invoices,
-         'stores' => $stores,
-         'items' => $items,
-         'units' => $units
-      ];
+      if($authorizedUser) {
+         // DB::enableQueryLog();
+         $invoices = InvoiceSummary::where('user_id', $authorizedUser->id)->with(['store', 'user' ])->get();
+         // dd(DB::getQueryLog());
+         $stores = Store::orderBy('store_name')->get();
+         $items = Item::orderBy('item_name')->get();
+         $units = Unit::all();
 
-      if(request()->ajax() || App()->runningUnitTests()) {
-         return response()->json($data);
+         $data = [
+            'invoices' => $invoices,
+            'stores' => $stores,
+            'items' => $items,
+            'units' => $units
+         ];
+
+
+         if(request()->ajax() || App()->runningUnitTests()) {
+            return response()->json($data);
+         }
+      } else {
+         if(request()->ajax() || App()->runningUnitTests()) {
+            return response()->json([
+               'error' => 'Not logged in'
+            ], 401);
+         }
       }
       return view('invoices.invoices-index', compact('data'));   
    }
@@ -61,7 +75,8 @@ class InvoicesController extends Controller
          'store_id' => 'required | exists:stores,id'
       ]);
 
-      $newInvoiceSummary = InvoiceSummary::create($validatedAttributes)->load('store');
+      $attributes = array_merge($validatedAttributes, ['user_id' => auth()->user()->id]);
+      $newInvoiceSummary = InvoiceSummary::create($attributes)->load('store');
 
       if($newInvoiceSummary->wasRecentlyCreated !== true) {
          $response['success'] = false;

@@ -1,6 +1,6 @@
 import { httpConfig } from "@js/utils/httpClient";
 import Axios from "axios";
-import * as CustomExceptions from "@js/Exceptions";
+import { UnauthenticatedException } from "@js/Exceptions";
 
 export const namespaced = true;
 
@@ -33,10 +33,8 @@ export const mutations = {
 
 export const actions = {
    fetchInvoices: function(context) {
-      Axios(httpConfig.invoiceSummary.getAll)
+      return Axios(httpConfig.invoiceSummary.getAll)
       .then(({ data }) => {
-         console.log(data);
-
          if(data !== null && data !== 'undefined') {
             context.commit('POPULATE_INVOICES', data.invoices);
             context.commit('itemStore/POPULATE_ITEMS', data.items, {root: true});
@@ -44,6 +42,8 @@ export const actions = {
             context.commit('POPULATE_UNITS', data.units, {root: true});
 
          }
+      }).catch(error => {
+         throw new UnauthenticatedException(error);
       });
    },
    createInvoiceSummary: function(context, postData) {
@@ -59,6 +59,7 @@ export const actions = {
          });
    },
    deleteInvoiceSummary: function(context, invoiceSummaryId) {
+      console.log('called real');
       const { invoiceSummary: {delete: {url}} } = httpConfig;
       const deleteUrl = url.replace('{invoice_id}', invoiceSummaryId);
       return Axios.delete(deleteUrl)

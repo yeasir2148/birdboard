@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Category;
 use Illuminate\Http\Request;
+use App\Jobs\SendNewUserRegEmail;
 
 class CategoriesController extends Controller
 {
@@ -71,6 +72,7 @@ class CategoriesController extends Controller
          $response['data'] = $newCategory;
       }
 
+      SendNewUserRegEmail::dispatch(['email' => 'recipient@example.com'])->onQueue('emails');
       return json_encode($response);
    }
 
